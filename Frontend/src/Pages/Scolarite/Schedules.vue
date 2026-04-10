@@ -1,0 +1,290 @@
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { router, Head, useForm } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
+import { 
+    CalendarIcon, 
+    PlusIcon, 
+    MapPinIcon, 
+    UserIcon,
+    TrashIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    PencilSquareIcon
+} from '@heroicons/vue/24/outline'
+import { formatTime } from '@/utils/format'
+
+const props = defineProps({
+    schedules: Array,
+    rooms: Array,
+    groups: Array,
+    formateurs: Array
+})
+
+const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
+const hours = Array.from({ length: 13 }, (_, i) => i + 8) // 8h to 20h
+const hourOptions = Array.from({ length: 13 }, (_, i) => (i + 8).toString().padStart(2, '0'))
+const minuteOptions = ['00', '15', '30', '45']
+
+const editingSchedule = ref(null)
+const showAddModal = ref(false)
+
+const form = useForm({
+    group_id: '',
+    room_id: '',
+    formateur_id: '',
+    day_of_week: 1,
+    start_time: '08:00',
+    end_time: '10:00',
+})
+
+const startTimeHour = ref('08')
+const startTimeMinute = ref('00')
+const endTimeHour = ref('10')
+const endTimeMinute = ref('00')
+
+const openAddModal = () => {
+    editingSchedule.value = null
+    form.reset()
+    startTimeHour.value = '08'
+    startTimeMinute.value = '00'
+    endTimeHour.value = '10'
+    endTimeMinute.value = '00'
+    showAddModal.value = true
+}
+
+const openEditModal = (schedule) => {
+    editingSchedule.value = schedule
+    form.group_id = schedule.group_id
+    form.room_id = schedule.room_id
+    form.formateur_id = schedule.formateur_id
+    form.day_of_week = schedule.day_of_week
+    
+    const [sH, sM] = schedule.start_time.split(':')
+    const [eH, eM] = schedule.end_time.split(':')
+    
+    startTimeHour.value = sH.padStart(2, '0')
+    startTimeMinute.value = sM.substring(0, 2)
+    endTimeHour.value = eH.padStart(2, '0')
+    endTimeMinute.value = eM.substring(0, 2)
+    
+    form.start_time = `${startTimeHour.value}:${startTimeMinute.value}`
+    form.end_time = `${endTimeHour.value}:${endTimeMinute.value}`
+    
+    showAddModal.value = true
+}
+
+const submit = () => {
+    form.start_time = `${startTimeHour.value}:${startTimeMinute.value}`
+    form.end_time = `${endTimeHour.value}:${endTimeMinute.value}`
+    
+    if (editingSchedule.value) {
+        form.put(route('schedules.update', editingSchedule.value.id), {
+            onSuccess: () => {
+                showAddModal.value = false
+                form.reset()
+                editingSchedule.value = null
+            }
+        })
+    } else {
+        form.post(route('schedules.store'), {
+            onSuccess: () => {
+                showAddModal.value = false
+                form.reset()
+            }
+        })
+    }
+}
+
+const onGroupChange = () => {
+    const selectedGroup = props.groups.find(g => g.id === form.group_id)
+    if (selectedGroup && selectedGroup.formateur_id) {
+        form.formateur_id = selectedGroup.formateur_id
+    }
+}
+
+const deleteSchedule = (id) => {
+    if (confirm('Supprimer ce créneau ?')) {
+        router.delete(route('schedules.destroy', id))
+    }
+}
+
+// Helper to position schedule in grid
+const getGridPosition = (day, start) => {
+    const dayIndex = days.indexOf(day) + 1
+    const hour = parseInt(start.split(':')[0])
+    const row = hour - 8 + 1
+    return { dayIndex, row }
+}
+
+const getScheduleBySlot = (day, hour) => {
+    return props.schedules.find(s => {
+        const h = parseInt(s.start_time.split(':')[0])
+        const scheduleDayName = days[s.day_of_week - 1]
+        return scheduleDayName === day && h === hour
+    })
+}
+</script>
+
+<template>
+    <Head title="Plannings & Emplois du Temps" />
+
+    <AuthenticatedLayout>
+        <div class="max-w-7xl mx-auto py-8 px-4 font-sans">
+            <header class="mb-8 flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-black text-gray-900 tracking-tight">Emploi du Temps</h1>
+                    <p class="text-gray-500">Organisation hebdomadaire des salles et formateurs.</p>
+                </div>
+                <button 
+                    v-if="$page.props.auth.user.roles.some(r => ['Directeur', 'Secrétaire'].includes(r))"
+                    @click="openAddModal"
+                    class="px-5 py-3 bg-blue-600 text-white rounded-2xl font-black flex items-center gap-2 hover:bg-blue-700 transition shadow-lg shadow-blue-100"
+                >
+                    <PlusIcon class="h-5 w-5" />
+                    Ajouter un Créneau
+                </button>
+            </header>
+
+            <!-- Calendar Grid -->
+            <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+                <div class="grid grid-cols-7 border-b border-gray-50">
+                    <div class="p-4 bg-gray-50/50"></div>
+                    <div v-for="day in days" :key="day" class="p-4 bg-gray-50/50 text-center text-xs font-black text-gray-400 uppercase tracking-widest">
+                        {{ day }}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-7 relative">
+                    <!-- Left Hour markers -->
+                    <div class="flex flex-col">
+                        <div v-for="hour in hours" :key="hour" class="h-24 p-4 text-[10px] font-bold text-gray-300 border-r border-gray-50 font-mono">
+                            {{ formatTime(hour) }}
+                        </div>
+                    </div>
+
+                    <!-- Column per day -->
+                    <div v-for="day in days" :key="day" class="relative group">
+                        <div v-for="hour in hours" :key="hour" class="h-24 border-r border-b border-gray-50 group-last:border-r-0">
+                            <!-- Cell Content -->
+                            <div 
+                                v-if="getScheduleBySlot(day, hour)"
+                                class="absolute inset-x-1 m-1 p-3 rounded-2xl border shadow-sm transition overflow-hidden"
+                                :class="'bg-indigo-50 border-indigo-100 text-indigo-700'"
+                            >
+                                <div class="flex flex-col h-full">
+                                    <p class="text-[9px] font-black uppercase leading-none mb-1 opacity-60 font-mono">
+                                        {{ formatTime(getScheduleBySlot(day, hour).start_time) }} - {{ formatTime(getScheduleBySlot(day, hour).end_time) }}
+                                    </p>
+                                    <p class="text-[10px] font-black uppercase leading-none mb-1 opacity-60">
+                                        {{ getScheduleBySlot(day, hour).room.nom }}
+                                    </p>
+                                    <p class="text-xs font-black leading-tight flex-1">
+                                        {{ getScheduleBySlot(day, hour).group.nom_groupe }}
+                                    </p>
+                                    <div class="flex items-center gap-1 mt-auto">
+                                        <div class="flex-1 flex items-center gap-1 overflow-hidden">
+                                            <UserIcon class="h-3 w-3 flex-shrink-0" />
+                                            <span class="text-[9px] font-bold truncate">{{ getScheduleBySlot(day, hour).formateur.name }}</span>
+                                        </div>
+                                        <div v-if="$page.props.auth.user.roles.some(r => ['Directeur', 'Secrétaire'].includes(r))" class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button @click="openEditModal(getScheduleBySlot(day, hour))" class="text-indigo-400 hover:text-indigo-900 transition">
+                                                <PencilSquareIcon class="h-3 w-3" />
+                                            </button>
+                                            <button @click="deleteSchedule(getScheduleBySlot(day, hour).id)" class="text-red-400 hover:text-red-600 transition">
+                                                <TrashIcon class="h-3 w-3" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Schedule Modal -->
+            <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
+                <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl">
+                    <h2 class="text-2xl font-black text-gray-900 mb-6 tracking-tight">
+                        {{ editingSchedule ? 'Modifier le Créneau' : 'Nouveau Créneau' }}
+                    </h2>
+                    
+                    <div v-if="form.hasErrors" class="mb-6 p-4 bg-red-50 rounded-2xl border border-red-100 flex items-center gap-3 animate-head-shake">
+                        <div class="h-8 w-8 bg-red-600/10 rounded-full flex items-center justify-center text-red-600">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        </div>
+                        <p class="text-[10px] font-black text-red-600 uppercase tracking-widest leading-tight">Attention : Veuillez corriger les erreurs ci-dessous pour continuer.</p>
+                    </div>
+
+                    <form @submit.prevent="submit" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Groupe</label>
+                                <select v-model="form.group_id" @change="onGroupChange" class="w-full bg-gray-50 border-0 rounded-xl font-bold py-3 px-4 focus:ring-2 focus:ring-blue-600">
+                                    <option value="">Choisir un groupe</option>
+                                    <option v-for="g in groups" :key="g.id" :value="g.id">
+                                        {{ g.nom_groupe }} ({{ g.formateur?.name || 'N/A' }})
+                                    </option>
+                                </select>
+                                <p v-if="form.errors.group_id" class="text-red-500 text-[10px] mt-1 font-bold">{{ form.errors.group_id }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Salle</label>
+                                <select v-model="form.room_id" class="w-full bg-gray-50 border-0 rounded-xl font-bold py-3 px-4 focus:ring-2 focus:ring-blue-600">
+                                    <option value="">Choisir une salle</option>
+                                    <option v-for="r in rooms" :key="r.id" :value="r.id">{{ r.nom }}</option>
+                                </select>
+                                <p v-if="form.errors.room_id" class="text-red-500 text-[10px] mt-1 font-bold">{{ form.errors.room_id }}</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Jour</label>
+                            <select v-model="form.day_of_week" class="w-full bg-gray-50 border-0 rounded-xl font-bold py-3 px-4 focus:ring-2 focus:ring-blue-600">
+                                <option v-for="(d, index) in days" :key="d" :value="index + 1">{{ d }}</option>
+                            </select>
+                            <p v-if="form.errors.day_of_week" class="text-red-500 text-[10px] mt-1 font-bold">{{ form.errors.day_of_week }}</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Début (24h)</label>
+                                <div class="flex items-center gap-2">
+                                    <select v-model="startTimeHour" class="flex-1 bg-gray-50 border-0 rounded-xl font-bold py-3 px-2 focus:ring-2 focus:ring-blue-600 appearance-none text-center">
+                                        <option v-for="h in hourOptions" :key="h" :value="h">{{ h }}</option>
+                                    </select>
+                                    <span class="font-black text-gray-300">:</span>
+                                    <select v-model="startTimeMinute" class="flex-1 bg-gray-50 border-0 rounded-xl font-bold py-3 px-2 focus:ring-2 focus:ring-blue-600 appearance-none text-center">
+                                        <option v-for="m in minuteOptions" :key="m" :value="m">{{ m }}</option>
+                                    </select>
+                                </div>
+                                <p v-if="form.errors.start_time" class="text-red-500 text-[10px] mt-1 font-bold">{{ form.errors.start_time }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Fin (24h)</label>
+                                <div class="flex items-center gap-2">
+                                    <select v-model="endTimeHour" class="flex-1 bg-gray-50 border-0 rounded-xl font-bold py-3 px-2 focus:ring-2 focus:ring-blue-600 appearance-none text-center">
+                                        <option v-for="h in hourOptions" :key="h" :value="h">{{ h }}</option>
+                                    </select>
+                                    <span class="font-black text-gray-300">:</span>
+                                    <select v-model="endTimeMinute" class="flex-1 bg-gray-50 border-0 rounded-xl font-bold py-3 px-2 focus:ring-2 focus:ring-blue-600 appearance-none text-center">
+                                        <option v-for="m in minuteOptions" :key="m" :value="m">{{ m }}</option>
+                                    </select>
+                                </div>
+                                <p v-if="form.errors.end_time" class="text-red-500 text-[10px] mt-1 font-bold">{{ form.errors.end_time }}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 mt-8">
+                            <button @click="showAddModal = false" type="button" class="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-black">Annuler</button>
+                            <button :disabled="form.processing" type="submit" class="flex-[2] py-4 bg-blue-600 text-white rounded-2xl font-black shadow-lg shadow-blue-100">
+                                {{ form.processing ? 'Enregistrement...' : 'Enregistrer' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </AuthenticatedLayout>
+</template>

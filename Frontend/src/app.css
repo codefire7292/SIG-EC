@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@100..800&family=Inter:wght@100..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand-primary: #06b6d4;
+    --brand-secondary: #6366f1;
+    --bg-deep: #020617;
+  }
+  
+  body {
+    @apply bg-[#020617] text-slate-200 antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Sora', sans-serif;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+  
+  .glass-dark {
+    @apply bg-slate-900/40 backdrop-blur-xl border border-slate-800/50;
+  }
+  
+  .text-glow-cyan {
+    text-shadow: 0 0 15px rgba(6, 182, 212, 0.5), 0 0 30px rgba(6, 182, 212, 0.2);
+  }
+}
+
+@layer utilities {
+  .animate-slow-pan {
+    animation: slow-pan 60s ease-in-out infinite alternate;
+  }
+  
+  @keyframes slow-pan {
+    from { transform: scale(1) translate(0, 0); }
+    to { transform: scale(1.1) translate(-2%, -2%); }
+  }
+}
