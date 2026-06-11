@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -23,7 +24,18 @@ class RolesAndPermissionsSeeder extends Seeder
         // Permissions
         // ---------------------------------------------------------------
         $permissions = [
-            'validate-chapters',
+            'manage-users',
+            'manage-centers',
+            'view-logs',
+            'full-access',
+            'validate-final',
+            'sign-legally',
+            'view-registries',
+            'validate-intermediate',
+            'manage-corrections',
+            'create-drafts',
+            'upload-docs',
+            'print-extracts',
         ];
 
         foreach ($permissions as $permission) {
@@ -31,15 +43,43 @@ class RolesAndPermissionsSeeder extends Seeder
         }
 
         // ---------------------------------------------------------------
-        // Roles
+        // Roles Mapping
         // ---------------------------------------------------------------
         $roles = [
-            'Directeur'          => ['validate-chapters'],
-            'Secrétaire'         => [],
-            'Formateur'          => ['validate-chapters'],
-            'Responsable Groupe' => [],
-            'Apprenant'          => [],
-            'Stagiaire'          => [],
+            UserRole::ADMIN->value => [
+                'manage-users',
+                'manage-centers',
+                'view-logs',
+                'view-registries',
+                'create-drafts',
+                'full-access', // Added for testing
+            ],
+            UserRole::MAIRE->value => [
+                'create-drafts',
+                'full-access',
+                'sign-legally',
+                'view-registries',
+                'print-extracts',
+            ],
+            UserRole::OFFICIER->value => [
+                'create-drafts',
+                'full-access',
+                'validate-final',
+                'view-registries',
+                'print-extracts',
+            ],
+            UserRole::SUPERVISEUR->value => [
+                'view-registries',
+                'validate-intermediate',
+                'manage-corrections',
+                'print-extracts',
+            ],
+            UserRole::AGENT->value => [
+                'create-drafts',
+                'upload-docs',
+                'print-extracts',
+                'view-registries',
+            ],
         ];
 
         foreach ($roles as $roleName => $rolePermissions) {
@@ -47,17 +87,10 @@ class RolesAndPermissionsSeeder extends Seeder
             $role = Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
 
             if (!empty($rolePermissions)) {
-                $role->givePermissionTo($rolePermissions);
+                $role->syncPermissions($rolePermissions);
             }
         }
 
-        $this->command->info('✅ Rôles et permissions créés avec succès.');
-        $this->command->table(
-            ['Rôle', 'Permissions'],
-            collect($roles)->map(fn ($perms, $name) => [
-                $name,
-                empty($perms) ? '—' : implode(', ', $perms),
-            ])->values()->toArray()
-        );
+        $this->command->info('✅ Rôles et permissions SIG-EC créés avec succès.');
     }
 }

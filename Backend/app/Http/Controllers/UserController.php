@@ -1,111 +1,105 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Inertia\Inertia;
-use Inertia\Response;
+use App\Enums\UserRole;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of all users.
-     */
-    public function index(): Response
+    public function index()
     {
-        return Inertia::render('Users/Index', [
-            'users' => User::with('roles')->orderBy('name')->get()->map(fn($user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'telephone' => $user->telephone,
-                'adresse' => $user->adresse,
-                'roles' => $user->getRoleNames(),
-                'profile_photo_url' => $user->profile_photo_url,
-                'is_active' => $user->is_active ?? true,
-                'created_at' => $user->created_at->format('d/m/Y'),
-            ]),
-            'available_roles' => Role::pluck('name')->toArray(),
+        $users = User::with('roles')->paginate(15);
+
+        // Pre-compute URLs server-side to avoid Ziggy stale manifest issues
+        $users->getCollection()->transform(function ($user) {
+            $user->edit_url = route('admin.users.edit', $user->id);
+            $user->delete_url = route('admin.users.destroy', $user->id);
+            return $user;
+        });
+
+        return Inertia::render('Admin/Users/Index', [
+            'users' => $users,
+            'create_url' => route('admin.users.create'),
         ]);
     }
 
-    /**
-     * Store a newly created user.
-     */
+    public function create()
+    {
+        return Inertia::render('Admin/Users/Form', [
+            'roles' => Role::all()->pluck('name'),
+            'is_edit' => false,
+            'back_url' => route('admin.users.index'),
+            'store_url' => route('admin.users.store'),
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'role'     => 'required|string|exists:roles,name',
-            'telephone'=> 'nullable|string|max:20',
-            'adresse'  => 'nullable|string|max:255',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => ['required', 'confirmed', Password::defaults()],
+            'role' => 'required|string|exists:roles,name',
         ]);
 
         $user = User::create([
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
-            'telephone'=> $validated['telephone'] ?? null,
-            'adresse'  => $validated['adresse'] ?? null,
+            'name' => $validated['name'],
+            'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);
 
         $user->assignRole($validated['role']);
 
-        return back()->with('success', 'Utilisateur créé avec succès.');
+        return redirect()->route('admin.users.index')->with('success', 'Utilisateur créé avec succès.');
     }
 
-    /**
-     * Update the specified user.
-     */
+    public function edit(User $user)
+    {
+        return Inertia::render('Admin/Users/Form', [
+            'user' => $user->load('roles'),
+            'roles' => Role::all()->pluck('name'),
+            'is_edit' => true,
+            'back_url' => route('admin.users.index'),
+            'update_url' => route('admin.users.update', $user->id),
+        ]);
+    }
+
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'password' => 'nullable|string|min:8',
-            'role'     => 'required|string|exists:roles,name',
-            'is_active'=> 'required|boolean',
-            'telephone'=> 'nullable|string|max:20',
-            'adresse'  => 'nullable|string|max:255',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+            'password' => ['nullable', 'confirmed', Password::defaults()],
+            'role' => 'required|string|exists:roles,name',
         ]);
 
         $user->update([
-            'name'  => $validated['name'],
+            'name' => $validated['name'],
             'email' => $validated['email'],
-            'telephone' => $validated['telephone'] ?? null,
-            'adresse' => $validated['adresse'] ?? null,
-            'is_active' => $validated['is_active'],
         ]);
 
         if (!empty($validated['password'])) {
             $user->update(['password' => Hash::make($validated['password'])]);
         }
 
-        $user->syncRoles([$validated['role']]);
+        $user->syncRoles($validated['role']);
 
-        return back()->with('success', 'Utilisateur mis à jour avec succès.');
+        return redirect()->route('admin.users.index')->with('success', 'Utilisateur mis à jour avec succès.');
     }
 
-    /**
-     * Remove the specified user.
-     */
     public function destroy(User $user)
     {
-        // Don't allow self-deletion
         if ($user->id === auth()->id()) {
             return back()->with('error', 'Vous ne pouvez pas supprimer votre propre compte.');
         }
 
         $user->delete();
-
-        return back()->with('success', 'Utilisateur supprimé.');
+        return redirect()->route('admin.users.index')->with('success', 'Utilisateur supprimé avec succès.');
     }
 }

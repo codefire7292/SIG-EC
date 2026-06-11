@@ -4,10 +4,10 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'E-CRE Kolda') }}</title>
+        <title inertia>{{ config('app.name', 'SIG-EC') }}</title>
         
         <!-- Favicon -->
-        <link rel="icon" type="image/png" href="{{ asset('images/logo-cre.png') }}">
+        <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
 
         <!-- Fonts (Inter as requested) -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -41,14 +41,13 @@ class HandleInertiaRequests extends Middleware
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
-                    'profile_photo_url' => $request->user()->profile_photo_url,
-                    'roles' => $request->user()->getRoleNames(),
-                    'unread_notifications' => $request->user()->unreadNotifications()->latest()->limit(10)->get(),
-                    'unread_notifications_count' => $request->user()->unreadNotifications()->count(),
+                    'role' => $request->user()->getRoleNames()->first(),
+                    'permissions' => $request->user()->getAllPermissions()->pluck('name'),
                 ] : null,
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
+                'warning' => fn () => $request->session()->get('warning'),
                 'error' => fn () => $request->session()->get('error'),
             ],
         ]);

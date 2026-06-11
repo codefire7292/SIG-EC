@@ -27,8 +27,8 @@ class AdminUserSeeder extends Seeder
         );
 
         // Ensure the role exists first
-        if (Role::where('name', 'Directeur')->exists()) {
-            $admin->assignRole('Directeur');
+        if (Role::where('name', \App\Enums\UserRole::ADMIN->value)->exists()) {
+            $admin->syncRoles([\App\Enums\UserRole::ADMIN->value]);
         }
     }
 }

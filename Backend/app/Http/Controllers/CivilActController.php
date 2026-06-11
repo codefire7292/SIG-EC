@@ -1,0 +1,285 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\BirthAct;
+use App\Models\MarriageAct;
+use App\Models\DeathAct;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Gate;
+
+class CivilActController extends Controller
+{
+    protected function getModel(string $type)
+    {
+        return match ($type) {
+            'naissance' => new BirthAct(),
+            'mariage' => new MarriageAct(),
+            'deces' => new DeathAct(),
+            default => throw new \InvalidArgumentException("Type d'acte invalide"),
+        };
+    }
+
+    public function index(Request $request)
+    {
+        $type = $request->route('type') ?? $request->route()->getAction('type');
+        $model = $this->getModel($type);
+        
+        $acts = $model->where('is_current', true)
+            ->with(['registry'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return Inertia::render('CivilActs/Index', [
+            'acts' => $acts,
+            'type' => $type
+        ]);
+    }
+
+    public function show(Request $request, $id)
+    {
+        $type = $request->route('type') ?? $request->route()->getAction('type');
+        $model = $this->getModel($type);
+        $act = $model->with(['registry', 'validator'])->findOrFail($id);
+
+        return Inertia::render('CivilActs/Show', [
+            'act' => $act,
+            'type' => $type,
+            'versions' => $act->versions()
+        ]);
+    }
+
+    public function create(Request $request)
+    {
+        $type = $request->route('type');
+        return Inertia::render('CivilActs/Form', [
+            'type' => $type,
+            'is_edit' => false
+        ]);
+    }
+
+    public function edit(Request $request, $id)
+    {
+        $type = $request->route('type');
+        $model = $this->getModel($type);
+        $act = $model->findOrFail($id);
+
+        return Inertia::render('CivilActs/Form', [
+            'act' => $act,
+            'type' => $type,
+            'is_edit' => true
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $type = $request->route('type');
+        $rules = $this->getValidationRules($type);
+        $validated = $request->validate($rules);
+
+        $centerId = 1;
+        
+        $year = now()->year;
+        if ($type === 'naissance' && !empty($validated['date_of_birth'])) {
+            $year = date('Y', strtotime($validated['date_of_birth']));
+        } elseif ($type === 'mariage' && !empty($validated['marriage_date'])) {
+            $year = date('Y', strtotime($validated['marriage_date']));
+        } elseif ($type === 'deces' && !empty($validated['date_of_death'])) {
+            $year = date('Y', strtotime($validated['date_of_death']));
+        }
+
+        $registry = \App\Models\Registry::firstOrCreate(
+            [
+                'civil_registration_center_id' => $centerId,
+                'type' => $type,
+                'year' => $year,
+            ],
+            [
+                'status' => 'open',
+                'opening_date' => now(),
+                'reference_prefix' => strtoupper(substr($type, 0, 1)) . '-' . $year . '-C1',
+            ]
+        );
+
+        if ($registry->status !== 'open') {
+            return back()->withErrors(['registry_id' => 'Le registre pour cette année est fermé.']);
+        }
+
+        $model = $this->getModel($type);
+        $lastAct = $model->where('registry_id', $registry->id)->latest('id')->first();
+        
+        $increment = 1;
+        if ($lastAct && preg_match('/-(\d+)$/', $lastAct->reference_number, $matches)) {
+            $increment = intval($matches[1]) + 1;
+        }
+        
+        $referenceNumber = $registry->reference_prefix . '-' . str_pad($increment, 4, '0', STR_PAD_LEFT);
+
+        // TECHNICAL RULE: Filter out dot-notation keys
+        $data = array_filter($validated, fn($key) => !str_contains($key, '.'), ARRAY_FILTER_USE_KEY);
+        
+        $data['registry_id'] = $registry->id;
+        $data['reference_number'] = $referenceNumber;
+
+        $act = $model->create($data);
+
+        return redirect()->route("acts.{$type}.show", $act->id)
+            ->with('success', 'Acte enregistré avec succès.');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $type = $request->route('type');
+        $model = $this->getModel($type);
+        $act = $model->with('registry')->findOrFail($id);
+
+        $rules = $this->getValidationRules($type, $id);
+        $validated = $request->validate($rules);
+
+        // TECHNICAL RULE: Filter out dot-notation keys
+        $data = array_filter($validated, fn($key) => !str_contains($key, '.'), ARRAY_FILTER_USE_KEY);
+
+        // Calculate year based on validated dates
+        $year = $act->registry ? $act->registry->year : now()->year;
+        if ($type === 'naissance' && !empty($validated['date_of_birth'])) {
+            $year = date('Y', strtotime($validated['date_of_birth']));
+        } elseif ($type === 'mariage' && !empty($validated['marriage_date'])) {
+            $year = date('Y', strtotime($validated['marriage_date']));
+        } elseif ($type === 'deces' && !empty($validated['date_of_death'])) {
+            $year = date('Y', strtotime($validated['date_of_death']));
+        }
+
+        // If the year of the event has been modified, we must reassign to the correct registry
+        if ($act->registry && $act->registry->year != $year) {
+            $centerId = $act->registry->civil_registration_center_id ?? 1;
+
+            $newRegistry = \App\Models\Registry::firstOrCreate(
+                [
+                    'civil_registration_center_id' => $centerId,
+                    'type' => $type,
+                    'year' => $year,
+                ],
+                [
+                    'status' => 'open',
+                    'opening_date' => now(),
+                    'reference_prefix' => strtoupper(substr($type, 0, 1)) . '-' . $year . '-C1',
+                ]
+            );
+
+            // Generate new reference number for the new registry
+            $lastAct = $model->where('registry_id', $newRegistry->id)->latest('id')->first();
+            $increment = 1;
+            if ($lastAct && preg_match('/-(\d+)$/', $lastAct->reference_number, $matches)) {
+                $increment = intval($matches[1]) + 1;
+            }
+            
+            $referenceNumber = $newRegistry->reference_prefix . '-' . str_pad($increment, 4, '0', STR_PAD_LEFT);
+
+            $data['registry_id'] = $newRegistry->id;
+            $data['reference_number'] = $referenceNumber;
+        }
+
+        $act->update($data);
+
+        return redirect()->route("acts.{$type}.show", $act->id)
+            ->with('success', 'Acte mis à jour avec succès.');
+    }
+
+    protected function getValidationRules(string $type, $id = null): array
+    {
+        $common = [
+            'officer_comments' => 'nullable|string',
+        ];
+
+        if ($type === 'naissance') {
+            return array_merge($common, [
+                'first_name' => 'required|string',
+                'last_name' => 'required|string',
+                'date_of_birth' => 'required|date',
+                'place_of_birth' => 'required|string',
+                'gender' => 'required|in:M,F',
+                'father_name' => 'nullable|string',
+                'mother_name' => 'nullable|string',
+                'parents_metadata' => 'nullable|array',
+                'parents_metadata.father_profession' => 'nullable|string',
+                'parents_metadata.mother_profession' => 'nullable|string',
+                'parents_metadata.residence' => 'nullable|string',
+            ]);
+        }
+
+        if ($type === 'mariage') {
+            return array_merge($common, [
+                'husband_first_name' => 'required|string',
+                'husband_last_name' => 'required|string',
+                'wife_first_name' => 'required|string',
+                'wife_last_name' => 'required|string',
+                'marriage_date' => 'required|date',
+                'marriage_place' => 'required|string',
+                'witnesses_metadata' => 'nullable|array',
+                'witnesses_metadata.witness1_name' => 'nullable|string',
+                'witnesses_metadata.witness2_name' => 'nullable|string',
+            ]);
+        }
+
+        if ($type === 'deces') {
+            return array_merge($common, [
+                'deceased_first_name' => 'required|string',
+                'deceased_last_name' => 'required|string',
+                'date_of_death' => 'required|date',
+                'place_of_death' => 'required|string',
+                'cause_of_death' => 'nullable|string',
+            ]);
+        }
+
+        return [];
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $type = $request->route('type');
+        $model = $this->getModel($type);
+        $act = $model->findOrFail($id);
+        
+        $validated = $request->validate([
+            'status' => 'required|in:valide,rejete,a_corriger,signe'
+        ]);
+
+        $newStatus = $validated['status'];
+        $user = $request->user();
+
+        // Let Administrator bypass role restrictions for system maintenance and Q&A.
+        $isAdmin = $user->hasRole(\App\Enums\UserRole::ADMIN->value);
+
+        // Technical Rule: Valideur is Officier. Signer is Maire.
+        if (in_array($newStatus, ['valide', 'rejete', 'a_corriger']) && !$isAdmin && !$user->hasRole(\App\Enums\UserRole::OFFICIER->value)) {
+            abort(403, 'Seul un Officier d\'état-civil peut valider ou rejeter un acte.');
+        }
+
+        if ($newStatus === 'signe' && !$isAdmin && !$user->hasRole(\App\Enums\UserRole::MAIRE->value)) {
+            abort(403, 'Seul le Maire peut signer définitivement un acte.');
+        }
+
+        if ($act->status === 'signe') {
+            return back()->with('error', 'Cet acte est déjà signé et ne peut plus modifier son statut.');
+        }
+
+        $updateData = ['status' => $newStatus];
+
+        if ($newStatus === 'valide' || $newStatus === 'signe') {
+            $updateData['validated_by'] = $user->id;
+            $updateData['validated_at'] = now();
+        }
+
+        if ($newStatus === 'signe') {
+            $updateData['locked_at'] = now();
+            $updateData['is_locked'] = true;
+        }
+
+        // Use direct DB update or unrestricted query to bypass Fillable protection securely
+        $model::where('id', $act->id)->update($updateData);
+
+        return back()->with('success', 'Statut de l\'acte mis à jour avec succès : ' . strtoupper($newStatus));
+    }
+}

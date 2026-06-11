@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/home/codefire/SIG-EC/Backend/phpunit.xml" tests="2" assertions="1" errors="1" failures="0" skipped="0" time="0.897907">
+    <testsuite name="Feature" tests="2" assertions="1" errors="1" failures="0" skipped="0" time="0.897907">
+      <testsuite name="Tests\Feature\ExcelImportTest" file="/home/codefire/SIG-EC/Backend/tests/Feature/ExcelImportTest.php" tests="2" assertions="1" errors="1" failures="0" skipped="0" time="0.897907">
+        <testcase name="test_can_upload_birth_registry_excel" file="/home/codefire/SIG-EC/Backend/tests/Feature/ExcelImportTest.php" line="25" class="Tests\Feature\ExcelImportTest" classname="Tests.Feature.ExcelImportTest" assertions="1" time="0.833622"/>
+        <testcase name="test_birth_acts_import_logic" file="/home/codefire/SIG-EC/Backend/tests/Feature/ExcelImportTest.php" line="38" class="Tests\Feature\ExcelImportTest" classname="Tests.Feature.ExcelImportTest" assertions="0" time="0.064286">
+          <error type="Illuminate\Database\QueryException">Tests\Feature\ExcelImportTest::test_birth_acts_import_logic
+Illuminate\Database\QueryException: SQLSTATE[23514]: Check violation: 7 ERROR:  new row for relation "registries" violates check constraint "registries_status_check"
+DETAIL:  Failing row contains (1, 1, naissance, 2026, REG, 0, ouvert, null, null, 2026-05-12 14:50:52, 2026-05-12 14:50:52). (Connection: pgsql, SQL: insert into "registries" ("civil_registration_center_id", "type", "year", "reference_prefix", "last_number", "status", "updated_at", "created_at") values (1, naissance, 2026, REG, 0, ouvert, 2026-05-12 14:50:52, 2026-05-12 14:50:52) returning "id")
+
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php:825
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php:779
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php:398
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Database/Connection.php:385
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Database/Query/Processors/PostgresProcessor.php:24
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3766
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:2120
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1359
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1324
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:1163
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1128
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Support/helpers.php:399
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:1127
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:23
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2372
+/home/codefire/SIG-EC/Backend/vendor/laravel/framework/src/Illuminate/Database/Eloquent/Model.php:2384
+/home/codefire/SIG-EC/Backend/tests/Feature/ExcelImportTest.php:62</error>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

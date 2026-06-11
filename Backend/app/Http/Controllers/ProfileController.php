@@ -44,7 +44,15 @@ class ProfileController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'password' => ['nullable', 'confirmed', Password::defaults()],
-            'profile_photo' => ['nullable', 'image', 'max:2048'],
+            'profile_photo' => [
+                $request->filled('password') ? 'required' : 'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048'
+            ],
+        ], [
+            'profile_photo.required' => 'Une photo de profil est obligatoire pour changer votre mot de passe.',
+            'profile_photo.mimes' => 'La photo de profil doit être au format JPG, PNG ou WebP.',
         ]);
 
         $user->fill([

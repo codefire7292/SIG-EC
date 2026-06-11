@@ -29,6 +29,11 @@ class Downloader
         $filepath = "{$folder}/{$filename}";
         $this->filepath = (string) realpath($filepath);
         $this->filename = basename($filepath);
+
+        if (empty($this->filepath) || file_exists($this->filepath) === false) {
+            throw new Exception('File path could not be resolved or does not exist.');
+        }
+
         if ((file_exists($this->filepath) === false) || (is_readable($this->filepath) === false)) {
             throw new Exception('File not found, or cannot be read');
         }

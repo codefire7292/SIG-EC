@@ -39,8 +39,8 @@ const submit = () => {
                 
                 <div class="p-10 md:p-12 focus:outline-none">
                     <div class="mb-10 text-center font-sans">
-                        <h1 class="text-3xl font-black text-gray-900 tracking-tighter mb-2">Bon retour !</h1>
-                        <p class="text-gray-500 font-medium">Espace sécurisé du CRE de Kolda</p>
+                        <h1 class="text-3xl font-black text-gray-900 tracking-tighter mb-2">Accès Console</h1>
+                        <p class="text-gray-500 font-medium tracking-tight">Système de Gestion de l'État Civil</p>
                     </div>
 
                     <form @submit.prevent="submit" class="space-y-6">
@@ -56,7 +56,7 @@ const submit = () => {
                                     v-model="form.login"
                                     type="text"
                                     required
-                                    placeholder="nom@exemple.sn ou 77..."
+                                    placeholder="nom@sig-ec.sn"
                                     class="block w-full pl-12 pr-4 py-4 bg-gray-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition"
                                     :class="{'ring-2 ring-red-500 bg-red-50': form.errors.login}"
                                 />
@@ -71,7 +71,6 @@ const submit = () => {
                         <div>
                             <div class="flex items-center justify-between mb-2 px-1">
                                 <label class="block text-xs font-black uppercase tracking-widest text-gray-400">Mot de passe</label>
-                                <Link :href="route('password.request')" class="text-xs font-bold text-blue-600 hover:text-indigo-600 transition">Oublié ?</Link>
                             </div>
                             <div class="relative group">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-600 transition-colors">
@@ -114,36 +113,27 @@ const submit = () => {
                         <button 
                             type="submit"
                             :disabled="form.processing"
-                            class="w-full py-4 bg-gray-900 text-white rounded-2xl font-black text-lg shadow-xl shadow-gray-200 hover:bg-black transition flex items-center justify-center gap-2 group disabled:opacity-50"
+                            class="w-full py-4 bg-blue-900 text-white rounded-2xl font-black text-lg shadow-xl shadow-blue-200 hover:bg-black transition flex items-center justify-center gap-2 group disabled:opacity-50"
                         >
-                            <span v-if="form.processing">Connexion en cours...</span>
+                            <span v-if="form.processing">Authentification...</span>
                             <span v-else>Se connecter</span>
                             <ArrowRightIcon v-if="!form.processing" class="h-5 w-5 group-hover:translate-x-1 transition-transform font-sans" />
                         </button>
                     </form>
                 </div>
-
-                <!-- Bottom Footer -->
-                <div class="bg-gray-50 py-6 px-10 text-center border-t border-gray-100 font-sans">
-                    <p class="text-sm text-gray-500 font-bold">
-                        Pas encore inscrit ? 
-                        <Link :href="route('applications.create')" class="text-blue-600 hover:underline ml-1">Candidater ici</Link>
-                    </p>
-                </div>
             </div>
 
             <!-- Accents -->
-            <div class="mt-8 flex items-center gap-8 opacity-40 grayscale flex-wrap justify-center font-sans">
-                <span class="text-xs font-black uppercase tracking-widest text-gray-400">CRE de Kolda</span>
-                <span class="text-xs font-black uppercase tracking-widest text-gray-400">Sénégal Émergent</span>
-                <span class="text-xs font-black uppercase tracking-widest text-gray-400">Excellence Inclusion</span>
+            <div class="mt-8 flex items-center gap-8 opacity-40 grayscale flex-wrap justify-center font-sans uppercase tracking-[0.3em] font-bold text-[10px] text-gray-500">
+                <span>SIG-EC</span>
+                <span>République du Sénégal</span>
+                <span>État Civil Numérique</span>
             </div>
         </div>
     </GuestLayout>
 </template>
 
 <style scoped>
-/* Optional micro-animations */
 input:focus {
     transform: translateY(-1px);
 }

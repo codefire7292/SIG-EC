@@ -1,34 +1,22 @@
 <?php
 
-use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CertificateVerificationController;
-use App\Http\Controllers\ChapterProgressController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\DirectorDashboardController;
-use App\Http\Controllers\LoanController;
-use App\Http\Controllers\NominationController;
-use App\Http\Controllers\StudentDashboardController;
-use App\Http\Controllers\CourseController;
-use App\Http\Controllers\ExerciseController;
-use App\Http\Controllers\ExamController;
-use App\Http\Controllers\Scolarite\AdminExamController;
-use App\Http\Controllers\Scolarite\AdminExerciseController;
-use App\Http\Controllers\Scolarite\ReportController;
-use App\Http\Middleware\EnsureWithinPremises;
+use App\Http\Controllers\CivilCertificateController;
 use Illuminate\Support\Facades\Route;
-
 use Inertia\Inertia;
-
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 
-Route::get('/', [\App\Http\Controllers\ApplicationController::class, 'welcome']);
+Route::get('/', function () {
+    return redirect()->route('login');
+});
 
 Route::get('login', [AuthenticatedSessionController::class, 'create'])
     ->name('login');
 
-Route::post('login', [AuthenticatedSessionController::class, 'store']);
+Route::post('login', [AuthenticatedSessionController::class, 'store'])
+    ->middleware('throttle:5,1');
 
 Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
@@ -37,7 +25,8 @@ Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
     ->name('password.request');
 
 Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-    ->name('password.email');
+    ->name('password.email')
+    ->middleware('throttle:3,1');
 
 Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
     ->name('password.reset');
@@ -55,274 +44,74 @@ Route::middleware('auth')->group(function () {
 // -----------------------------------------------------------------------
 // Public Routes
 // -----------------------------------------------------------------------
-Route::get('/apply', [\App\Http\Controllers\ApplicationController::class, 'create'])
-    ->name('applications.create');
-Route::post('/apply', [\App\Http\Controllers\ApplicationController::class, 'store'])
-    ->name('applications.store');
-
 Route::get('/verify-certificate/{uuid}', [CertificateVerificationController::class, 'verify'])
     ->name('certificates.verify');
 
+Route::post('/verify-certificate/search', [CertificateVerificationController::class, 'search'])
+    ->name('certificates.search');
+
 Route::get('/certificates/v/{uuid}', [CertificateVerificationController::class, 'show'])
     ->name('certificates.view');
-Route::get('/certificates/{certificate}/download', [CertificateVerificationController::class, 'download'])
-    ->name('certificates.download');
-
-Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 // -----------------------------------------------------------------------
-// Authenticated Routes
+// Authenticated Routes (Civil Certificates)
 // -----------------------------------------------------------------------
 Route::middleware(['auth'])->group(function (): void {
-    // Student LMS (PROMPT 9)
-    // -----------------------------------------------------------------------
-    Route::group(['prefix' => 'student', 'as' => 'student.'], function() {
-        Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/courses', [CourseController::class, 'index'])->name('courses');
-        Route::get('/courses/{module}/{chapter}', [CourseController::class, 'showChapter'])->name('courses.show');
-        
-        // Exercises
-        Route::get('/exercises', [ExerciseController::class, 'index'])->name('exercises.index');
-        Route::get('/exercises/{chapter}/start', [ExerciseController::class, 'showOnline'])->name('exercises.start');
-        Route::post('/exercises/{chapter}/submit', [ExerciseController::class, 'submit'])->name('exercises.submit');
-        Route::get('/exercises/{submission}/result', [ExerciseController::class, 'showResult'])->name('exercises.result');
-        Route::get('/exercises/{submission}/download', [ExerciseController::class, 'download'])->name('exercises.download');
-
-        // Exams
-        Route::get('/exams', [ExamController::class, 'index'])->name('exams.index');
-        Route::get('/exams/{exam}', [ExamController::class, 'show'])->name('exams.show');
-        Route::post('/exams/{exam}/submit', [ExamController::class, 'submit'])->name('exams.submit');
-    });
-
-    Route::get('/trainer/groups', [App\Http\Controllers\TrainerGroupsController::class, 'index'])->name('trainer.groups');
-    Route::post('/trainer/exercises/{submission}/grade', [ExerciseController::class, 'grade'])->name('trainer.exercises.grade');
+    // Dashboard
+    Route::get('/dashboard', [CivilCertificateController::class, 'dashboard'])
+        ->name('dashboard');
 
     // Profile Management
     Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])
         ->name('profile.edit');
     Route::patch('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])
         ->name('profile.update');
-    Route::get('/profile/settings', [\App\Http\Controllers\ProfileController::class, 'settings'])
-        ->name('profile.settings');
 
-    // Notifications
-    Route::post('/notifications/mark-all-as-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])
-        ->name('notifications.mark-all-as-read');
+    // Civil Certificates Modules
+    Route::get('/civil-certificates', [CivilCertificateController::class, 'index'])->name('civil-certificates.index');
+    Route::get('/civil-certificates/create', [CivilCertificateController::class, 'create'])->name('civil-certificates.create');
+    Route::post('/civil-certificates', [CivilCertificateController::class, 'store'])->name('civil-certificates.store');
+    Route::get('/civil-certificates/{civilCertificate}', [CivilCertificateController::class, 'show'])->name('civil-certificates.show');
+    Route::get('/civil-certificates/{civilCertificate}/edit', [CivilCertificateController::class, 'edit'])->name('civil-certificates.edit');
+    Route::patch('/civil-certificates/{civilCertificate}', [CivilCertificateController::class, 'update'])->name('civil-certificates.update');
+    Route::post('/civil-certificates/{civilCertificate}/approve', [CivilCertificateController::class, 'approve'])->name('civil-certificates.approve');
+    Route::post('/civil-certificates/{civilCertificate}/sign', [CivilCertificateController::class, 'sign'])->name('civil-certificates.sign');
+    Route::post('/civil-certificates/{civilCertificate}/observe', [CivilCertificateController::class, 'observe'])->name('civil-certificates.observe');
+    Route::post('/civil-certificates/{civilCertificate}/request-correction', [CivilCertificateController::class, 'requestCorrection'])->name('civil-certificates.request-correction');
+    Route::post('/civil-certificates/{civilCertificate}/rectify', [CivilCertificateController::class, 'rectify'])->name('civil-certificates.rectify');
 
-
-
-    // Director Dashboard
-    Route::get('/dashboard/director', [DirectorDashboardController::class, 'index'])
-        ->name('dashboard.director');
-    Route::get('/dashboard/director/export-pdf', [DirectorDashboardController::class, 'exportPdf'])
-        ->name('dashboard.director.export-pdf');
-
-    // Nominations
-    Route::get('/nominations', [NominationController::class, 'index'])
-        ->name('nominations.index');
-    Route::post('/nominations', [NominationController::class, 'store'])
-        ->name('nominations.store');
-    Route::patch('/nominations/{nomination}/approve', [NominationController::class, 'approve'])
-        ->name('nominations.approve');
-
-    // Chapter Progress
-    Route::get('/chapter-progress/groups', [ChapterProgressController::class, 'groupsIndex'])
-        ->name('chapter-progress.groups');
-    Route::get('/groups/{group}/chapter-progress', [ChapterProgressController::class, 'index'])
-        ->name('chapter-progress.index');
-    Route::post('/chapter-progress', [ChapterProgressController::class, 'submit'])
-        ->name('chapter-progress.submit');
-    Route::patch('/chapter-progress/{chapterGroupProgress}/approve', [ChapterProgressController::class, 'approve'])
-        ->name('chapter-progress.approve');
-    Route::patch('/chapter-progress/{chapterGroupProgress}/reject', [ChapterProgressController::class, 'reject'])
-        ->name('chapter-progress.reject');
-
-    // Attendances (Trainer & History)
-    Route::get('/attendances/groups', [AttendanceController::class, 'trainerGroups'])
-        ->name('attendances.trainer-groups');
-    Route::get('/attendances/take/{group}', [AttendanceController::class, 'takeAttendance'])
-        ->name('attendances.take');
-    Route::post('/attendances/store-batch', [AttendanceController::class, 'storeBatch'])
-        ->middleware(EnsureWithinPremises::class)
-        ->name('attendances.store-batch');
-    Route::get('/groups/{group}/history', [AttendanceController::class, 'index'])
-        ->name('attendances.history');
-    Route::post('/attendances/individual', [AttendanceController::class, 'store'])
-        ->middleware(EnsureWithinPremises::class)
-        ->name('attendances.store');
-
-
-    // Loans (Logistics)
-    Route::get('/loans', [LoanController::class, 'index'])
-        ->name('loans.index');
-    Route::get('/loans/create', [LoanController::class, 'index']) // Reusing index and passing props as it handles data
-        ->name('loans.create');
-    Route::post('/loans/checkout', [LoanController::class, 'checkout'])
-        ->name('loans.checkout');
-    Route::patch('/loans/{loan}/return', [LoanController::class, 'returnAsset'])
-        ->name('loans.return');
-
-    // Ecosystem & CRM
-    Route::get('/users', [\App\Http\Controllers\UserController::class, 'index'])
-        ->name('users.index');
-    Route::post('/users', [\App\Http\Controllers\UserController::class, 'store'])
-        ->name('users.store');
-    Route::put('/users/{user}', [\App\Http\Controllers\UserController::class, 'update'])
-        ->name('users.update');
-    Route::delete('/users/{user}', [\App\Http\Controllers\UserController::class, 'destroy'])
-        ->name('users.destroy');
-
-    // Students Management
-    Route::get('/apprenants', [\App\Http\Controllers\StudentsController::class, 'index'])
-        ->name('students.index');
-
-    // Logistics & Physical Inventory
-    Route::resource('assets', \App\Http\Controllers\AssetController::class);
-
-    // Advanced Stats
-    Route::get('/stats/reports', [\App\Http\Controllers\StatsController::class, 'index'])
-        ->name('stats.index');
-
-    Route::get('/ecosystem', [\App\Http\Controllers\EcosystemController::class, 'index'])
-        ->name('ecosystem.index');
-    Route::get('/ecosystem/partnerships', [\App\Http\Controllers\EcosystemController::class, 'partnerships'])
-        ->name('ecosystem.partnerships');
-    Route::get('/ecosystem/events', [\App\Http\Controllers\EcosystemController::class, 'events'])
-        ->name('ecosystem.events');
-    Route::post('/ecosystem/partnerships', [\App\Http\Controllers\EcosystemController::class, 'storePartnership'])
-        ->name('ecosystem.partnerships.store');
-
-    Route::put('/ecosystem/partnerships/{partnership}', [\App\Http\Controllers\EcosystemController::class, 'updatePartnership'])
-        ->name('ecosystem.partnerships.update');
-    Route::patch('/ecosystem/partnerships/{partnership}/toggle', [\App\Http\Controllers\EcosystemController::class, 'togglePartnershipStatus'])
-        ->name('ecosystem.partnerships.toggle');
-    Route::delete('/ecosystem/partnerships/{partnership}', [\App\Http\Controllers\EcosystemController::class, 'destroyPartnership'])
-        ->name('ecosystem.partnerships.destroy');
-
-    Route::put('/ecosystem/events/{event}', [\App\Http\Controllers\EcosystemController::class, 'updateEvent'])
-        ->name('ecosystem.events.update');
-    Route::patch('/ecosystem/events/{event}/toggle', [\App\Http\Controllers\EcosystemController::class, 'toggleEventStatus'])
-        ->name('ecosystem.events.toggle');
-    Route::delete('/ecosystem/events/{event}', [\App\Http\Controllers\EcosystemController::class, 'destroyEvent'])
-        ->name('ecosystem.events.destroy');
-    Route::post('/ecosystem/media', [\App\Http\Controllers\EcosystemController::class, 'storeMediaMention'])
-        ->name('ecosystem.media.store');
-
-    // Admissions (Scolarité)
-    Route::get('/applications', [\App\Http\Controllers\ApplicationController::class, 'index'])
-        ->name('applications.index');
-    
-    // Group Management
-    Route::get('/groups', [\App\Http\Controllers\Scolarite\GroupController::class, 'index'])
-        ->name('groups.index');
-    Route::post('/groups', [\App\Http\Controllers\Scolarite\GroupController::class, 'store'])
-        ->name('groups.store');
-    Route::put('/groups/{group}', [\App\Http\Controllers\Scolarite\GroupController::class, 'update'])
-        ->name('groups.update');
-    Route::delete('/groups/{group}', [\App\Http\Controllers\Scolarite\GroupController::class, 'destroy'])
-        ->name('groups.destroy');
-    
-    // Group Student Management
-    Route::get('/groups/{group}/students', [\App\Http\Controllers\Scolarite\GroupStudentController::class, 'index'])
-        ->name('groups.students.index');
-    Route::post('/groups/{group}/students', [\App\Http\Controllers\Scolarite\GroupStudentController::class, 'store'])
-        ->name('groups.students.store');
-    Route::delete('/groups/{group}/students/{student}', [\App\Http\Controllers\Scolarite\GroupStudentController::class, 'destroy'])
-        ->name('groups.students.destroy');
-
-    // Room Management
-    Route::resource('rooms', \App\Http\Controllers\Scolarite\RoomController::class)
-        ->only(['index', 'store', 'update', 'destroy']);
-    
-    // Curriculum Management
-    Route::resource('modules', \App\Http\Controllers\ModuleController::class);
-    Route::post('/modules/{module}/chapters', [\App\Http\Controllers\ModuleController::class, 'storeChapter'])
-        ->name('modules.chapters.store');
-    Route::post('/modules/{module}/chapters/reorder', [\App\Http\Controllers\ModuleController::class, 'reorderChapters'])
-        ->name('modules.chapters.reorder');
-    Route::post('/chapters/{chapter}/update', [\App\Http\Controllers\ModuleController::class, 'updateChapter'])
-        ->name('modules.chapters.update');
-    Route::delete('/chapters/{chapter}', [\App\Http\Controllers\ModuleController::class, 'destroyChapter'])
-        ->name('modules.chapters.destroy');
-    Route::get('/chapters/{chapter}/attachments/{index}/download', [\App\Http\Controllers\ModuleController::class, 'downloadAttachment'])
-        ->name('modules.chapters.attachments.download');
-    Route::delete('/chapters/{chapter}/attachments/{index}', [\App\Http\Controllers\ModuleController::class, 'destroyAttachment'])
-        ->name('modules.chapters.attachments.destroy');
-
-    // Student Management (Apprenants/Learners)
-    Route::resource('students', \App\Http\Controllers\StudentsController::class)
-        ->only(['index', 'store', 'update', 'destroy']);
-
-    // Trainee Management (Stagiaires/Assistants)
-    Route::resource('trainees', \App\Http\Controllers\TraineesController::class)
-        ->only(['index', 'store', 'update', 'destroy']);
-    Route::get('/trainees/preview/{trainee}/{type}', [\App\Http\Controllers\TraineesController::class, 'previewFile'])
-        ->name('trainees.preview');
-
-    // Administration des Examens et Exercices
-    Route::group(['prefix' => 'admin-scolarite'], function() {
-        Route::resource('exams', AdminExamController::class);
-        Route::get('exams/{exam}/results', [AdminExamController::class, 'getResults'])->name('exams.results');
-        Route::post('exams/{exam}/grades', [AdminExamController::class, 'enterGrades'])->name('exams.enter-grades');
-        
-        Route::get('exercises', [AdminExerciseController::class, 'index'])->name('exercises.index');
-        Route::put('exercises/{chapter}', [AdminExerciseController::class, 'update'])->name('exercises.update');
-        Route::post('exercises/{submission}/grade', [AdminExerciseController::class, 'gradeSubmission'])->name('exercises.grade-submission');
-        
-        // Questions (Chapters & Exams)
-        Route::post('exercises/{chapter}/questions', [AdminExerciseController::class, 'storeQuestion'])->name('exercises.questions.store');
-        Route::post('exams/{exam}/questions', [AdminExamController::class, 'storeQuestion'])->name('exams.questions.store');
-        
-        Route::patch('questions/{question}', [AdminExerciseController::class, 'updateQuestion'])->name('questions.update');
-        Route::delete('questions/{question}', [AdminExerciseController::class, 'destroyQuestion'])->name('questions.destroy');
-
-        // Certificates Management
-        Route::get('certificates', [\App\Http\Controllers\Scolarite\AdminCertificateController::class, 'index'])->name('certificates.index');
-        Route::post('certificates/{student}/{module}', [\App\Http\Controllers\Scolarite\AdminCertificateController::class, 'generate'])->name('certificates.generate');
-        Route::delete('certificates/{certificate}', [\App\Http\Controllers\Scolarite\AdminCertificateController::class, 'destroy'])->name('certificates.destroy');
+    // 📂 État-Civil Acts (Unified Controller)
+    Route::prefix('acts')->name('acts.')->group(function () {
+        foreach (['naissance', 'mariage', 'deces'] as $type) {
+            Route::prefix($type)->name($type . '.')->group(function () use ($type) {
+                Route::get("/", [\App\Http\Controllers\CivilActController::class, 'index'])->name('index')->defaults('type', $type);
+                Route::get("/create", [\App\Http\Controllers\CivilActController::class, 'create'])->name('create')->defaults('type', $type);
+                Route::post("/", [\App\Http\Controllers\CivilActController::class, 'store'])->name('store')->defaults('type', $type);
+                Route::get("/template", [\App\Http\Controllers\CivilActImportController::class, 'downloadTemplate'])->name('template')->defaults('type', $type);
+                Route::post("/import", [\App\Http\Controllers\CivilActImportController::class, 'import'])->name('import')->defaults('type', $type);
+                Route::get("/{id}", [\App\Http\Controllers\CivilActController::class, 'show'])->name('show')->defaults('type', $type);
+                Route::get("/{id}/edit", [\App\Http\Controllers\CivilActController::class, 'edit'])->name('edit')->defaults('type', $type);
+                Route::patch("/{id}", [\App\Http\Controllers\CivilActController::class, 'update'])->name('update')->defaults('type', $type);
+                Route::post("/{id}/status", [\App\Http\Controllers\CivilActController::class, 'updateStatus'])->name('status')->defaults('type', $type);
+            });
+        }
     });
 
-    Route::group(['prefix' => 'student', 'as' => 'student.'], function() {
-        Route::get('my-certificates', [App\Http\Controllers\StudentDashboardController::class, 'myCertificates'])->name('certificates');
+    // ⚙️ Administration Suite
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::resource('users', \App\Http\Controllers\UserController::class)->middleware('permission:manage-users');
+        Route::resource('centers', \App\Http\Controllers\CenterController::class)->middleware('permission:manage-centers');
+        Route::resource('registries', \App\Http\Controllers\RegistryController::class)->middleware('permission:manage-centers');
+        Route::post('registries/{registry}/close', [\App\Http\Controllers\RegistryController::class, 'close'])
+            ->name('registries.close')
+            ->middleware('permission:manage-centers');
+        Route::post('registries/{registry}/reopen', [\App\Http\Controllers\RegistryController::class, 'reopen'])
+            ->name('registries.reopen')
+            ->middleware('permission:manage-centers');
+        
+        Route::middleware('permission:manage-centers')->group(function() {
+            Route::get('settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('settings.index');
+            Route::post('settings', [\App\Http\Controllers\SettingController::class, 'update'])->name('settings.update');
+        });
     });
-
-    Route::get('/applications/preview/{application}/{type}', [\App\Http\Controllers\ApplicationController::class, 'previewFile'])
-        ->name('applications.preview');
-    Route::patch('/applications/{application}/status', [\App\Http\Controllers\ApplicationController::class, 'updateStatus'])
-        ->name('applications.status.update');
-    Route::post('/applications/enroll-manual', [\App\Http\Controllers\ApplicationController::class, 'enrollManual'])
-        ->name('applications.enroll.manual');
-    Route::put('/applications/{application}', [\App\Http\Controllers\ApplicationController::class, 'update'])
-        ->name('applications.update');
-
-
-    // Emplois du temps
-    Route::get('/schedules', [\App\Http\Controllers\ScheduleController::class, 'index'])
-        ->name('schedules.index');
-    // Paramètres
-    Route::get('/settings', [\App\Http\Controllers\SettingController::class, 'index'])
-        ->name('settings.index');
-    Route::post('/settings', [\App\Http\Controllers\SettingController::class, 'update'])
-        ->name('settings.update');
-
-    Route::post('/schedules', [\App\Http\Controllers\ScheduleController::class, 'store'])
-        ->name('schedules.store');
-    Route::put('/schedules/{schedule}', [\App\Http\Controllers\ScheduleController::class, 'update'])
-        ->name('schedules.update');
-    Route::delete('/schedules/{schedule}', [\App\Http\Controllers\ScheduleController::class, 'destroy'])
-        ->name('schedules.destroy');
-
-    // Gestion des présences
-    Route::get('/attendance', [\App\Http\Controllers\Scolarite\AttendanceController::class, 'index'])->name('attendance.index');
-    Route::get('/attendance/{schedule}/{date}', [\App\Http\Controllers\Scolarite\AttendanceController::class, 'take'])->name('attendance.take');
-    Route::post('/attendance', [\App\Http\Controllers\Scolarite\AttendanceController::class, 'store'])->name('attendance.store');
-
-    // Gestion des rapports
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
-
-    // Assistant ASSANE
-    Route::post('/assane/chat', [\App\Http\Controllers\Scolarite\AssaneChatController::class, 'chat'])->name('assane.chat');
-
 });

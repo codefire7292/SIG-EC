@@ -1,12 +1,9 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue'
-import { usePage, router } from '@inertiajs/vue3'
+import { usePage } from '@inertiajs/vue3'
 import Sidebar from '@/Components/Sidebar.vue'
 import Topbar from '@/Components/Topbar.vue'
 import AlertModal from '@/Components/AlertModal.vue'
-import ConfirmModal from '@/Components/ConfirmModal.vue'
-import CelebrationOverlay from '@/Components/CelebrationOverlay.vue'
-import AssaneChat from '@/Components/AssaneChat.vue'
 
 const isSidebarOpen = ref(false)
 const page = usePage()
@@ -17,15 +14,6 @@ const alertState = ref({
     message: ''
 })
 
-const celebrationState = ref({
-    show: false,
-    title: '',
-    message: '',
-    uuid: ''
-})
-
-const celebratedIds = ref(new Set(JSON.parse(localStorage.getItem('e_cre_celebrated_certs') || '[]')))
-
 function toggleSidebar() {
     isSidebarOpen.value = !isSidebarOpen.value
 }
@@ -34,20 +22,8 @@ function closeAlert() {
     alertState.value.message = ''
 }
 
-function closeCelebration() {
-    celebrationState.value.show = false
-}
-
-function markAsCelebrated(uuid) {
-    if (!uuid) return
-    celebratedIds.value.add(uuid)
-    localStorage.setItem('e_cre_celebrated_certs', JSON.stringify([...celebratedIds.value]))
-}
-
-// Global helper for components to suppress celebration
+// Global helper for components
 onMounted(() => {
-    window.markCertificateAsCelebrated = markAsCelebrated
-    
     window.platformAlert = (message, type = 'success', title = '') => {
         alertState.value = {
             type: type,
@@ -57,25 +33,6 @@ onMounted(() => {
     }
 })
 
-// Watch for celebratory notifications
-watch(() => page.props.auth?.user?.unread_notifications, (notifications) => {
-    if (!notifications) return
-    
-    const certNotif = notifications.find(n => 
-        n.data.type === 'certificate_issued' && !celebratedIds.value.has(n.data.certificate_uuid)
-    )
-
-    if (certNotif) {
-        markAsCelebrated(certNotif.data.certificate_uuid)
-        celebrationState.value = {
-            show: true,
-            title: certNotif.data.title,
-            message: certNotif.data.message,
-            uuid: certNotif.data.certificate_uuid
-        }
-    }
-}, { deep: true, immediate: true })
-
 // Watch for flash messages
 watch(() => page.props.flash, (flash) => {
     if (flash.success) {
@@ -84,23 +41,17 @@ watch(() => page.props.flash, (flash) => {
             title: 'Opération Réussie',
             message: flash.success
         }
-    } else if (flash.error) {
-        alertState.value = {
-            type: 'error',
-            title: 'Une erreur est survenue',
-            message: flash.error
-        }
     } else if (flash.warning) {
         alertState.value = {
             type: 'warning',
             title: 'Attention',
             message: flash.warning
         }
-    } else if (flash.info) {
+    } else if (flash.error) {
         alertState.value = {
-            type: 'info',
-            title: 'Information',
-            message: flash.info
+            type: 'error',
+            title: 'Une erreur est survenue',
+            message: flash.error
         }
     }
 }, { deep: true, immediate: true })
@@ -117,7 +68,12 @@ watch(() => page.props.flash, (flash) => {
             <!-- Topbar -->
             <Topbar @toggle-sidebar="toggleSidebar" />
 
-            <!-- Global Alert Modal (PROMPT 10) -->
+            <!-- Page Header (Optional) -->
+            <header v-if="$slots.header" class="bg-white border-b border-gray-100 py-6 px-4 sm:px-6 lg:px-8">
+                <slot name="header" />
+            </header>
+
+            <!-- Global Alert Modal -->
             <AlertModal 
                 :is-open="!!alertState.message"
                 :type="alertState.type"
@@ -126,26 +82,14 @@ watch(() => page.props.flash, (flash) => {
                 @close="closeAlert"
             />
 
-            <!-- Celebration Overlay (PROMPT 11) -->
-            <CelebrationOverlay
-                :show="celebrationState.show"
-                :title="celebrationState.title"
-                :message="celebrationState.message"
-                :certificate-uuid="celebrationState.uuid"
-                @close="closeCelebration"
-            />
-
-            <!-- Page Management -->
+            <!-- Page Content -->
             <main class="flex-1 p-4 sm:p-6 lg:p-8">
                 <slot />
             </main>
 
-            <!-- AI Assistant ASSANE -->
-            <AssaneChat />
-
             <!-- Optional Footer -->
             <footer class="py-6 px-8 border-t border-gray-200 text-center text-sm text-gray-400">
-                &copy; {{ new Date().getFullYear() }} Plateforme E-CRE Kolda.
+                &copy; {{ new Date().getFullYear() }} SIG-EC - Système Intégré de Gestion de l'État Civil.
             </footer>
         </div>
 

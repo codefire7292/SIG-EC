@@ -8,7 +8,7 @@ import { ZiggyVue } from 'ziggy-js';
 import { Ziggy } from './ziggy';
 import { ensureCsrf } from '@/services/api';
 
-const appName = import.meta.env.VITE_APP_NAME || 'E-CRE Kolda';
+const appName = import.meta.env.VITE_APP_NAME || 'SIG-EC';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
