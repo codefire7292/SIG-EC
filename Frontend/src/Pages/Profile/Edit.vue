@@ -57,14 +57,14 @@ function updatePhotoPreview() {
         <div class="max-w-4xl mx-auto py-12 px-4">
             <header class="mb-12 text-center">
                 <div class="relative inline-block group">
-                    <div v-if="!photoPreview" class="h-32 w-32 bg-blue-600 text-white rounded-[3rem] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-200 border-4 border-white relative overflow-hidden transition-all group-hover:scale-105">
+                    <div v-if="!photoPreview" class="h-32 w-32 text-white rounded-[3rem] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-green-100 border-4 border-white relative overflow-hidden transition-all group-hover:scale-105" style="background-color: #1E690F;">
                          <UserIcon class="h-16 w-16" />
                     </div>
-                    <div v-else class="h-32 w-32 rounded-[3rem] overflow-hidden mx-auto mb-6 shadow-2xl shadow-blue-200 border-4 border-white transition-all scale-105">
+                    <div v-else class="h-32 w-32 rounded-[3rem] overflow-hidden mx-auto mb-6 shadow-2xl shadow-green-100 border-4 border-white transition-all scale-105">
                         <img :src="photoPreview" class="h-full w-full object-cover">
                     </div>
                     
-                    <button @click="selectNewPhoto" class="absolute bottom-4 -right-2 p-3 bg-white rounded-2xl shadow-lg border border-gray-100 text-blue-600 hover:bg-black hover:text-white transition-all active:scale-95">
+                    <button @click="selectNewPhoto" class="absolute bottom-4 -right-2 p-3 bg-white rounded-2xl shadow-lg border border-gray-100 text-[#1E690F] hover:bg-[#1E690F] hover:text-white transition-all active:scale-95">
                         <ArrowUpTrayIcon class="w-5 h-5" />
                     </button>
                     <input ref="photoInput" type="file" class="hidden" @change="updatePhotoPreview">
@@ -86,13 +86,13 @@ function updatePhotoPreview() {
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Nom Complet</label>
-                                <input v-model="form.name" type="text" class="w-full bg-gray-50 border-0 rounded-2xl font-bold py-4 px-6 focus:ring-2 focus:ring-blue-600 transition-all">
+                                <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Nom Complet</label>
+                                <input v-model="form.name" type="text" class="w-full bg-white border border-gray-300 rounded-2xl font-bold py-4 px-6 focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] transition-all">
                                 <p v-if="form.errors.name" class="mt-2 text-xs text-red-600 font-bold uppercase tracking-widest">{{ form.errors.name }}</p>
                             </div>
                             <div>
-                                <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Adresse Email</label>
-                                <input v-model="form.email" type="email" class="w-full bg-gray-50 border-0 rounded-2xl font-bold py-4 px-6 focus:ring-2 focus:ring-blue-600 transition-all">
+                                <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Adresse Email</label>
+                                <input v-model="form.email" type="email" class="w-full bg-white border border-gray-300 rounded-2xl font-bold py-4 px-6 focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] transition-all">
                                 <p v-if="form.errors.email" class="mt-2 text-xs text-red-600 font-bold uppercase tracking-widest">{{ form.errors.email }}</p>
                             </div>
                         </div>
@@ -110,13 +110,13 @@ function updatePhotoPreview() {
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Nouveau Mot de Passe</label>
-                                <input v-model="form.password" type="password" class="w-full bg-gray-50 border-0 rounded-2xl font-bold py-4 px-6 focus:ring-2 focus:ring-blue-600 transition-all">
+                                <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Nouveau Mot de Passe</label>
+                                <input v-model="form.password" type="password" class="w-full bg-white border border-gray-300 rounded-2xl font-bold py-4 px-6 focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] transition-all">
                                 <p v-if="form.errors.password" class="mt-2 text-xs text-red-600 font-bold uppercase tracking-widest">{{ form.errors.password }}</p>
                             </div>
                             <div>
-                                <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Confirmer le Mot de Passe</label>
-                                <input v-model="form.password_confirmation" type="password" class="w-full bg-gray-50 border-0 rounded-2xl font-bold py-4 px-6 focus:ring-2 focus:ring-blue-600 transition-all">
+                                <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Confirmer le Mot de Passe</label>
+                                <input v-model="form.password_confirmation" type="password" class="w-full bg-white border border-gray-300 rounded-2xl font-bold py-4 px-6 focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] transition-all">
                             </div>
                         </div>
                     </section>
@@ -131,7 +131,8 @@ function updatePhotoPreview() {
                         <button 
                             type="submit" 
                             :disabled="form.processing"
-                            class="px-10 py-4 bg-blue-600 text-white rounded-2xl font-black shadow-xl shadow-blue-100 hover:bg-black transition-all disabled:opacity-50 flex items-center gap-3"
+                            class="px-10 py-4 text-white rounded-2xl font-black shadow-xl shadow-green-100 hover:bg-[#185709] transition-all disabled:opacity-50 flex items-center gap-3"
+                            style="background-color: #1E690F;"
                         >
                             <span v-if="form.processing">Traitement...</span>
                             <span v-else>Enregistrer les modifications</span>

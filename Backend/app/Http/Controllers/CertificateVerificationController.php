@@ -39,7 +39,10 @@ class CertificateVerificationController extends Controller
     public function search(Request $request)
     {
         $request->validate([
-            'reference' => 'required|string',
+            'reference' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z0-9\-]+$/'],
+        ], [
+            'reference.regex' => 'Le format du numéro de référence est invalide.',
+            'reference.max' => 'Le numéro de référence ne doit pas dépasser 50 caractères.',
         ]);
 
         $certificate = CivilCertificate::where('reference_number', $request->reference)

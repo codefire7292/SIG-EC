@@ -16,13 +16,19 @@ return Application::configure(basePath: dirname(__DIR__))
             'logout',
         ]);
         $middleware->statefulApi();
+
+        // ── Middleware Web (global sur toutes les requêtes Web) ──────────────
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
+            \App\Http\Middleware\SecurityHeaders::class,   // 🔒 Headers de sécurité HTTP
         ]);
+
+        // ── Alias de middleware ───────────────────────────────────────────────
         $middleware->alias([
-            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role'               => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission'         => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'security.headers'   => \App\Http\Middleware\SecurityHeaders::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -17,6 +17,7 @@ class MarriageAct extends Model
 
     protected $fillable = [
         'registry_id',
+        'certificate_path',
         'reference_number',
         'uuid',
         'husband_first_name',
@@ -25,6 +26,8 @@ class MarriageAct extends Model
         'wife_last_name',
         'marriage_date',
         'marriage_place',
+        'marriage_option',
+        'matrimonial_regime',
         'witnesses_metadata',
         'officer_comments',
         // NOTE: status, validated_by, validated_at, locked_at etc. managed by the system only.

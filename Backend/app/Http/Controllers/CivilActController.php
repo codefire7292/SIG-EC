@@ -24,6 +24,10 @@ class CivilActController extends Controller
 
     public function index(Request $request)
     {
+        if (!$request->user()->hasPermissionTo('view-registries')) {
+            abort(403, "Vous n'avez pas la permission de voir les registres.");
+        }
+
         $type = $request->route('type') ?? $request->route()->getAction('type');
         $model = $this->getModel($type);
         
@@ -40,6 +44,10 @@ class CivilActController extends Controller
 
     public function show(Request $request, $id)
     {
+        if (!$request->user()->hasPermissionTo('view-registries')) {
+            abort(403, "Vous n'avez pas la permission de voir les détails de l'acte.");
+        }
+
         $type = $request->route('type') ?? $request->route()->getAction('type');
         $model = $this->getModel($type);
         $act = $model->with(['registry', 'validator'])->findOrFail($id);
@@ -53,6 +61,10 @@ class CivilActController extends Controller
 
     public function create(Request $request)
     {
+        if (!$request->user()->hasPermissionTo('create-drafts')) {
+            abort(403, "Vous n'avez pas la permission de créer un acte.");
+        }
+
         $type = $request->route('type');
         return Inertia::render('CivilActs/Form', [
             'type' => $type,
@@ -62,6 +74,10 @@ class CivilActController extends Controller
 
     public function edit(Request $request, $id)
     {
+        if (!$request->user()->hasPermissionTo('create-drafts')) {
+            abort(403, "Vous n'avez pas la permission de modifier cet acte.");
+        }
+
         $type = $request->route('type');
         $model = $this->getModel($type);
         $act = $model->findOrFail($id);
@@ -75,6 +91,10 @@ class CivilActController extends Controller
 
     public function store(Request $request)
     {
+        if (!$request->user()->hasPermissionTo('create-drafts')) {
+            abort(403, "Vous n'avez pas la permission de créer un acte.");
+        }
+
         $type = $request->route('type');
         $rules = $this->getValidationRules($type);
         $validated = $request->validate($rules);
@@ -123,6 +143,11 @@ class CivilActController extends Controller
         $data['registry_id'] = $registry->id;
         $data['reference_number'] = $referenceNumber;
 
+        if ($request->hasFile('certificate_file')) {
+            $path = $request->file('certificate_file')->store('certificates', 'public');
+            $data['certificate_path'] = '/storage/' . $path;
+        }
+
         $act = $model->create($data);
 
         return redirect()->route("acts.{$type}.show", $act->id)
@@ -131,6 +156,10 @@ class CivilActController extends Controller
 
     public function update(Request $request, $id)
     {
+        if (!$request->user()->hasPermissionTo('create-drafts')) {
+            abort(403, "Vous n'avez pas la permission de modifier cet acte.");
+        }
+
         $type = $request->route('type');
         $model = $this->getModel($type);
         $act = $model->with('registry')->findOrFail($id);
@@ -181,6 +210,11 @@ class CivilActController extends Controller
             $data['reference_number'] = $referenceNumber;
         }
 
+        if ($request->hasFile('certificate_file')) {
+            $path = $request->file('certificate_file')->store('certificates', 'public');
+            $data['certificate_path'] = '/storage/' . $path;
+        }
+
         $act->update($data);
 
         return redirect()->route("acts.{$type}.show", $act->id)
@@ -191,6 +225,8 @@ class CivilActController extends Controller
     {
         $common = [
             'officer_comments' => 'nullable|string',
+            'certificate_file' => 'nullable|file|mimes:pdf|max:10240',
+            'certificate_path' => 'nullable|string',
         ];
 
         if ($type === 'naissance') {
@@ -200,6 +236,10 @@ class CivilActController extends Controller
                 'date_of_birth' => 'required|date',
                 'place_of_birth' => 'required|string',
                 'gender' => 'required|in:M,F',
+                'is_judgment' => 'nullable|boolean',
+                'judgment_number' => 'nullable|required_if:is_judgment,true|string',
+                'judgment_date' => 'nullable|required_if:is_judgment,true|date',
+                'judgment_court' => 'nullable|required_if:is_judgment,true|string',
                 'father_name' => 'nullable|string',
                 'mother_name' => 'nullable|string',
                 'parents_metadata' => 'nullable|array',
@@ -217,9 +257,17 @@ class CivilActController extends Controller
                 'wife_last_name' => 'required|string',
                 'marriage_date' => 'required|date',
                 'marriage_place' => 'required|string',
+                'marriage_option' => 'nullable|string',
+                'matrimonial_regime' => 'nullable|string',
                 'witnesses_metadata' => 'nullable|array',
                 'witnesses_metadata.witness1_name' => 'nullable|string',
+                'witnesses_metadata.witness1_cni' => 'nullable|string',
                 'witnesses_metadata.witness2_name' => 'nullable|string',
+                'witnesses_metadata.witness2_cni' => 'nullable|string',
+                'witnesses_metadata.witness3_name' => 'nullable|string',
+                'witnesses_metadata.witness3_cni' => 'nullable|string',
+                'witnesses_metadata.witness4_name' => 'nullable|string',
+                'witnesses_metadata.witness4_cni' => 'nullable|string',
             ]);
         }
 

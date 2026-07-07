@@ -100,6 +100,21 @@ const updateStatus = (newStatus) => {
                                     <div class="text-sm font-black text-gray-900">{{ formatDate(act.date_of_birth) }}</div>
                                     <div class="text-xs font-bold text-gray-500 italic">{{ act.place_of_birth }}</div>
                                 </div>
+                                <div v-if="act.is_judgment" class="col-span-full p-4 bg-green-50/50 rounded-2xl border border-green-100 flex flex-wrap gap-6 items-center">
+                                    <div class="px-3 py-1 bg-[#1E690F] text-white rounded-full text-[9px] font-black uppercase tracking-wider">Jugement de Naissance</div>
+                                    <div>
+                                        <div class="text-[9px] font-black text-gray-400 uppercase">Numéro du Jugement</div>
+                                        <div class="text-xs font-black text-gray-900">{{ act.judgment_number }}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[9px] font-black text-gray-400 uppercase">Date du Jugement</div>
+                                        <div class="text-xs font-black text-gray-900">{{ formatDate(act.judgment_date) }}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[9px] font-black text-gray-400 uppercase">Tribunal</div>
+                                        <div class="text-xs font-black text-gray-900">{{ act.judgment_court }}</div>
+                                    </div>
+                                </div>
                                 <div class="col-span-full pt-4 border-t border-gray-50 grid grid-cols-2 gap-8">
                                     <div>
                                         <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Père</h4>
@@ -124,7 +139,7 @@ const updateStatus = (newStatus) => {
                                         <div class="text-lg font-black text-gray-900">{{ act.wife_first_name }} {{ act.wife_last_name }}</div>
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-8">
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
                                     <div>
                                         <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Célébration</h4>
                                         <div class="text-sm font-black text-gray-900">{{ formatDate(act.marriage_date) }}</div>
@@ -132,6 +147,18 @@ const updateStatus = (newStatus) => {
                                     <div>
                                         <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Lieu</h4>
                                         <div class="text-sm font-bold text-gray-700 italic">{{ act.marriage_place }}</div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Option Matrimoniale</h4>
+                                        <div class="text-sm font-black text-gray-900 uppercase tracking-tight">
+                                            {{ act.marriage_option === 'monogamie' ? 'Monogamie' : (act.marriage_option === 'limitation_polygamie' ? 'Limitation de polygamie' : (act.marriage_option === 'polygamie' ? 'Polygamie' : act.marriage_option || 'Polygamie')) }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Régime Matrimonial</h4>
+                                        <div class="text-sm font-black text-[#1E690F] uppercase tracking-tight">
+                                            {{ act.matrimonial_regime === 'separation_biens' ? 'Séparation des biens' : (act.matrimonial_regime === 'regime_dotal' ? 'Régime dotal' : (act.matrimonial_regime === 'participation_meubles_acquets' ? 'Participation aux meubles et acquêts' : act.matrimonial_regime || 'Séparation des biens')) }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -205,13 +232,25 @@ const updateStatus = (newStatus) => {
                             </div>
 
                             <div v-if="type === 'mariage' && act.witnesses_metadata" class="grid grid-cols-2 gap-6">
-                                <div v-if="act.witnesses_metadata.witness1_name">
+                                <div v-if="act.witnesses_metadata.witness1_name" class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
                                     <h4 class="text-[9px] font-black text-gray-400 uppercase mb-1">Témoin 1</h4>
-                                    <p class="text-xs font-bold text-gray-900">{{ act.witnesses_metadata.witness1_name }}</p>
+                                    <p class="text-sm font-black text-gray-900">{{ act.witnesses_metadata.witness1_name }}</p>
+                                    <p v-if="act.witnesses_metadata.witness1_cni" class="text-xs text-gray-500 font-medium mt-1">CNI : {{ act.witnesses_metadata.witness1_cni }}</p>
                                 </div>
-                                <div v-if="act.witnesses_metadata.witness2_name">
+                                <div v-if="act.witnesses_metadata.witness2_name" class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
                                     <h4 class="text-[9px] font-black text-gray-400 uppercase mb-1">Témoin 2</h4>
-                                    <p class="text-xs font-bold text-gray-900">{{ act.witnesses_metadata.witness2_name }}</p>
+                                    <p class="text-sm font-black text-gray-900">{{ act.witnesses_metadata.witness2_name }}</p>
+                                    <p v-if="act.witnesses_metadata.witness2_cni" class="text-xs text-gray-500 font-medium mt-1">CNI : {{ act.witnesses_metadata.witness2_cni }}</p>
+                                </div>
+                                <div v-if="act.witnesses_metadata.witness3_name" class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                                    <h4 class="text-[9px] font-black text-gray-400 uppercase mb-1">Témoin 3</h4>
+                                    <p class="text-sm font-black text-gray-900">{{ act.witnesses_metadata.witness3_name }}</p>
+                                    <p v-if="act.witnesses_metadata.witness3_cni" class="text-xs text-gray-500 font-medium mt-1">CNI : {{ act.witnesses_metadata.witness3_cni }}</p>
+                                </div>
+                                <div v-if="act.witnesses_metadata.witness4_name" class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+                                    <h4 class="text-[9px] font-black text-gray-400 uppercase mb-1">Témoin 4</h4>
+                                    <p class="text-sm font-black text-gray-900">{{ act.witnesses_metadata.witness4_name }}</p>
+                                    <p v-if="act.witnesses_metadata.witness4_cni" class="text-xs text-gray-500 font-medium mt-1">CNI : {{ act.witnesses_metadata.witness4_cni }}</p>
                                 </div>
                             </div>
                         </div>

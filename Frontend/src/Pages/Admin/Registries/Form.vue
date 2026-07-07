@@ -53,7 +53,7 @@ const submit = () => {
         </template>
 
         <div class="max-w-2xl mx-auto mt-12 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="bg-blue-600 px-8 py-4">
+            <div class="px-8 py-4" style="background-color: #1E690F;">
                 <div class="flex items-center gap-2 text-white/80 text-[10px] font-black uppercase tracking-widest">
                     <BookOpenIcon class="h-4 w-4" />
                     Détails du Registre
@@ -64,10 +64,10 @@ const submit = () => {
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Center Selection -->
                     <div class="col-span-full">
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Centre d'État Civil</label>
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Centre d'État Civil</label>
                         <select 
                             v-model="form.civil_registration_center_id"
-                            class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold text-gray-700 transition-all"
+                            class="w-full px-5 py-4 bg-white border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-gray-700 transition-all"
                             required
                         >
                             <option value="" disabled>Sélectionner un centre</option>
@@ -80,10 +80,10 @@ const submit = () => {
 
                     <!-- Type Selection -->
                     <div>
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Type d'acte</label>
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Type d'acte</label>
                         <select 
                             v-model="form.type"
-                            class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold text-gray-700 transition-all capitalize"
+                            class="w-full px-5 py-4 bg-white border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-gray-700 transition-all capitalize"
                             required
                         >
                             <option v-for="t in types" :key="t" :value="t">{{ t }}</option>
@@ -93,23 +93,23 @@ const submit = () => {
 
                     <!-- Year -->
                     <div>
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Année</label>
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Année</label>
                         <input 
                             type="number"
                             v-model="form.year"
-                            class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold text-gray-700 transition-all"
+                            class="w-full px-5 py-4 bg-white border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-gray-700 transition-all"
                             required
                         />
                     </div>
 
                     <!-- Reference Prefix -->
                     <div class="col-span-full">
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Préfixe de Référence</label>
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Préfixe de Référence</label>
                         <input 
                             type="text"
                             v-model="form.reference_prefix"
                             placeholder="Ex: N-2026-KOL"
-                            class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold text-gray-700 transition-all uppercase"
+                            class="w-full px-5 py-4 bg-white border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-gray-700 transition-all uppercase"
                             required
                         />
                         <div v-if="form.errors.reference_prefix" class="text-xs text-red-500 mt-2 ml-1 font-bold">{{ form.errors.reference_prefix }}</div>
@@ -118,11 +118,11 @@ const submit = () => {
 
                     <!-- Opening Date -->
                     <div>
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Date d'ouverture</label>
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Date d'ouverture</label>
                         <input 
                             type="date"
                             v-model="form.opening_date"
-                            class="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 font-bold text-gray-700 transition-all"
+                            class="w-full px-5 py-4 bg-white border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-gray-700 transition-all"
                         />
                     </div>
                 </div>
@@ -131,7 +131,8 @@ const submit = () => {
                     <button 
                         type="submit"
                         :disabled="form.processing"
-                        class="w-full flex items-center justify-center gap-3 px-8 py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all active:scale-95 disabled:opacity-50"
+                        class="w-full flex items-center justify-center gap-3 px-8 py-5 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-[#185709] shadow-xl shadow-green-100 transition-all active:scale-95 disabled:opacity-50"
+                        style="background-color: #1E690F;"
                     >
                         <CheckCircleIcon class="h-5 w-5 stroke-[2.5]" />
                         Confirmer l'ouverture du registre

@@ -21,7 +21,7 @@ const props = defineProps({
         <div class="max-w-4xl mx-auto py-12 px-4">
             <header class="mb-12">
                 <div class="flex items-center gap-4 mb-4">
-                    <div class="h-12 w-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">
+                    <div class="h-12 w-12 bg-green-50 text-[#1E690F] rounded-2xl flex items-center justify-center">
                         <Cog6ToothIcon class="h-6 w-6" />
                     </div>
                     <div>
@@ -45,15 +45,15 @@ const props = defineProps({
                             </div>
                         </div>
                         <div class="flex bg-gray-50 p-1 rounded-xl">
-                            <button class="px-4 py-2 bg-white text-indigo-600 rounded-lg shadow-sm font-black text-xs">Clair</button>
+                            <button class="px-4 py-2 bg-white text-[#1E690F] rounded-lg shadow-sm font-black text-xs">Clair</button>
                             <button class="px-4 py-2 text-gray-400 font-black text-xs hover:text-gray-600">Sombre</button>
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-3 gap-4">
-                        <div class="border-2 border-indigo-600 rounded-2xl p-4 cursor-pointer bg-indigo-50/50">
+                        <div class="border-2 border-[#1E690F] rounded-2xl p-4 cursor-pointer bg-green-50/50">
                             <div class="h-12 bg-white rounded-lg shadow-sm mb-3"></div>
-                            <p class="text-[10px] font-black text-center text-indigo-600 uppercase tracking-widest">Moderne</p>
+                            <p class="text-[10px] font-black text-center text-[#1E690F] uppercase tracking-widest">Moderne</p>
                         </div>
                         <div class="border-2 border-transparent hover:border-gray-200 rounded-2xl p-4 cursor-pointer bg-gray-50/50 transition-all">
                             <div class="h-12 bg-gray-200 rounded-lg mb-3"></div>
@@ -81,7 +81,7 @@ const props = defineProps({
                     <div class="space-y-4">
                         <div v-for="label in ['Alertes de sécurité', 'Rapports hebdomadaires', 'Nouveaux messages']" :key="label" class="flex items-center justify-between p-4 bg-gray-50/50 rounded-2xl border border-gray-50">
                              <span class="font-bold text-sm text-gray-700">{{ label }}</span>
-                             <div class="w-12 h-6 bg-indigo-600 rounded-full relative cursor-pointer">
+                             <div class="w-12 h-6 bg-[#1E690F] rounded-full relative cursor-pointer">
                                  <div class="absolute right-1 top-1 h-4 w-4 bg-white rounded-full transition-all"></div>
                              </div>
                         </div>
@@ -100,7 +100,7 @@ const props = defineProps({
                         </div>
                     </div>
                     
-                    <select class="w-full bg-gray-50 border-0 rounded-2xl font-bold py-4 px-6 focus:ring-2 focus:ring-indigo-600">
+                    <select class="w-full bg-white border border-gray-300 rounded-2xl font-bold py-4 px-6 focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F]">
                         <option>Français (Sénégal)</option>
                         <option>Wolof</option>
                         <option>English (US)</option>

@@ -63,17 +63,17 @@ watch(() => page.props.flash, (flash) => {
         <!-- Sidebar -->
         <Sidebar :is-open="isSidebarOpen" @toggle-sidebar="toggleSidebar" />
 
-        <!-- Main Content Area -->
+        <!-- Zone de contenu principale -->
         <div class="flex-1 flex flex-col lg:ml-64 transition-all duration-300">
             <!-- Topbar -->
             <Topbar @toggle-sidebar="toggleSidebar" />
 
-            <!-- Page Header (Optional) -->
-            <header v-if="$slots.header" class="bg-white border-b border-gray-100 py-6 px-4 sm:px-6 lg:px-8">
+            <!-- En-tête de page (optionnel) -->
+            <header v-if="$slots.header" class="bg-white border-b py-5 px-4 sm:px-6 lg:px-8" style="border-color: #D9EDD0;">
                 <slot name="header" />
             </header>
 
-            <!-- Global Alert Modal -->
+            <!-- Alerte globale -->
             <AlertModal 
                 :is-open="!!alertState.message"
                 :type="alertState.type"
@@ -82,22 +82,30 @@ watch(() => page.props.flash, (flash) => {
                 @close="closeAlert"
             />
 
-            <!-- Page Content -->
+            <!-- Contenu de la page -->
             <main class="flex-1 p-4 sm:p-6 lg:p-8">
                 <slot />
             </main>
 
-            <!-- Optional Footer -->
-            <footer class="py-6 px-8 border-t border-gray-200 text-center text-sm text-gray-400">
-                &copy; {{ new Date().getFullYear() }} SIG-EC - Système Intégré de Gestion de l'État Civil.
+            <!-- Footer -->
+            <footer class="py-4 px-8 border-t flex items-center justify-between bg-white" style="border-color: #D9EDD0;">
+                <div class="flex items-center gap-2">
+                    <div class="h-6 w-6 rounded-full border flex items-center justify-center" style="border-color: #F0C31E;">
+                        <img src="/images/logo.png" alt="Mairie de Enampore" class="h-4 w-4 object-contain" />
+                    </div>
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Mairie de Enampore — SIG-EC</span>
+                </div>
+                <span class="text-[10px] text-gray-300 font-medium">
+                    © {{ new Date().getFullYear() }} Système de Gestion de l'État Civil
+                </span>
             </footer>
         </div>
 
-        <!-- Mobile Overlay -->
+        <!-- Overlay mobile -->
         <div 
             v-if="isSidebarOpen" 
             @click="isSidebarOpen = false"
-            class="fixed inset-0 z-40 bg-gray-900 bg-opacity-50 lg:hidden"
+            class="fixed inset-0 z-40 bg-brand-900/60 backdrop-blur-sm lg:hidden"
         ></div>
     </div>
 </template>

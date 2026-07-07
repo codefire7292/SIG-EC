@@ -16,6 +16,10 @@ class CivilActImportController extends Controller
 {
     public function downloadTemplate(string $type)
     {
+        if (!auth()->user()->hasPermissionTo('create-drafts')) {
+            abort(403, "Vous n'avez pas la permission de télécharger le template d'importation.");
+        }
+
         $exportClass = match ($type) {
             'naissance' => new BirthActTemplateExport(),
             'mariage'   => new MarriageActTemplateExport(),
@@ -33,6 +37,10 @@ class CivilActImportController extends Controller
 
     public function import(Request $request, string $type)
     {
+        if (!$request->user()->hasPermissionTo('create-drafts')) {
+            abort(403, "Vous n'avez pas la permission d'importer des actes.");
+        }
+
         $request->validate([
             'file'        => 'required|mimes:xls,xlsx,csv|max:10240',
             'registry_id' => 'nullable|exists:registries,id',
@@ -79,7 +87,12 @@ class CivilActImportController extends Controller
 
             return back()->with('success', "Importation réussie du registre des {$type}s.");
         } catch (\Exception $e) {
-            return back()->with('error', "Erreur lors de l'importation : " . $e->getMessage());
+            // Log the detailed message for debugging, but show a safe, generic error message to user
+            \Log::error("Import error for type {$type}: " . $e->getMessage(), [
+                'exception' => $e,
+                'user_id' => auth()->id()
+            ]);
+            return back()->with('error', "Une erreur est survenue lors du traitement du fichier. Veuillez vérifier sa structure.");
         }
     }
 }

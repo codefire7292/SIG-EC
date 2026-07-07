@@ -30,12 +30,23 @@ class AuthenticatedSessionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'login' => ['required', 'string'],
+            'login' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string'],
         ]);
 
         $loginValue = trim($request->login);
-        $loginField = filter_var($loginValue, FILTER_VALIDATE_EMAIL) ? 'email' : 'telephone';
+        $isEmail = filter_var($loginValue, FILTER_VALIDATE_EMAIL);
+        $loginField = $isEmail ? 'email' : 'telephone';
+
+        // Si ce n'est pas un email, valider le format téléphone
+        if (!$isEmail) {
+            // Permet +, espaces, tirets et chiffres (min 7 chiffres, max 20 caractères)
+            if (!preg_match('/^\+?[0-9\s\-]{7,20}$/', $loginValue)) {
+                throw ValidationException::withMessages([
+                    'login' => "Le format de l'identifiant (email ou téléphone) est invalide.",
+                ]);
+            }
+        }
 
         if (! Auth::attempt([$loginField => $loginValue, 'password' => $request->password], $request->boolean('remember'))) {
             throw ValidationException::withMessages([

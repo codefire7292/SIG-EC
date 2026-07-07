@@ -16,6 +16,7 @@ class BirthAct extends Model
 
     protected $fillable = [
         'registry_id',
+        'certificate_path',
         'reference_number',
         'uuid',
         'first_name',
@@ -23,6 +24,10 @@ class BirthAct extends Model
         'date_of_birth',
         'place_of_birth',
         'gender',
+        'is_judgment',
+        'judgment_number',
+        'judgment_date',
+        'judgment_court',
         'father_name',
         'mother_name',
         'parents_metadata',
@@ -33,6 +38,8 @@ class BirthAct extends Model
 
     protected $casts = [
         'date_of_birth' => 'date',
+        'is_judgment' => 'boolean',
+        'judgment_date' => 'date',
         'parents_metadata' => 'array',
         'validated_at' => 'datetime',
     ];

@@ -45,13 +45,16 @@ Route::middleware('auth')->group(function () {
 // Public Routes
 // -----------------------------------------------------------------------
 Route::get('/verify-certificate/{uuid}', [CertificateVerificationController::class, 'verify'])
-    ->name('certificates.verify');
+    ->name('certificates.verify')
+    ->middleware('throttle:15,1');
 
 Route::post('/verify-certificate/search', [CertificateVerificationController::class, 'search'])
-    ->name('certificates.search');
+    ->name('certificates.search')
+    ->middleware('throttle:10,1');
 
 Route::get('/certificates/v/{uuid}', [CertificateVerificationController::class, 'show'])
-    ->name('certificates.view');
+    ->name('certificates.view')
+    ->middleware('throttle:20,1');
 
 // -----------------------------------------------------------------------
 // Authenticated Routes (Civil Certificates)

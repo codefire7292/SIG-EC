@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\BirthAct;
+use App\Models\MarriageAct;
+use App\Models\DeathAct;
+use App\Models\Registry;
+use App\Models\User;
+use App\Models\CivilRegistrationCenter;
 use App\Models\CivilCertificate;
 use App\Enums\CivilCertificateType;
 use App\Services\CivilCertificateRegistryService;
@@ -20,6 +25,7 @@ class CivilCertificateController extends Controller
     public function dashboard()
     {
         $stats = [
+            // Certificats
             'total' => CivilCertificate::count(),
             'pending' => CivilCertificate::where('status', 'pending')->count(),
             'validated' => CivilCertificate::where('status', 'validated')->count(),
@@ -27,6 +33,34 @@ class CivilCertificateController extends Controller
                 ->groupBy('type')
                 ->get()
                 ->mapWithKeys(fn($item) => [$item->type->value => $item->count]),
+            
+            // Actes Civils
+            'births_count' => BirthAct::where('is_current', true)->count(),
+            'marriages_count' => MarriageAct::where('is_current', true)->count(),
+            'deaths_count' => DeathAct::where('is_current', true)->count(),
+            
+            // Actes par statut
+            'acts_draft' => BirthAct::where('status', 'draft')->where('is_current', true)->count() +
+                            MarriageAct::where('status', 'draft')->where('is_current', true)->count() +
+                            DeathAct::where('status', 'draft')->where('is_current', true)->count(),
+            
+            'acts_valide' => BirthAct::where('status', 'valide')->where('is_current', true)->count() +
+                             MarriageAct::where('status', 'valide')->where('is_current', true)->count() +
+                             DeathAct::where('status', 'valide')->where('is_current', true)->count(),
+
+            'acts_signe' => BirthAct::where('status', 'signe')->where('is_current', true)->count() +
+                            MarriageAct::where('status', 'signe')->where('is_current', true)->count() +
+                            DeathAct::where('status', 'signe')->where('is_current', true)->count(),
+
+            'acts_a_corriger' => BirthAct::where('status', 'a_corriger')->where('is_current', true)->count() +
+                                 MarriageAct::where('status', 'a_corriger')->where('is_current', true)->count() +
+                                 DeathAct::where('status', 'a_corriger')->where('is_current', true)->count(),
+
+            // Info Administrative
+            'registries_open' => Registry::where('status', 'open')->count(),
+            'registries_closed' => Registry::where('status', 'closed')->count(),
+            'users_count' => User::count(),
+            'centers_count' => CivilRegistrationCenter::count(),
         ];
 
         $recent = CivilCertificate::latest()->limit(5)->get();
@@ -81,6 +115,8 @@ class CivilCertificateController extends Controller
             'applicant_cni' => ['nullable', 'string', 'max:50'],
             'data' => ['required', 'array'],
         ]);
+
+        $this->validateCertificateData($validatedData['data']);
 
         $enumType = CivilCertificateType::from($validatedData['type']);
         $centerCode = $request->input('center', 'DEF');
@@ -193,6 +229,8 @@ class CivilCertificateController extends Controller
             'applicant_cni' => ['nullable', 'string', 'max:50'],
             'data' => ['required', 'array'],
         ]);
+
+        $this->validateCertificateData($validatedData['data']);
 
         $enumType = $civilCertificate->type;
 
@@ -364,6 +402,8 @@ class CivilCertificateController extends Controller
             'data' => 'required|array'
         ]);
 
+        $this->validateCertificateData($request->input('data'));
+
         return DB::transaction(function() use ($civilCertificate, $request) {
             // 1. Mark current as no longer current (if we want only one active version)
             $civilCertificate->is_current = false;
@@ -387,5 +427,35 @@ class CivilCertificateController extends Controller
             return redirect()->route('civil-certificates.show', $newVersion->id)
                 ->with('success', 'Nouvelle version de l\'acte créée pour rectification. L\'original est conservé en historique.');
         });
+    }
+
+    /**
+     * Valide le format et limite la taille/profondeur du JSON soumis dans le champ 'data'.
+     */
+    protected function validateCertificateData(array $data): void
+    {
+        if (count($data) > 30) {
+            abort(400, "Trop de champs de données soumis.");
+        }
+        foreach ($data as $key => $value) {
+            if (strlen((string)$key) > 100) {
+                abort(400, "Nom de champ invalide.");
+            }
+            if (is_array($value)) {
+                if (count($value) > 20) {
+                    abort(400, "Structure de données imbriquée trop grande.");
+                }
+                foreach ($value as $subKey => $subValue) {
+                    if (is_array($subValue)) {
+                        abort(400, "Profondeur de données imbriquée non supportée.");
+                    }
+                    if (strlen((string)$subKey) > 100 || strlen((string)$subValue) > 1000) {
+                        abort(400, "Valeurs de données invalides.");
+                    }
+                }
+            } elseif (strlen((string)$value) > 1000) {
+                abort(400, "Valeur de champ trop longue.");
+            }
+        }
     }
 }
