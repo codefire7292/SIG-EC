@@ -1,0 +1,63 @@
+#!/bin/bash
+set -e
+
+# Configuration
+PROJECT_ROOT="/var/www/sig-ec"
+BACKEND_DIR="$PROJECT_ROOT/Backend"
+FRONTEND_DIR="$PROJECT_ROOT/Frontend"
+
+echo "🚀 Démarrage du déploiement SIG-EC - $(date)"
+
+# 1. Mise à jour du code
+echo "📥 Récupération des derniers changements (Git)..."
+cd "$PROJECT_ROOT"
+# Ajustement temporaire des permissions pour que Git puisse travailler
+echo "@CreKolda/2026" | sudo -S chown -R crekolda:crekolda "$PROJECT_ROOT"
+git fetch origin main
+git reset --hard origin/main
+git clean -fd
+
+# 2. Backend (Laravel)
+echo "🐘 Mise à jour du Backend (Laravel)..."
+cd "$BACKEND_DIR"
+
+# Installation des dépendances Composer
+echo "📦 Installation des dépendances Composer..."
+composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --ignore-platform-reqs
+
+# Nettoyage des caches existants
+php artisan optimize:clear
+
+# Migration de la base de données et lien de stockage
+echo "🗄️  Exécution des migrations et création du lien de stockage..."
+php artisan migrate --force
+php artisan storage:link || true # Ne pas planter si le lien existe déjà
+
+# Optimisation de Laravel
+echo "✨ Optimisation du cache Laravel..."
+php artisan optimize
+
+# 3. Frontend (Vue.js / Vite)
+echo "🎨 Mise à jour du Frontend (Vite)..."
+cd "$FRONTEND_DIR"
+
+# Suppression de l'ancien build et du fichier hot pour forcer le mode production
+echo "🧹 Nettoyage de l'ancien build..."
+rm -rf "$BACKEND_DIR/public/build"
+rm -f "$BACKEND_DIR/public/hot"
+
+# Installation des dépendances NPM
+echo "📦 Installation des dépendances NPM..."
+npm install
+
+# Build du frontend
+echo "🛠️  Compilation des assets frontend..."
+npm run build
+
+# 4. Rétablissement des permissions de production
+echo "🔒 Ajustement des permissions pour le serveur web..."
+cd "$PROJECT_ROOT"
+echo "@CreKolda/2026" | sudo -S chown -R www-data:www-data Backend/storage Backend/bootstrap/cache
+echo "@CreKolda/2026" | sudo -S chmod -R 775 Backend/storage Backend/bootstrap/cache
+
+echo "✅ Déploiement E-CRE SIG-EC terminé avec succès ! - $(date)"
