@@ -42,16 +42,34 @@ Route::middleware('auth')->group(function () {
 });
 
 // -----------------------------------------------------------------------
-// Public Routes
+// Public Routes — Portail de Vérification Officiel
 // -----------------------------------------------------------------------
-Route::get('/verify-certificate/{uuid}', [CertificateVerificationController::class, 'verify'])
+
+// Page d'accueil du portail de vérification
+Route::get('/verify', [CertificateVerificationController::class, 'verify'])
     ->name('certificates.verify')
+    ->middleware('throttle:30,1');
+
+// Rétro-compatibilité
+Route::get('/verify-certificate/{uuid}', [CertificateVerificationController::class, 'verify'])
     ->middleware('throttle:15,1');
 
-Route::post('/verify-certificate/search', [CertificateVerificationController::class, 'search'])
+// Recherche unifiée (naissance, mariage, décès, certificats)
+Route::post('/verify/search', [CertificateVerificationController::class, 'search'])
     ->name('certificates.search')
     ->middleware('throttle:10,1');
 
+// Rétro-compatibilité
+Route::post('/verify-certificate/search', [CertificateVerificationController::class, 'search'])
+    ->middleware('throttle:10,1');
+
+// Affichage public d'un acte d'état civil (naissance / mariage / décès)
+Route::get('/verify/{type}/{uuid}', [CertificateVerificationController::class, 'showAct'])
+    ->name('acts.verify.show')
+    ->where('type', 'naissance|mariage|deces')
+    ->middleware('throttle:20,1');
+
+// Affichage public d'un certificat civil (legacy)
 Route::get('/certificates/v/{uuid}', [CertificateVerificationController::class, 'show'])
     ->name('certificates.view')
     ->middleware('throttle:20,1');

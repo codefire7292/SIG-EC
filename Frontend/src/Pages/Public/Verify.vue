@@ -1,84 +1,245 @@
 <script setup>
-import { Head, useForm, Link } from '@inertiajs/vue3'
+import { Head, useForm } from '@inertiajs/vue3'
 import GuestLayout from '@/Layouts/GuestLayout.vue'
-import { 
-    ShieldCheckIcon, 
+import { ref } from 'vue'
+import {
+    ShieldCheckIcon,
     MagnifyingGlassIcon,
-    ExclamationTriangleIcon
+    ExclamationTriangleIcon,
+    DocumentTextIcon,
+    HeartIcon,
+    UserGroupIcon,
+    CheckCircleIcon,
+    ArrowRightIcon,
+    QrCodeIcon,
+    LockClosedIcon,
+    BuildingOffice2Icon
 } from '@heroicons/vue/24/outline'
 
 const form = useForm({
     reference: '',
 })
 
+const isFocused = ref(false)
+
 const submit = () => {
     form.post(route('certificates.search'))
 }
+
+const actTypes = [
+    {
+        icon: DocumentTextIcon,
+        label: 'Actes de Naissance',
+        color: 'from-emerald-500 to-green-600',
+        bg: 'bg-emerald-50',
+        text: 'text-emerald-700',
+        border: 'border-emerald-200',
+    },
+    {
+        icon: HeartIcon,
+        label: 'Actes de Mariage',
+        color: 'from-rose-400 to-pink-600',
+        bg: 'bg-rose-50',
+        text: 'text-rose-700',
+        border: 'border-rose-200',
+    },
+    {
+        icon: UserGroupIcon,
+        label: 'Actes de Décès',
+        color: 'from-slate-500 to-gray-700',
+        bg: 'bg-slate-50',
+        text: 'text-slate-700',
+        border: 'border-slate-200',
+    },
+    {
+        icon: BuildingOffice2Icon,
+        label: 'Certificats Civils',
+        color: 'from-blue-500 to-indigo-600',
+        bg: 'bg-blue-50',
+        text: 'text-blue-700',
+        border: 'border-blue-200',
+    },
+]
+
+const steps = [
+    { num: '01', title: 'Saisir', desc: 'Entrez le numéro de référence figurant sur votre document officiel.' },
+    { num: '02', title: 'Vérifier', desc: 'Le système consulte le registre numérique sécurisé en temps réel.' },
+    { num: '03', title: 'Consulter', desc: 'Les informations officielles certifiées vous sont présentées.' },
+]
+
+const trusts = [
+    { icon: QrCodeIcon, title: 'QR Code Sécurisé', desc: 'Vérification instantanée via le QR code imprimé sur le document.' },
+    { icon: LockClosedIcon, title: 'Chiffrement SSL', desc: 'Toutes les données transitent de manière chiffrée et sécurisée.' },
+    { icon: ShieldCheckIcon, title: 'Registre Officiel', desc: 'Données issues du registre central de l\'État Civil de Enampore.' },
+]
 </script>
 
 <template>
-    <Head title="Vérification d'Acte" />
+    <Head title="Portail de Vérification — État Civil de Enampore" />
 
     <GuestLayout>
-        <div class="max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <div class="inline-flex items-center justify-center w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl mb-6 shadow-sm ring-1 ring-blue-100">
-                    <ShieldCheckIcon class="h-12 w-12" />
+        <!-- ═══════════════════════════════════════════════════
+             HERO SECTION
+        ════════════════════════════════════════════════════ -->
+        <section class="relative overflow-hidden">
+            <!-- Background vert institutionnel -->
+            <div class="absolute inset-0 bg-gradient-to-br from-[#0d4a08] via-[#1E690F] to-[#2d8a1f]"></div>
+            <!-- Motif géométrique discret -->
+            <div class="absolute inset-0 opacity-5"
+                 style="background-image: repeating-linear-gradient(45deg, white 0, white 1px, transparent 0, transparent 50%); background-size: 30px 30px;"></div>
+            <!-- Cercles décoratifs -->
+            <div class="absolute -top-20 -right-20 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-60 h-60 bg-[#F0C31E]/10 rounded-full blur-2xl"></div>
+
+            <div class="relative max-w-5xl mx-auto px-4 py-20 sm:py-28 text-center">
+                <!-- Badge République -->
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white/80 text-[10px] font-black uppercase tracking-[0.3em] mb-8">
+                    <span class="w-2 h-2 rounded-full bg-[#F0C31E] animate-pulse"></span>
+                    République du Sénégal — Commune de Enampore
                 </div>
-                <h1 class="text-4xl font-black text-gray-900 tracking-tighter mb-4">Portail de Vérification Officiel</h1>
-                <p class="text-lg text-gray-500 font-medium max-w-2xl mx-auto leading-relaxed">
-                    Vérifiez l'authenticité d'un certificat d'état civil en saisissant sa référence unique. 
-                    Ce service permet de confirmer la validité des actes délivrés par les centres d'état civil.
+
+                <!-- Icône principale -->
+                <div class="flex justify-center mb-8">
+                    <div class="relative">
+                        <div class="w-24 h-24 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-2xl">
+                            <ShieldCheckIcon class="h-14 w-14 text-white" />
+                        </div>
+                        <div class="absolute -top-1 -right-1 w-6 h-6 bg-[#F0C31E] rounded-full flex items-center justify-center">
+                            <CheckCircleIcon class="h-4 w-4 text-[#0d4a08]" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Titre -->
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none mb-5">
+                    Portail de Vérification<br />
+                    <span class="text-[#F0C31E]">Officiel</span>
+                </h1>
+                <p class="text-white/70 text-lg font-medium max-w-2xl mx-auto leading-relaxed mb-12">
+                    Vérifiez en ligne l'authenticité d'un acte d'état civil ou d'un certificat officiel
+                    émis par la Mairie de Enampore.
                 </p>
-            </div>
 
-            <div class="max-w-xl mx-auto">
-                <div v-if="$page.props.flash.error" class="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 animate-pulse">
-                    <ExclamationTriangleIcon class="h-6 w-6" />
-                    <p class="text-sm font-bold uppercase tracking-tight">{{ $page.props.flash.error }}</p>
-                </div>
+                <!-- ══ Formulaire de recherche ══ -->
+                <div class="max-w-2xl mx-auto">
+                    <!-- Erreur flash -->
+                    <div v-if="$page.props.flash.error"
+                         class="mb-5 p-4 bg-red-500/20 border border-red-400/40 backdrop-blur-md rounded-2xl flex items-center gap-3 text-white">
+                        <ExclamationTriangleIcon class="h-5 w-5 text-red-300 shrink-0" />
+                        <p class="text-sm font-bold">{{ $page.props.flash.error }}</p>
+                    </div>
 
-                <form @submit.prevent="submit" class="bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-blue-100 border border-gray-100">
-                    <div class="space-y-6">
-                        <div>
-                            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2 ml-1">Référence du Certificat</label>
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-600 transition-colors">
-                                    <MagnifyingGlassIcon class="h-5 w-5" />
+                    <form @submit.prevent="submit">
+                        <div class="relative group">
+                            <!-- Glow effect au focus -->
+                            <div class="absolute -inset-0.5 rounded-2xl transition-all duration-300"
+                                 :class="isFocused ? 'bg-gradient-to-r from-[#F0C31E] to-yellow-300 opacity-60 blur-sm' : 'opacity-0'">
+                            </div>
+
+                            <div class="relative flex bg-white rounded-2xl shadow-2xl overflow-hidden">
+                                <div class="flex items-center pl-6 text-gray-400">
+                                    <MagnifyingGlassIcon class="h-6 w-6" :class="isFocused ? 'text-[#1E690F]' : ''" style="transition: color 0.2s" />
                                 </div>
-                                <input 
+                                <input
                                     v-model="form.reference"
-                                    type="text" 
-                                    placeholder="Ex: KOLDA-2026-0001"
-                                    class="block w-full pl-14 pr-6 py-5 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition font-bold text-lg uppercase placeholder:normal-case"
+                                    type="text"
+                                    placeholder="Ex : ENAM-N-2026-0001"
+                                    class="flex-1 px-5 py-5 text-gray-900 font-bold text-lg bg-transparent border-0 focus:ring-0 placeholder:font-normal placeholder:text-gray-400 uppercase"
+                                    style="outline: none;"
+                                    @focus="isFocused = true"
+                                    @blur="isFocused = false"
                                     required
                                 />
+                                <button
+                                    type="submit"
+                                    :disabled="form.processing"
+                                    class="flex items-center gap-2 px-8 py-5 font-black text-[#0d4a08] text-sm transition-all duration-200 active:scale-95 disabled:opacity-60 shrink-0"
+                                    style="background: linear-gradient(135deg, #F0C31E 0%, #e6b800 100%);"
+                                >
+                                    <span v-if="form.processing">...</span>
+                                    <span v-else>Vérifier</span>
+                                    <ArrowRightIcon v-if="!form.processing" class="h-4 w-4" />
+                                </button>
                             </div>
                         </div>
+                        <p class="text-white/40 text-xs font-medium mt-3">
+                            Le numéro de référence figure sur votre document officiel (ex. : ENAM-N-2026-0001)
+                        </p>
+                    </form>
+                </div>
 
-                        <button 
-                            type="submit"
-                            :disabled="form.processing"
-                            class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-blue-200 hover:bg-black transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-                        >
-                            <span v-if="form.processing">Recherche...</span>
-                            <span v-else>Vérifier l'Authenticité</span>
-                            <ShieldCheckIcon v-if="!form.processing" class="h-6 w-6" />
-                        </button>
-                    </div>
-                </form>
-
-                <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 opacity-60">
-                    <div class="p-6 bg-gray-50 rounded-2xl border border-gray-100">
-                        <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Sécurité QR Code</h3>
-                        <p class="text-sm text-gray-500 font-medium">Les certificats récents comportent un QR code pour une vérification instantanée via mobile.</p>
-                    </div>
-                    <div class="p-6 bg-gray-50 rounded-2xl border border-gray-100">
-                        <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Registre Numérique</h3>
-                        <p class="text-sm text-gray-500 font-medium">Les données sont extraites en temps réel du registre central sécurisé de l'État Civil.</p>
+                <!-- Types d'actes couverts -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto mt-12">
+                    <div
+                        v-for="act in actTypes"
+                        :key="act.label"
+                        class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 text-center hover:bg-white/15 transition-all duration-200"
+                    >
+                        <div class="w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center"
+                             style="background: rgba(255,255,255,0.15)">
+                            <component :is="act.icon" class="h-5 w-5 text-white" />
+                        </div>
+                        <p class="text-white/80 text-xs font-bold leading-tight">{{ act.label }}</p>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════
+             COMMENT ÇA MARCHE
+        ════════════════════════════════════════════════════ -->
+        <section class="py-20 bg-white">
+            <div class="max-w-5xl mx-auto px-4">
+                <div class="text-center mb-14">
+                    <p class="text-[10px] font-black text-[#1E690F] uppercase tracking-[0.4em] mb-3">Processus</p>
+                    <h2 class="text-3xl font-black text-gray-900 tracking-tight">Comment ça marche ?</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div v-for="(step, i) in steps" :key="step.num" class="relative">
+                        <!-- Connecteur -->
+                        <div v-if="i < steps.length - 1"
+                             class="hidden md:block absolute top-8 left-[calc(100%-0px)] w-full h-px bg-gradient-to-r from-[#1E690F]/20 to-transparent z-0"></div>
+
+                        <div class="relative z-10 text-center p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 bg-white">
+                            <!-- Numéro -->
+                            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl font-black text-2xl text-white mb-5 shadow-lg"
+                                 style="background: linear-gradient(135deg, #1E690F 0%, #3D9426 100%);">
+                                {{ step.num }}
+                            </div>
+                            <h3 class="text-xl font-black text-gray-900 mb-3">{{ step.title }}</h3>
+                            <p class="text-sm text-gray-500 font-medium leading-relaxed">{{ step.desc }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════
+             GARANTIES DE SÉCURITÉ
+        ════════════════════════════════════════════════════ -->
+        <section class="py-20" style="background: linear-gradient(180deg, #F2F9EE 0%, #E8F5E1 100%);">
+            <div class="max-w-5xl mx-auto px-4">
+                <div class="text-center mb-14">
+                    <p class="text-[10px] font-black text-[#1E690F] uppercase tracking-[0.4em] mb-3">Sécurité</p>
+                    <h2 class="text-3xl font-black text-gray-900 tracking-tight">Un service de confiance</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div
+                        v-for="trust in trusts"
+                        :key="trust.title"
+                        class="bg-white rounded-3xl p-8 shadow-sm border border-green-100 hover:shadow-md transition-all duration-300"
+                    >
+                        <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 shadow-sm"
+                             style="background: linear-gradient(135deg, #1E690F 0%, #3D9426 100%);">
+                            <component :is="trust.icon" class="h-6 w-6 text-white" />
+                        </div>
+                        <h3 class="font-black text-gray-900 mb-2">{{ trust.title }}</h3>
+                        <p class="text-sm text-gray-500 font-medium leading-relaxed">{{ trust.desc }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </GuestLayout>
 </template>
