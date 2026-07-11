@@ -83,11 +83,9 @@
             </div>
 
             <!-- Actions d'Administration -->
-            <div class="mt-10 pt-6 border-t border-gray-200 flex flex-wrap gap-3 justify-end">
-              
-              <!-- Rectification (OFFICIER - If Signed) -->
+            <div class="mt-10 pt-6 border-t border-gray-200 flex flex-wrap gap-3 justify-end">              <!-- Rectification (OFFICIER - If Signed) -->
               <button v-if="can.rectify"
-                @click="rectify"
+                @click="openModal('rectify')"
                 :disabled="loading"
                 class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
               >
@@ -96,7 +94,7 @@
 
               <!-- Observe (Officier/Responsable) -->
               <button v-if="can.observe && certificate.status !== 'signe' && certificate.status !== 'brouillon'"
-                @click="observe"
+                @click="openModal('observe')"
                 :disabled="loading"
                 class="inline-flex items-center px-4 py-2 bg-yellow-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-600 active:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition ease-in-out duration-150"
               >
@@ -105,7 +103,7 @@
 
               <!-- Request Correction -->
               <button v-if="can.observe && certificate.status === 'observation'"
-                @click="requestCorrection"
+                @click="openModal('request-correction')"
                 :disabled="loading"
                 class="inline-flex items-center px-4 py-2 bg-orange-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-orange-700 active:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition ease-in-out duration-150"
               >
@@ -114,7 +112,7 @@
 
               <!-- Signature (OFFICIER) -->
               <button v-if="can.sign && certificate.status === 'valide_hierarchie'"
-                @click="sign"
+                @click="openModal('sign')"
                 :disabled="loading"
                 class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150"
               >
@@ -123,7 +121,7 @@
 
               <!-- Validation (Responsable/Directeur) -->
               <button v-if="can.approve && certificate.status !== 'signe' && certificate.status !== 'valide_hierarchie'"
-                @click="approve"
+                @click="openModal('approve')"
                 :disabled="loading"
                 class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring ring-green-300 disabled:opacity-25 transition ease-in-out duration-150"
               >
@@ -183,8 +181,6 @@
             </div>
 
             <!-- Traçabilité (Audit Logs) -->
-
-            <!-- Traçabilité (Audit Logs) -->
             <div class="mt-12 pt-8 border-t-2 border-dashed border-gray-100">
                 <h4 class="text-sm font-black text-gray-900 uppercase mb-4 flex items-center">
                     <svg class="h-4 w-4 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -207,7 +203,94 @@
                 </div>
             </div>
 
-            <!-- Modal d'Observation (Simulé par prompt pour rapidité) -->
+            <!-- Custom Premium Modal -->
+            <Teleport to="body">
+              <Transition
+                enter-active-class="transition duration-200 ease-out"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition duration-150 ease-in"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+              >
+                <div v-if="showModal" class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+                  <div 
+                    class="bg-white rounded-3xl overflow-hidden shadow-2xl transform transition-all max-w-lg w-full border border-gray-100"
+                  >
+                    <!-- Top border colored decorator -->
+                    <div class="h-2 w-full" :class="{
+                      'bg-green-600': modalType === 'approve',
+                      'bg-blue-600': modalType === 'sign',
+                      'bg-yellow-500': modalType === 'observe',
+                      'bg-orange-600': modalType === 'request-correction',
+                      'bg-indigo-600': modalType === 'rectify'
+                    }"></div>
+
+                    <div class="p-8">
+                      <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-2xl" :class="{
+                          'bg-green-50 text-green-600': modalType === 'approve',
+                          'bg-blue-50 text-blue-600': modalType === 'sign',
+                          'bg-yellow-50 text-yellow-600': modalType === 'observe',
+                          'bg-orange-50 text-orange-600': modalType === 'request-correction',
+                          'bg-indigo-50 text-indigo-600': modalType === 'rectify'
+                        }">
+                          <component :is="getModalIcon()" class="h-6 w-6" />
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                          <h3 class="text-lg font-black text-gray-900 leading-6 tracking-tight mb-2">
+                            {{ modalTitle }}
+                          </h3>
+                          <p class="text-sm font-semibold text-gray-500 mb-6">
+                            {{ modalDescription }}
+                          </p>
+
+                          <!-- Form Inputs inside Modal -->
+                          <div v-if="isInputRequired" class="space-y-2 mb-4">
+                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">
+                              {{ modalInputLabel }}
+                            </label>
+                            <textarea 
+                              v-model="modalInputValue" 
+                              rows="4" 
+                              :placeholder="modalInputPlaceholder"
+                              class="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-opacity-50 font-medium text-sm transition-all focus:bg-white resize-none"
+                              :class="{
+                                'focus:ring-yellow-500 focus:border-yellow-500': modalType === 'observe',
+                                'focus:ring-indigo-600 focus:border-indigo-600': modalType === 'rectify'
+                              }"
+                            ></textarea>
+                            <p v-if="modalInputError" class="text-xs text-red-500 font-bold pl-1">
+                              {{ modalInputError }}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Footer Action Buttons -->
+                      <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-gray-50">
+                        <button 
+                          type="button" 
+                          @click="showModal = false" 
+                          class="px-6 py-3 bg-white border border-gray-200 rounded-2xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 transition-all focus:outline-none"
+                        >
+                          Annuler
+                        </button>
+                        <button 
+                          type="button" 
+                          @click="handleConfirm" 
+                          class="px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center gap-2"
+                          :class="modalConfirmButtonClass"
+                        >
+                          {{ modalConfirmButtonText }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Transition>
+            </Teleport>
         </div>
       </div>
     </div>
@@ -218,6 +301,13 @@
 import { ref } from 'vue';
 import { router, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { 
+  CheckCircleIcon, 
+  CheckBadgeIcon, 
+  EyeIcon, 
+  ArrowPathIcon, 
+  PencilSquareIcon 
+} from '@heroicons/vue/24/outline';
 
 const props = defineProps({
   certificate: Object,
@@ -228,58 +318,101 @@ const props = defineProps({
 
 const loading = ref(false);
 
-const approve = () => {
-  if (confirm("Confirmer la validation vers la hiérarchie ? L'acte sera examiné par l'autorité supérieure.")) {
-    loading.value = true;
-    router.post(route('civil-certificates.approve', props.certificate.id), {}, {
-      onFinish: () => loading.value = false,
-    });
-  }
+// Modal state variables
+const showModal = ref(false);
+const modalType = ref(''); // 'approve' | 'sign' | 'observe' | 'request-correction' | 'rectify'
+const modalTitle = ref('');
+const modalDescription = ref('');
+const modalInputLabel = ref('');
+const modalInputValue = ref('');
+const modalInputPlaceholder = ref('');
+const modalConfirmButtonText = ref('');
+const modalConfirmButtonClass = ref('');
+const isInputRequired = ref(false);
+const modalInputError = ref('');
+
+const getModalIcon = () => {
+  if (modalType.value === 'approve') return CheckCircleIcon;
+  if (modalType.value === 'sign') return CheckBadgeIcon;
+  if (modalType.value === 'observe') return EyeIcon;
+  if (modalType.value === 'request-correction') return ArrowPathIcon;
+  if (modalType.value === 'rectify') return PencilSquareIcon;
+  return CheckCircleIcon;
 };
 
-const sign = () => {
-  if (confirm("Voulez-vous procéder à la SIGNATURE FINALE ? Après cette action, l'acte deviendra IMMUABLE et sera archivé au registre numérique.")) {
-    loading.value = true;
-    router.post(route('civil-certificates.sign', props.certificate.id), {}, {
-      onFinish: () => loading.value = false,
-    });
-  }
-};
-
-const observe = () => {
-  const comment = prompt("Saisissez vos observations pour l'agent :");
-  if (comment) {
-    loading.value = true;
-    router.post(route('civil-certificates.observe', props.certificate.id), { comments: comment }, {
-      onFinish: () => loading.value = false,
-    });
-  }
-};
-
-const requestCorrection = () => {
-  if (confirm("Renvoyer cet acte à l'agent pour correction selon les observations ?")) {
-    loading.value = true;
-    router.post(route('civil-certificates.request-correction', props.certificate.id), {}, {
-      onFinish: () => loading.value = false,
-    });
-  }
-};
-
-const rectify = () => {
-  const reason = prompt("Saisissez le MOTIF LÉGAL de la rectification (Mention Marginale) :");
-  if (reason && reason.length >= 10) {
-    if (confirm("Cela créera une nouvelle version de l'acte basée sur celle-ci. L'original sera conservé. Continuer ?")) {
-        loading.value = true;
-        router.post(route('civil-certificates.rectify', props.certificate.id), {
-            reason: reason,
-            data: props.certificate.data // Pre-fill with current data for modification in draft
-        }, {
-            onFinish: () => loading.value = false,
-        });
+const openModal = (type) => {
+    modalType.value = type;
+    modalInputValue.value = '';
+    modalInputError.value = '';
+    isInputRequired.value = false;
+    
+    if (type === 'approve') {
+        modalTitle.value = 'Validation vers la hiérarchie';
+        modalDescription.value = "Confirmer la validation vers la hiérarchie ? L'acte sera examiné par l'autorité supérieure.";
+        modalConfirmButtonText.value = 'Valider';
+        modalConfirmButtonClass.value = 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500';
+    } else if (type === 'sign') {
+        modalTitle.value = 'Signature finale et scellage';
+        modalDescription.value = "Voulez-vous procéder à la SIGNATURE FINALE ? Après cette action, l'acte deviendra IMMUABLE et sera archivé au registre numérique.";
+        modalConfirmButtonText.value = 'Signer et Sceller';
+        modalConfirmButtonClass.value = 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500';
+    } else if (type === 'observe') {
+        modalTitle.value = 'Mise en observation';
+        modalDescription.value = "Saisissez vos observations pour l'agent afin qu'il puisse corriger ou compléter l'acte.";
+        modalInputLabel.value = 'Observations / Remarques';
+        modalInputPlaceholder.value = 'Ex : Le nom de famille de l\'époux comporte une faute de frappe...';
+        isInputRequired.value = true;
+        modalConfirmButtonText.value = 'Enregistrer';
+        modalConfirmButtonClass.value = 'bg-yellow-500 hover:bg-yellow-600 text-white focus:ring-yellow-500';
+    } else if (type === 'request-correction') {
+        modalTitle.value = 'Renvoyer pour correction';
+        modalDescription.value = "Renvoyer cet acte à l'agent pour correction selon les observations ?";
+        modalConfirmButtonText.value = 'Renvoyer à l\'agent';
+        modalConfirmButtonClass.value = 'bg-orange-600 hover:bg-orange-700 text-white focus:ring-orange-500';
+    } else if (type === 'rectify') {
+        modalTitle.value = 'Rectification (Mention Marginale)';
+        modalDescription.value = "Saisissez le MOTIF LÉGAL de la rectification (Mention Marginale). Cela créera une nouvelle version de l'acte basée sur celle-ci. L'original sera conservé.";
+        modalInputLabel.value = 'Motif légal de la rectification';
+        modalInputPlaceholder.value = 'Ex : Suite au jugement de rectification n° X du Tribunal d\'Instance...';
+        isInputRequired.value = true;
+        modalConfirmButtonText.value = 'Rectifier';
+        modalConfirmButtonClass.value = 'bg-indigo-600 hover:bg-indigo-700 text-white focus:ring-indigo-500';
     }
-  } else if (reason) {
-      alert("Le motif doit être plus explicite (min. 10 caractères).");
-  }
+    showModal.value = true;
+};
+
+const handleConfirm = () => {
+    modalInputError.value = '';
+    
+    if (isInputRequired.value && (!modalInputValue.value || modalInputValue.value.trim().length === 0)) {
+        modalInputError.value = 'Ce champ est obligatoire.';
+        return;
+    }
+    
+    if (modalType.value === 'rectify' && modalInputValue.value.trim().length < 10) {
+        modalInputError.value = 'Le motif doit être plus explicite (min. 10 caractères).';
+        return;
+    }
+    
+    showModal.value = false;
+    loading.value = true;
+    
+    const finish = () => { loading.value = false; };
+
+    if (modalType.value === 'approve') {
+        router.post(route('civil-certificates.approve', props.certificate.id), {}, { onFinish: finish });
+    } else if (modalType.value === 'sign') {
+        router.post(route('civil-certificates.sign', props.certificate.id), {}, { onFinish: finish });
+    } else if (modalType.value === 'observe') {
+        router.post(route('civil-certificates.observe', props.certificate.id), { comments: modalInputValue.value }, { onFinish: finish });
+    } else if (modalType.value === 'request-correction') {
+        router.post(route('civil-certificates.request-correction', props.certificate.id), {}, { onFinish: finish });
+    } else if (modalType.value === 'rectify') {
+        router.post(route('civil-certificates.rectify', props.certificate.id), {
+            reason: modalInputValue.value,
+            data: props.certificate.data
+        }, { onFinish: finish });
+    }
 };
 
 const formatType = (type) => {

@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { 
@@ -12,7 +12,10 @@ import {
     CheckBadgeIcon,
     PencilSquareIcon,
     PlusCircleIcon,
-    DocumentIcon
+    DocumentIcon,
+    CheckCircleIcon,
+    ArrowPathIcon,
+    ExclamationTriangleIcon
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -47,12 +50,54 @@ const hasRole = (role) => {
     return authUser.roles && authUser.roles.map(r => r.name).includes(role);
 };
 
-const updateStatus = (newStatus) => {
-    if (confirm(`Confirmez-vous le passage au statut: ${newStatus} ?`)) {
-        router.post(`/acts/${props.type}/${props.act.id}/status`, {
-            status: newStatus
-        }, { preserveScroll: true });
+const showStatusModal = ref(false);
+const pendingStatus = ref('');
+const statusModalTitle = ref('');
+const statusModalDescription = ref('');
+const statusModalConfirmClass = ref('');
+const statusModalConfirmText = ref('');
+
+const openStatusModal = (newStatus) => {
+    pendingStatus.value = newStatus;
+    
+    if (newStatus === 'valide') {
+        statusModalTitle.value = 'Valider et Approuver';
+        statusModalDescription.value = "Confirmez-vous le passage au statut: VALIDÉ ? L'acte sera approuvé et disponible pour la signature finale du Maire.";
+        statusModalConfirmText.value = 'Valider et Approuver';
+        statusModalConfirmClass.value = 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500';
+    } else if (newStatus === 'a_corriger') {
+        statusModalTitle.value = 'Renvoyer à la correction';
+        statusModalDescription.value = "Confirmez-vous le passage au statut: À CORRIGER ? L'acte sera renvoyé à l'agent d'état civil pour modification.";
+        statusModalConfirmText.value = 'Renvoyer pour correction';
+        statusModalConfirmClass.value = 'bg-yellow-500 hover:bg-yellow-600 text-white focus:ring-yellow-500';
+    } else if (newStatus === 'rejete') {
+        statusModalTitle.value = 'Rejeter Définitivement';
+        statusModalDescription.value = "Attention : Confirmez-vous le rejet définitif de cet acte ? Cette action est irréversible.";
+        statusModalConfirmText.value = 'Rejeter Définitivement';
+        statusModalConfirmClass.value = 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500';
+    } else if (newStatus === 'signe') {
+        statusModalTitle.value = 'Signer et Sceller';
+        statusModalDescription.value = "Voulez-vous procéder à la SIGNATURE FINALE ? Après cette action, l'acte deviendra IMMUABLE et sera définitivement archivé au registre numérique.";
+        statusModalConfirmText.value = 'Signer et Sceller';
+        statusModalConfirmClass.value = 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500';
     }
+    
+    showStatusModal.value = true;
+};
+
+const confirmStatusChange = () => {
+    showStatusModal.value = false;
+    router.post(`/acts/${props.type}/${props.act.id}/status`, {
+        status: pendingStatus.value
+    }, { preserveScroll: true });
+};
+
+const getStatusModalIcon = () => {
+    if (pendingStatus.value === 'valide') return CheckCircleIcon;
+    if (pendingStatus.value === 'a_corriger') return ArrowPathIcon;
+    if (pendingStatus.value === 'rejete') return ExclamationTriangleIcon;
+    if (pendingStatus.value === 'signe') return CheckBadgeIcon;
+    return CheckCircleIcon;
 };
 </script>
 
@@ -656,26 +701,93 @@ const updateStatus = (newStatus) => {
                     <div v-if="act.status !== 'signe'" class="space-y-3 mt-4">
                         <!-- Officier Actions -->
                         <template v-if="hasRole(`Officier d'état-civil`) || hasRole('Administrateur technique')">
-                            <button v-if="['brouillon', 'a_corriger'].includes(act.status)" @click="updateStatus('valide')" class="w-full py-4 bg-green-50 text-green-600 hover:bg-green-100 rounded-3xl transition-all font-black text-xs uppercase flex items-center justify-center gap-2">
+                            <button v-if="['brouillon', 'a_corriger'].includes(act.status)" @click="openStatusModal('valide')" class="w-full py-4 bg-green-50 text-green-600 hover:bg-green-100 rounded-3xl transition-all font-black text-xs uppercase flex items-center justify-center gap-2">
                                 Valider et Approuver
                             </button>
-                            <button v-if="['brouillon', 'valide'].includes(act.status)" @click="updateStatus('a_corriger')" class="w-full py-4 bg-yellow-50 text-yellow-600 hover:bg-yellow-100 rounded-3xl transition-all font-black text-xs uppercase flex items-center justify-center gap-2">
+                            <button v-if="['brouillon', 'valide'].includes(act.status)" @click="openStatusModal('a_corriger')" class="w-full py-4 bg-yellow-50 text-yellow-600 hover:bg-yellow-100 rounded-3xl transition-all font-black text-xs uppercase flex items-center justify-center gap-2">
                                 Renvoyer à la correction
                             </button>
-                            <button v-if="['brouillon', 'valide', 'a_corriger'].includes(act.status)" @click="updateStatus('rejete')" class="w-full py-4 bg-red-50 text-red-600 hover:bg-red-100 rounded-3xl transition-all font-black text-xs uppercase flex items-center justify-center gap-2">
+                            <button v-if="['brouillon', 'valide', 'a_corriger'].includes(act.status)" @click="openStatusModal('rejete')" class="w-full py-4 bg-red-50 text-red-600 hover:bg-red-100 rounded-3xl transition-all font-black text-xs uppercase flex items-center justify-center gap-2">
                                 Rejeter Définitivement
                             </button>
                         </template>
 
                         <!-- Maire Actions -->
                         <template v-if="hasRole('Maire ou Délégué') || hasRole('Administrateur technique')">
-                            <button v-if="act.status === 'valide'" @click="updateStatus('signe')" class="w-full py-4 bg-blue-600 text-white shadow-xl shadow-blue-600/20 hover:scale-[1.02] active:scale-95 rounded-3xl transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                            <button v-if="act.status === 'valide'" @click="openStatusModal('signe')" class="w-full py-4 bg-blue-600 text-white shadow-xl shadow-blue-600/20 hover:scale-[1.02] active:scale-95 rounded-3xl transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2">
                                 Signer et Sceller
                             </button>
                         </template>
                     </div>
                 </div>
             </div>
+
+            <!-- Custom Status Confirmation Modal -->
+            <Teleport to="body">
+              <Transition
+                enter-active-class="transition duration-200 ease-out"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition duration-150 ease-in"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+              >
+                <div v-if="showStatusModal" class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+                  <div 
+                    class="bg-white rounded-3xl overflow-hidden shadow-2xl transform transition-all max-w-lg w-full border border-gray-100"
+                  >
+                    <!-- Top border colored decorator -->
+                    <div class="h-2 w-full" :class="{
+                      'bg-green-600': pendingStatus === 'valide',
+                      'bg-blue-600': pendingStatus === 'signe',
+                      'bg-yellow-500': pendingStatus === 'a_corriger',
+                      'bg-red-600': pendingStatus === 'rejete'
+                    }"></div>
+
+                    <div class="p-8">
+                      <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-2xl" :class="{
+                          'bg-green-50 text-green-600': pendingStatus === 'valide',
+                          'bg-blue-50 text-blue-600': pendingStatus === 'signe',
+                          'bg-yellow-50 text-yellow-600': pendingStatus === 'a_corriger',
+                          'bg-red-50 text-red-600': pendingStatus === 'rejete'
+                        }">
+                          <component :is="getStatusModalIcon()" class="h-6 w-6" />
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                          <h3 class="text-lg font-black text-gray-900 leading-6 tracking-tight mb-2">
+                            {{ statusModalTitle }}
+                          </h3>
+                          <p class="text-sm font-semibold text-gray-500">
+                            {{ statusModalDescription }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <!-- Footer Action Buttons -->
+                      <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-gray-50">
+                        <button 
+                          type="button" 
+                          @click="showStatusModal = false" 
+                          class="px-6 py-3 bg-white border border-gray-200 rounded-2xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 transition-all focus:outline-none"
+                        >
+                          Annuler
+                        </button>
+                        <button 
+                          type="button" 
+                          @click="confirmStatusChange" 
+                          class="px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center gap-2"
+                          :class="statusModalConfirmClass"
+                        >
+                          {{ statusModalConfirmText }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Transition>
+            </Teleport>
         </div>
     </AuthenticatedLayout>
 </template>
