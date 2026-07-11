@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, useForm, usePage } from '@inertiajs/vue3'
 import { 
@@ -10,12 +10,13 @@ import {
     ArrowUpTrayIcon
 } from '@heroicons/vue/24/outline'
 
-const user = usePage().props.auth.user
+const page = usePage()
+const user = computed(() => page.props.auth.user)
 
 const form = useForm({
     _method: 'patch',
-    name: user.name,
-    email: user.email,
+    name: user.value.name,
+    email: user.value.email,
     password: '',
     password_confirmation: '',
     profile_photo: null,
@@ -57,21 +58,21 @@ function updatePhotoPreview() {
         <div class="max-w-4xl mx-auto py-12 px-4">
             <header class="mb-12 text-center">
                 <div class="relative inline-block group">
-                    <div v-if="!photoPreview" class="h-32 w-32 text-white rounded-[3rem] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-green-100 border-4 border-white relative overflow-hidden transition-all group-hover:scale-105" style="background-color: #1E690F;">
+                    <div v-if="photoPreview || user.profile_photo_url" class="h-32 w-32 rounded-[3rem] overflow-hidden mx-auto mb-6 shadow-2xl shadow-green-100 border-4 border-white transition-all scale-105">
+                        <img :src="photoPreview || user.profile_photo_url" class="h-full w-full object-cover">
+                    </div>
+                    <div v-else class="h-32 w-32 text-white rounded-[3rem] flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-green-100 border-4 border-white relative overflow-hidden transition-all group-hover:scale-105" style="background-color: #1E690F;">
                          <UserIcon class="h-16 w-16" />
                     </div>
-                    <div v-else class="h-32 w-32 rounded-[3rem] overflow-hidden mx-auto mb-6 shadow-2xl shadow-green-100 border-4 border-white transition-all scale-105">
-                        <img :src="photoPreview" class="h-full w-full object-cover">
-                    </div>
                     
-                    <button @click="selectNewPhoto" class="absolute bottom-4 -right-2 p-3 bg-white rounded-2xl shadow-lg border border-gray-100 text-[#1E690F] hover:bg-[#1E690F] hover:text-white transition-all active:scale-95">
+                    <button @click="selectNewPhoto" type="button" class="absolute bottom-4 -right-2 p-3 bg-white rounded-2xl shadow-lg border border-gray-100 text-[#1E690F] hover:bg-[#1E690F] hover:text-white transition-all active:scale-95">
                         <ArrowUpTrayIcon class="w-5 h-5" />
                     </button>
                     <input ref="photoInput" type="file" class="hidden" @change="updatePhotoPreview">
                 </div>
 
                 <h1 class="text-4xl font-black text-gray-900 tracking-tight mb-2">{{ user.name }}</h1>
-                <p class="text-gray-500 font-medium tracking-wide italic leading-relaxed">Gérez vos informations personnelles et votre accès sécurisé au SIG-EC.</p>
+                <p class="text-gray-500 font-medium tracking-wide italic leading-relaxed">Gérer vos informations personnelles et votre accès sécurisé au SIG-EC.</p>
                 <div v-if="form.errors.profile_photo" class="mt-4 text-xs text-red-600 font-bold uppercase tracking-widest bg-red-50 py-2 px-4 rounded-full inline-block border border-red-100">{{ form.errors.profile_photo }}</div>
             </header>
 

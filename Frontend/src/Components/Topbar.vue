@@ -50,7 +50,8 @@ const isProfileOpen = ref(false)
                         class="flex items-center gap-3 p-1 rounded-full hover:bg-brand-50 transition-colors focus:outline-none pr-3 border border-transparent hover:border-brand-100"
                     >
                         <div class="h-9 w-9 rounded-full overflow-hidden border-2 shadow-sm flex items-center justify-center bg-brand-50" style="border-color: #1E690F;">
-                             <UserCircleIcon class="h-full w-full" style="color: #1E690F;" />
+                             <img v-if="page.props.auth.user.profile_photo_url" :src="page.props.auth.user.profile_photo_url" class="h-full w-full object-cover" />
+                             <UserCircleIcon v-else class="h-full w-full" style="color: #1E690F;" />
                         </div>
                         <div class="hidden sm:block text-left">
                             <p class="text-sm font-bold text-gray-800 leading-none">{{ page.props.auth.user.name }}</p>

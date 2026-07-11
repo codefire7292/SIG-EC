@@ -124,8 +124,11 @@ const isUrl = (url) => page.url.startsWith(url)
         <!-- User Info & Logout -->
         <div class="flex-shrink-0 p-4 border-t border-white/10" style="background: rgba(0,0,0,0.25);">
             <div class="flex items-center gap-3 px-2 py-1 mb-3">
-                <div class="h-9 w-9 rounded-full flex items-center justify-center border-2 flex-shrink-0" style="background: rgba(240,195,30,0.15); border-color: rgba(240,195,30,0.4);">
-                    <UserIcon class="h-5 w-5 text-green-100" />
+                <div class="h-9 w-9 rounded-full overflow-hidden border-2 flex-shrink-0" style="border-color: rgba(240,195,30,0.4);">
+                    <img v-if="page.props.auth.user.profile_photo_url" :src="page.props.auth.user.profile_photo_url" class="h-full w-full object-cover" />
+                    <div v-else class="h-full w-full flex items-center justify-center bg-[#F0C31E]/10">
+                        <UserIcon class="h-5 w-5 text-green-100" />
+                    </div>
                 </div>
                 <div class="flex flex-col overflow-hidden">
                     <span class="text-xs font-black text-white truncate">{{ page.props.auth.user.name }}</span>
