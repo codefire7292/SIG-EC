@@ -827,6 +827,16 @@ const submit = () => {
                             <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Déclarant différent des parents</span>
                         </label>
                     </div>
+                    <!-- Notice par défaut quand pas de déclarant tiers -->
+                    <div v-if="!hasDeclarant" class="flex items-start gap-3 p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                        <svg class="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-[11px] text-blue-700 font-medium leading-relaxed">
+                            <span class="font-black">Déclarant par défaut : le Père.</span>
+                            Conformément à la règle légale, en l'absence d'un déclarant tiers, c'est le père de l'enfant qui est considéré comme déclarant de la naissance.
+                        </p>
+                    </div>
                     <div v-if="hasDeclarant" class="space-y-6">
                         <div class="grid grid-cols-2 gap-6">
                             <div>

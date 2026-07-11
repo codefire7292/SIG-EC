@@ -44,6 +44,37 @@ const formatDate = (date) => {
 
 import { router, usePage } from '@inertiajs/vue3';
 
+// Pour les actes de naissance : si aucun déclarant tiers n'est renseigné,
+// le père est considéré comme déclarant par défaut (règle légale).
+const effectiveDeclarant = computed(() => {
+    if (props.type !== 'naissance') return null;
+    const meta = props.act?.parents_metadata;
+    const hasThirdPartyDeclarant = !!(meta?.declarant_first_name || meta?.declarant_last_name);
+    if (hasThirdPartyDeclarant) {
+        return {
+            name: `${meta.declarant_first_name || ''} ${meta.declarant_last_name || ''}`.trim(),
+            profession: meta.declarant_profession || null,
+            address: meta.declarant_address || null,
+            id_number: meta.declarant_id_number || null,
+            date: meta.declarant_date || null,
+            judgment_ref: meta.declarant_judgment_ref || null,
+            isDefault: false,
+        };
+    }
+    // Fallback : le père est le déclarant par défaut
+    const fatherName = props.act?.father_name;
+    if (!fatherName) return null;
+    return {
+        name: fatherName,
+        profession: meta?.father_profession || null,
+        address: meta?.father_domicile || null,
+        id_number: null,
+        date: null,
+        judgment_ref: null,
+        isDefault: true,
+    };
+});
+
 const authUser = usePage().props.auth.user;
 
 const hasRole = (role) => {
@@ -189,15 +220,23 @@ const getStatusModalIcon = () => {
                                     </div>
                                 </div>
                                 <!-- Déclarant -->
-                                <div v-if="act.parents_metadata?.declarant_first_name || act.parents_metadata?.declarant_last_name" class="pt-4 border-t border-gray-50">
-                                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Déclarant</h4>
+                                <div v-if="effectiveDeclarant" class="pt-4 border-t border-gray-50">
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Déclarant</h4>
+                                        <span v-if="effectiveDeclarant.isDefault" class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-wider border border-blue-100">
+                                            Père (par défaut)
+                                        </span>
+                                        <span v-else class="px-2 py-0.5 bg-purple-50 text-purple-600 rounded-full text-[9px] font-black uppercase tracking-wider border border-purple-100">
+                                            Tiers déclarant
+                                        </span>
+                                    </div>
                                     <div class="grid grid-cols-2 gap-4 text-xs">
-                                        <div><span class="text-gray-400">Nom :</span> <span class="font-bold text-gray-900">{{ act.parents_metadata.declarant_first_name }} {{ act.parents_metadata.declarant_last_name }}</span></div>
-                                        <div v-if="act.parents_metadata.declarant_profession"><span class="text-gray-400">Profession :</span> <span class="font-bold text-gray-900">{{ act.parents_metadata.declarant_profession }}</span></div>
-                                        <div v-if="act.parents_metadata.declarant_address"><span class="text-gray-400">Adresse :</span> <span class="font-bold text-gray-900">{{ act.parents_metadata.declarant_address }}</span></div>
-                                        <div v-if="act.parents_metadata.declarant_id_number"><span class="text-gray-400">ID :</span> <span class="font-bold text-gray-900">{{ act.parents_metadata.declarant_id_number }}</span></div>
-                                        <div v-if="act.parents_metadata.declarant_date"><span class="text-gray-400">Déclaration le :</span> <span class="font-bold text-gray-900">{{ formatDate(act.parents_metadata.declarant_date) }}</span></div>
-                                        <div v-if="act.parents_metadata.declarant_judgment_ref"><span class="text-gray-400">Réf. Jugement :</span> <span class="font-bold text-gray-900">{{ act.parents_metadata.declarant_judgment_ref }}</span></div>
+                                        <div><span class="text-gray-400">Nom :</span> <span class="font-bold text-gray-900">{{ effectiveDeclarant.name }}</span></div>
+                                        <div v-if="effectiveDeclarant.profession"><span class="text-gray-400">Profession :</span> <span class="font-bold text-gray-900">{{ effectiveDeclarant.profession }}</span></div>
+                                        <div v-if="effectiveDeclarant.address"><span class="text-gray-400">Adresse :</span> <span class="font-bold text-gray-900">{{ effectiveDeclarant.address }}</span></div>
+                                        <div v-if="effectiveDeclarant.id_number"><span class="text-gray-400">ID :</span> <span class="font-bold text-gray-900">{{ effectiveDeclarant.id_number }}</span></div>
+                                        <div v-if="effectiveDeclarant.date"><span class="text-gray-400">Déclaration le :</span> <span class="font-bold text-gray-900">{{ formatDate(effectiveDeclarant.date) }}</span></div>
+                                        <div v-if="effectiveDeclarant.judgment_ref"><span class="text-gray-400">Réf. Jugement :</span> <span class="font-bold text-gray-900">{{ effectiveDeclarant.judgment_ref }}</span></div>
                                     </div>
                                 </div>
                                 <!-- Témoins -->
