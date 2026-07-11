@@ -1,5 +1,6 @@
 <script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { 
     PlusIcon, 
@@ -15,18 +16,46 @@ const props = defineProps({
     registries: Object,
 });
 
+const showConfirmModal = ref(false);
+const modalType = ref(''); // 'close' or 'reopen'
+const activeRegistry = ref(null);
+
 const closeRegistry = (registry) => {
-    if (confirm(`Voulez-vous vraiment clôturer le registre des ${registry.type}s pour l'année ${registry.year} ?`)) {
-        router.post(`/admin/registries/${registry.id}/close`);
-    }
+    activeRegistry.value = registry;
+    modalType.value = 'close';
+    showConfirmModal.value = true;
 };
 
 const currentYear = new Date().getFullYear();
 
 const reopenRegistry = (registry) => {
-    if (confirm(`Voulez-vous réouvrir le registre des ${registry.type}s (${registry.year}) ?`)) {
-        router.post(`/admin/registries/${registry.id}/reopen`);
+    activeRegistry.value = registry;
+    modalType.value = 'reopen';
+    showConfirmModal.value = true;
+};
+
+const executeAction = () => {
+    showConfirmModal.value = false;
+    if (!activeRegistry.value) return;
+
+    if (modalType.value === 'close') {
+        router.post(`/admin/registries/${activeRegistry.value.id}/close`, {}, {
+            onFinish: () => {
+                activeRegistry.value = null;
+            }
+        });
+    } else if (modalType.value === 'reopen') {
+        router.post(`/admin/registries/${activeRegistry.value.id}/reopen`, {}, {
+            onFinish: () => {
+                activeRegistry.value = null;
+            }
+        });
     }
+};
+
+const cancelAction = () => {
+    showConfirmModal.value = false;
+    activeRegistry.value = null;
 };
 
 const getStatusColor = (status) => {
@@ -137,5 +166,68 @@ const getStatusColor = (status) => {
                  </div>
             </div>
         </div>
+
+        <!-- Custom Confirm Action Modal -->
+        <Teleport to="body">
+          <Transition
+            enter-active-class="transition duration-200 ease-out"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="transition duration-150 ease-in"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+          >
+            <div v-if="showConfirmModal" class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+              <div 
+                class="bg-white rounded-3xl overflow-hidden shadow-2xl transform transition-all max-w-lg w-full border border-gray-100"
+              >
+                <div class="p-8 flex items-start gap-6">
+                  <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-2xl"
+                    :class="{
+                      'bg-red-50 text-red-600': modalType === 'close',
+                      'bg-orange-50 text-orange-600': modalType === 'reopen'
+                    }"
+                  >
+                    <component :is="modalType === 'close' ? LockClosedIcon : BookOpenIcon" class="h-6 w-6" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <h3 class="text-lg font-black text-gray-900 leading-tight">
+                      {{ modalType === 'close' ? 'Clôture du registre' : 'Réouverture du registre' }}
+                    </h3>
+                    <p class="mt-2 text-sm text-gray-500 font-medium">
+                      <span v-if="modalType === 'close'">
+                        Voulez-vous vraiment clôturer le registre des <strong class="capitalize">{{ activeRegistry?.type }}s</strong> pour l'année <strong>{{ activeRegistry?.year }}</strong> ? Plus aucun nouvel acte ne pourra y être ajouté après cette opération.
+                      </span>
+                      <span v-else>
+                        Voulez-vous vraiment réouvrir le registre des <strong class="capitalize">{{ activeRegistry?.type }}s</strong> pour l'année <strong>{{ activeRegistry?.year }}</strong> ? Les officiers pourront à nouveau y enregistrer des actes.
+                      </span>
+                    </p>
+                    
+                    <div class="mt-8 flex justify-end gap-3">
+                      <button
+                        type="button"
+                        @click="cancelAction"
+                        class="px-6 py-3 bg-white border border-gray-200 rounded-xl font-black text-[10px] text-gray-500 uppercase tracking-widest hover:bg-gray-50 transition-all active:scale-95"
+                      >
+                        Annuler
+                      </button>
+                      <button
+                        type="button"
+                        @click="executeAction"
+                        class="px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 text-white"
+                        :class="{
+                          'bg-red-600 hover:bg-red-700 shadow-xl shadow-red-100': modalType === 'close',
+                          'bg-orange-600 hover:bg-orange-700 shadow-xl shadow-orange-100': modalType === 'reopen'
+                        }"
+                      >
+                        {{ modalType === 'close' ? 'Clôturer' : 'Réouvrir' }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Transition>
+        </Teleport>
     </AuthenticatedLayout>
 </template>

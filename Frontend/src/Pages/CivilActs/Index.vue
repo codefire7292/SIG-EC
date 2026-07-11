@@ -55,28 +55,42 @@ const formatDate = (date) => {
 };
 
 const fileInput = ref(null);
+const showConfirmModal = ref(false);
+const pendingFile = ref(null);
 
 const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    if (confirm(`Voulez-vous vraiment importer ce fichier dans le registre des ${props.type}s ?`)) {
-        const formData = new FormData();
-        formData.append('file', file);
+    pendingFile.value = file;
+    showConfirmModal.value = true;
+};
 
-        router.post(`/acts/${props.type}/import`, formData, {
-            forceFormData: true,
-            onSuccess: () => {
-                fileInput.value.value = '';
-            },
-            onError: (errors) => {
-                console.error(errors);
-                alert("Une erreur est survenue lors de l'importation.");
-            }
-        });
-    } else {
-        fileInput.value.value = '';
-    }
+const executeImport = () => {
+    showConfirmModal.value = false;
+    if (!pendingFile.value) return;
+
+    const formData = new FormData();
+    formData.append('file', pendingFile.value);
+
+    router.post(`/acts/${props.type}/import`, formData, {
+        forceFormData: true,
+        onSuccess: () => {
+            fileInput.value.value = '';
+            pendingFile.value = null;
+        },
+        onError: (errors) => {
+            console.error(errors);
+            fileInput.value.value = '';
+            pendingFile.value = null;
+        }
+    });
+};
+
+const cancelImport = () => {
+    showConfirmModal.value = false;
+    pendingFile.value = null;
+    fileInput.value.value = '';
 };
 </script>
 
@@ -202,5 +216,54 @@ const handleFileUpload = (event) => {
                 </table>
             </div>
         </div>
+        
+        <!-- Custom Confirm Modal -->
+        <Teleport to="body">
+          <Transition
+            enter-active-class="transition duration-200 ease-out"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="transition duration-150 ease-in"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+          >
+            <div v-if="showConfirmModal" class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+              <div 
+                class="bg-white rounded-3xl overflow-hidden shadow-2xl transform transition-all max-w-lg w-full border border-gray-100"
+              >
+                <div class="p-8 flex items-start gap-6">
+                  <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-2xl bg-blue-50 text-blue-600">
+                    <ArrowUpTrayIcon class="h-6 w-6" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <h3 class="text-lg font-black text-gray-900 leading-tight">
+                      Importation du registre
+                    </h3>
+                    <p class="mt-2 text-sm text-gray-500 font-medium">
+                      Voulez-vous vraiment importer ce fichier dans le registre des {{ props.type }}s ?
+                    </p>
+                    
+                    <div class="mt-8 flex justify-end gap-3">
+                      <button
+                        type="button"
+                        @click="cancelImport"
+                        class="px-6 py-3 bg-white border border-gray-200 rounded-xl font-black text-[10px] text-gray-500 uppercase tracking-widest hover:bg-gray-50 transition-all active:scale-95"
+                      >
+                        Annuler
+                      </button>
+                      <button
+                        type="button"
+                        @click="executeImport"
+                        class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-100 transition-all active:scale-95"
+                      >
+                        Importer
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Transition>
+        </Teleport>
     </AuthenticatedLayout>
 </template>

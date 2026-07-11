@@ -1,5 +1,6 @@
 <script setup>
 import { Head, Link, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { 
     UserPlusIcon, 
@@ -13,10 +14,28 @@ const props = defineProps({
     create_url: String,
 });
 
+const showDeleteModal = ref(false);
+const pendingDeleteUrl = ref('');
+
 const deleteUser = (deleteUrl) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.')) {
-        router.delete(deleteUrl);
+    pendingDeleteUrl.value = deleteUrl;
+    showDeleteModal.value = true;
+};
+
+const executeDelete = () => {
+    showDeleteModal.value = false;
+    if (pendingDeleteUrl.value) {
+        router.delete(pendingDeleteUrl.value, {
+            onFinish: () => {
+                pendingDeleteUrl.value = '';
+            }
+        });
     }
+};
+
+const cancelDelete = () => {
+    showDeleteModal.value = false;
+    pendingDeleteUrl.value = '';
 };
 
 const getRoleColor = (role) => {
@@ -114,5 +133,54 @@ const getRoleColor = (role) => {
                 </tbody>
             </table>
         </div>
+
+        <!-- Custom Delete Modal -->
+        <Teleport to="body">
+          <Transition
+            enter-active-class="transition duration-200 ease-out"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="transition duration-150 ease-in"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+          >
+            <div v-if="showDeleteModal" class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+              <div 
+                class="bg-white rounded-3xl overflow-hidden shadow-2xl transform transition-all max-w-lg w-full border border-gray-100"
+              >
+                <div class="p-8 flex items-start gap-6">
+                  <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-2xl bg-red-50 text-red-600">
+                    <TrashIcon class="h-6 w-6" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <h3 class="text-lg font-black text-gray-900 leading-tight">
+                      Suppression de l'utilisateur
+                    </h3>
+                    <p class="mt-2 text-sm text-gray-500 font-medium">
+                      Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible et révoquera immédiatement tous ses accès à la plateforme.
+                    </p>
+                    
+                    <div class="mt-8 flex justify-end gap-3">
+                      <button
+                        type="button"
+                        @click="cancelDelete"
+                        class="px-6 py-3 bg-white border border-gray-200 rounded-xl font-black text-[10px] text-gray-500 uppercase tracking-widest hover:bg-gray-50 transition-all active:scale-95"
+                      >
+                        Annuler
+                      </button>
+                      <button
+                        type="button"
+                        @click="executeDelete"
+                        class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-red-100 transition-all active:scale-95"
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Transition>
+        </Teleport>
     </AuthenticatedLayout>
 </template>
