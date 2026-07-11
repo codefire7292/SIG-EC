@@ -306,48 +306,6 @@ const submit = () => {
                                     <input v-model="form.health_facility" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Ex : Centre de Santé d'Enampore" />
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2 py-2">
-                                <input id="is_judgment" v-model="form.is_judgment" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-[#1E690F] focus:ring-[#1E690F] focus:border-[#1E690F]" />
-                                <label for="is_judgment" class="text-xs font-black text-gray-700 uppercase tracking-wider cursor-pointer">Cet acte fait suite à un Jugement de Naissance</label>
-                            </div>
-                            <div v-if="form.is_judgment" class="p-6 bg-green-50/30 rounded-2xl border border-green-100/50 space-y-6 col-span-full">
-                                <h4 class="text-[10px] font-black text-[#1E690F] uppercase tracking-widest flex items-center gap-2">
-                                    <div class="w-1.5 h-1.5 bg-[#1E690F] rounded-full"></div>
-                                    Références du Jugement & d'Autorisation
-                                </h4>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    <div>
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Numéro du Jugement</label>
-                                        <input v-model="form.judgment_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date du Jugement</label>
-                                        <input v-model="form.judgment_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Juridiction (Tribunal)</label>
-                                        <input v-model="form.judgment_court" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" placeholder="Tribunal d'Instance" />
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de l'Autorisation (si distincte)</label>
-                                        <input v-model="form.parents_metadata.judgment_auth_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Référence de l'Autorisation</label>
-                                        <input v-model="form.parents_metadata.judgment_auth_ref" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Réf. Autorisation" />
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Pièce Justificative (Copie Jugement PDF)</label>
-                                        <label class="flex flex-col items-center justify-center w-full h-12 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_jugement ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
-                                            <div class="flex items-center gap-2">
-                                                <DocumentIcon class="w-4 h-4" :class="form.doc_jugement ? 'text-[#1E690F]' : 'text-gray-400'" />
-                                                <span class="text-xs text-gray-500 font-bold"><span v-if="form.doc_jugement">{{ form.doc_jugement.name }}</span><span v-else>Téléverser le PDF</span></span>
-                                            </div>
-                                            <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_jugement = e.target.files[0]" />
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                            <div v-if="type === 'mariage'" class="space-y-6 col-span-full">
                             <!-- Les Époux -->
@@ -902,6 +860,52 @@ const submit = () => {
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">N° et Date du Jugement d'Autorisation</label>
                                 <input v-model="form.parents_metadata.declarant_judgment_ref" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Ex : N°12 du 01/01/2026" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Jugement (Naissance) -->
+                <div v-if="type === 'naissance'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
+                    <div class="flex items-center gap-2">
+                        <input id="is_judgment" v-model="form.is_judgment" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-[#1E690F] focus:ring-[#1E690F] focus:border-[#1E690F]" />
+                        <label for="is_judgment" class="text-xs font-black text-gray-700 uppercase tracking-wider cursor-pointer">Cet acte fait suite à un Jugement de Naissance</label>
+                    </div>
+                    <div v-if="form.is_judgment" class="p-6 bg-green-50/30 rounded-2xl border border-green-100/50 space-y-6">
+                        <h4 class="text-[10px] font-black text-[#1E690F] uppercase tracking-widest flex items-center gap-2">
+                            <div class="w-1.5 h-1.5 bg-[#1E690F] rounded-full"></div>
+                            Références du Jugement & d'Autorisation
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Numéro du Jugement</label>
+                                <input v-model="form.judgment_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date du Jugement</label>
+                                <input v-model="form.judgment_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Juridiction (Tribunal)</label>
+                                <input v-model="form.judgment_court" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" placeholder="Tribunal d'Instance" />
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de l'Autorisation (si distincte)</label>
+                                <input v-model="form.parents_metadata.judgment_auth_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Référence de l'Autorisation</label>
+                                <input v-model="form.parents_metadata.judgment_auth_ref" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Réf. Autorisation" />
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Pièce Justificative (Copie Jugement PDF)</label>
+                                <label class="flex flex-col items-center justify-center w-full h-12 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_jugement ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                    <div class="flex items-center gap-2">
+                                        <DocumentIcon class="w-4 h-4" :class="form.doc_jugement ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                        <span class="text-xs text-gray-500 font-bold"><span v-if="form.doc_jugement">{{ form.doc_jugement.name }}</span><span v-else>Téléverser le PDF</span></span>
+                                    </div>
+                                    <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_jugement = e.target.files[0]" />
+                                </label>
                             </div>
                         </div>
                     </div>
