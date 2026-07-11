@@ -43,10 +43,17 @@ class SecurityHeaders
         );
 
         // ── 6. Content Security Policy ────────────────────────────────────────
-        // Autorise : sources propres + Google Fonts (polices) + Vite HMR en dev
-        $cspNonce   = $request->attributes->get('csp_nonce', '');
-        $isLocal    = app()->environment('local');
-        $viteWs     = $isLocal ? " ws://localhost:5173 http://localhost:5173 ws://127.0.0.1:5173 http://127.0.0.1:5173" : '';
+        // Autorise : sources propres + Google Fonts (polices) + Vite HMR en dev uniquement
+        $isLocal  = app()->environment('local');
+        $appUrl   = rtrim(config('app.url', ''), '/');
+
+        // En dev : on ajoute les URLs HMR Vite (websocket + http)
+        $viteWs = $isLocal
+            ? " ws://localhost:5173 http://localhost:5173 ws://127.0.0.1:5173 http://127.0.0.1:5173"
+            : '';
+
+        // En production : on s'assure que le domaine applicatif est explicitement autorisé
+        $prodOrigin = (!$isLocal && $appUrl) ? " {$appUrl}" : '';
 
         $response->headers->set(
             'Content-Security-Policy',
@@ -56,7 +63,7 @@ class SecurityHeaders
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
                 "font-src 'self' https://fonts.gstatic.com data:",
                 "img-src 'self' data: blob:",
-                "connect-src 'self'{$viteWs}",
+                "connect-src 'self'{$prodOrigin}{$viteWs}",
                 "frame-ancestors 'self'",
                 "object-src 'none'",
                 "base-uri 'self'",
