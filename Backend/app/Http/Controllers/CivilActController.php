@@ -149,18 +149,48 @@ class CivilActController extends Controller
         }
 
         // Pièces justificatives par catégorie
-        $docFields = [
-            'doc_cni_pere'       => 'doc_cni_pere_path',
-            'doc_cni_mere'       => 'doc_cni_mere_path',
-            'doc_acte_naissance' => 'doc_acte_naissance_path',
-            'doc_cni_declarant'  => 'doc_cni_declarant_path',
-            'doc_autres'         => 'doc_autres_path',
-            'doc_jugement'       => 'doc_jugement_path',
-        ];
+        $docFields = [];
+        if ($type === 'naissance') {
+            $docFields = [
+                'doc_cni_pere'       => 'doc_cni_pere_path',
+                'doc_cni_mere'       => 'doc_cni_mere_path',
+                'doc_acte_naissance' => 'doc_acte_naissance_path',
+                'doc_cni_declarant'  => 'doc_cni_declarant_path',
+                'doc_autres'         => 'doc_autres_path',
+                'doc_jugement'       => 'doc_jugement_path',
+            ];
+        } elseif ($type === 'mariage') {
+            $docFields = [
+                'doc_cni_husband'    => 'doc_cni_husband_path',
+                'doc_cni_wife'       => 'doc_cni_wife_path',
+                'doc_birth_husband'  => 'doc_birth_husband_path',
+                'doc_birth_wife'     => 'doc_birth_wife_path',
+                'doc_domicile'       => 'doc_domicile_path',
+                'doc_medical'        => 'doc_medical_path',
+                'doc_parental_auth'  => 'doc_parental_auth_path',
+                'doc_jugement'       => 'doc_jugement_path',
+                'doc_autres'         => 'doc_autres_path',
+            ];
+        }
         foreach ($docFields as $fileKey => $pathKey) {
             if ($request->hasFile($fileKey)) {
                 $path = $request->file($fileKey)->store('certificates/pieces', 'public');
                 $data[$pathKey] = '/storage/' . $path;
+            }
+        }
+
+        // Témoins dynamiques mariage (avec CNI)
+        if ($type === 'mariage') {
+            $witnesses = $request->input('witnesses_metadata', []);
+            if (is_array($witnesses)) {
+                foreach ($witnesses as $index => &$witness) {
+                    if ($request->hasFile("witnesses_metadata.{$index}.cni_file")) {
+                        $path = $request->file("witnesses_metadata.{$index}.cni_file")->store('certificates/pieces', 'public');
+                        $witness['doc_cni_path'] = '/storage/' . $path;
+                    }
+                    unset($witness['cni_file']);
+                }
+                $data['witnesses_metadata'] = $witnesses;
             }
         }
 
@@ -232,18 +262,48 @@ class CivilActController extends Controller
         }
 
         // Pièces justificatives par catégorie
-        $docFields = [
-            'doc_cni_pere'       => 'doc_cni_pere_path',
-            'doc_cni_mere'       => 'doc_cni_mere_path',
-            'doc_acte_naissance' => 'doc_acte_naissance_path',
-            'doc_cni_declarant'  => 'doc_cni_declarant_path',
-            'doc_autres'         => 'doc_autres_path',
-            'doc_jugement'       => 'doc_jugement_path',
-        ];
+        $docFields = [];
+        if ($type === 'naissance') {
+            $docFields = [
+                'doc_cni_pere'       => 'doc_cni_pere_path',
+                'doc_cni_mere'       => 'doc_cni_mere_path',
+                'doc_acte_naissance' => 'doc_acte_naissance_path',
+                'doc_cni_declarant'  => 'doc_cni_declarant_path',
+                'doc_autres'         => 'doc_autres_path',
+                'doc_jugement'       => 'doc_jugement_path',
+            ];
+        } elseif ($type === 'mariage') {
+            $docFields = [
+                'doc_cni_husband'    => 'doc_cni_husband_path',
+                'doc_cni_wife'       => 'doc_cni_wife_path',
+                'doc_birth_husband'  => 'doc_birth_husband_path',
+                'doc_birth_wife'     => 'doc_birth_wife_path',
+                'doc_domicile'       => 'doc_domicile_path',
+                'doc_medical'        => 'doc_medical_path',
+                'doc_parental_auth'  => 'doc_parental_auth_path',
+                'doc_jugement'       => 'doc_jugement_path',
+                'doc_autres'         => 'doc_autres_path',
+            ];
+        }
         foreach ($docFields as $fileKey => $pathKey) {
             if ($request->hasFile($fileKey)) {
                 $path = $request->file($fileKey)->store('certificates/pieces', 'public');
                 $data[$pathKey] = '/storage/' . $path;
+            }
+        }
+
+        // Témoins dynamiques mariage (avec CNI)
+        if ($type === 'mariage') {
+            $witnesses = $request->input('witnesses_metadata', []);
+            if (is_array($witnesses)) {
+                foreach ($witnesses as $index => &$witness) {
+                    if ($request->hasFile("witnesses_metadata.{$index}.cni_file")) {
+                        $path = $request->file("witnesses_metadata.{$index}.cni_file")->store('certificates/pieces', 'public');
+                        $witness['doc_cni_path'] = '/storage/' . $path;
+                    }
+                    unset($witness['cni_file']);
+                }
+                $data['witnesses_metadata'] = $witnesses;
             }
         }
 
@@ -318,23 +378,72 @@ class CivilActController extends Controller
 
         if ($type === 'mariage') {
             return array_merge($common, [
-                'husband_first_name' => 'required|string',
-                'husband_last_name' => 'required|string',
-                'wife_first_name' => 'required|string',
-                'wife_last_name' => 'required|string',
-                'marriage_date' => 'required|date',
-                'marriage_place' => 'required|string',
-                'marriage_option' => 'nullable|string',
-                'matrimonial_regime' => 'nullable|string',
-                'witnesses_metadata' => 'nullable|array',
-                'witnesses_metadata.witness1_name' => 'nullable|string',
-                'witnesses_metadata.witness1_cni' => 'nullable|string',
-                'witnesses_metadata.witness2_name' => 'nullable|string',
-                'witnesses_metadata.witness2_cni' => 'nullable|string',
-                'witnesses_metadata.witness3_name' => 'nullable|string',
-                'witnesses_metadata.witness3_cni' => 'nullable|string',
-                'witnesses_metadata.witness4_name' => 'nullable|string',
-                'witnesses_metadata.witness4_cni' => 'nullable|string',
+                'husband_first_name'                           => 'required|string',
+                'husband_last_name'                            => 'required|string',
+                'wife_first_name'                              => 'required|string',
+                'wife_last_name'                               => 'required|string',
+                'marriage_date'                                => 'required|date',
+                'marriage_place'                               => 'required|string',
+                'marriage_option'                              => 'nullable|string',
+                'matrimonial_regime'                           => 'nullable|string',
+                'is_judgment'                                  => 'nullable|boolean',
+                'judgment_number'                              => 'nullable|required_if:is_judgment,true|string',
+                'judgment_date'                                => 'nullable|required_if:is_judgment,true|date',
+                // Spouses Metadata JSON
+                'spouses_metadata'                             => 'nullable|array',
+                'spouses_metadata.husband_date_of_birth'       => 'nullable|date',
+                'spouses_metadata.husband_place_of_birth'      => 'nullable|string',
+                'spouses_metadata.husband_profession'          => 'nullable|string',
+                'spouses_metadata.husband_domicile'            => 'nullable|string',
+                'spouses_metadata.husband_residence'           => 'nullable|string',
+                'spouses_metadata.husband_married_to'          => 'nullable|string',
+                'spouses_metadata.wife_date_of_birth'          => 'nullable|date',
+                'spouses_metadata.wife_place_of_birth'         => 'nullable|string',
+                'spouses_metadata.wife_profession'             => 'nullable|string',
+                'spouses_metadata.wife_domicile'               => 'nullable|string',
+                'spouses_metadata.wife_residence'              => 'nullable|string',
+                // Husband Parents
+                'spouses_metadata.husband_father_first_name'   => 'nullable|string',
+                'spouses_metadata.husband_father_last_name'    => 'nullable|string',
+                'spouses_metadata.husband_father_date_of_birth'=> 'nullable|date',
+                'spouses_metadata.husband_father_profession'   => 'nullable|string',
+                'spouses_metadata.husband_father_domicile'     => 'nullable|string',
+                'spouses_metadata.husband_mother_first_name'   => 'nullable|string',
+                'spouses_metadata.husband_mother_last_name'    => 'nullable|string',
+                'spouses_metadata.husband_mother_date_of_birth'=> 'nullable|date',
+                'spouses_metadata.husband_mother_profession'   => 'nullable|string',
+                'spouses_metadata.husband_mother_domicile'     => 'nullable|string',
+                // Wife Parents
+                'spouses_metadata.wife_father_first_name'      => 'nullable|string',
+                'spouses_metadata.wife_father_last_name'       => 'nullable|string',
+                'spouses_metadata.wife_father_date_of_birth'   => 'nullable|date',
+                'spouses_metadata.wife_father_profession'      => 'nullable|string',
+                'spouses_metadata.wife_father_domicile'        => 'nullable|string',
+                'spouses_metadata.wife_mother_first_name'      => 'nullable|string',
+                'spouses_metadata.wife_mother_last_name'       => 'nullable|string',
+                'spouses_metadata.wife_mother_date_of_birth'   => 'nullable|date',
+                'spouses_metadata.wife_mother_profession'      => 'nullable|string',
+                'spouses_metadata.wife_mother_domicile'        => 'nullable|string',
+                // Max wives limit
+                'spouses_metadata.max_wives'                   => 'nullable|string',
+                // Witnesses (dynamic)
+                'witnesses_metadata'                           => 'nullable|array',
+                'witnesses_metadata.*.first_name'              => 'nullable|string',
+                'witnesses_metadata.*.last_name'               => 'nullable|string',
+                'witnesses_metadata.*.profession'              => 'nullable|string',
+                'witnesses_metadata.*.address'                 => 'nullable|string',
+                'witnesses_metadata.*.id_number'               => 'nullable|string',
+                'witnesses_metadata.*.cni_file'                => 'nullable|file|mimes:pdf|max:10240',
+                // Documents PDF separate
+                'doc_cni_husband'                              => 'nullable|file|mimes:pdf|max:10240',
+                'doc_cni_wife'                                 => 'nullable|file|mimes:pdf|max:10240',
+                'doc_birth_husband'                            => 'nullable|file|mimes:pdf|max:10240',
+                'doc_birth_wife'                               => 'nullable|file|mimes:pdf|max:10240',
+                'doc_domicile'                                 => 'nullable|file|mimes:pdf|max:10240',
+                'doc_medical'                                  => 'nullable|file|mimes:pdf|max:10240',
+                'doc_parental_auth'                            => 'nullable|file|mimes:pdf|max:10240',
+                'doc_jugement'                                 => 'nullable|file|mimes:pdf|max:10240',
+                'doc_autres'                                   => 'nullable|file|mimes:pdf|max:10240',
             ]);
         }
 

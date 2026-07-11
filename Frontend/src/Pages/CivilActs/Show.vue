@@ -174,17 +174,85 @@ const updateStatus = (newStatus) => {
 
                             <!-- Mariage Context -->
                             <div v-if="type === 'mariage'" class="space-y-8">
-                                <div class="grid grid-cols-2 gap-8 p-6 bg-gray-50 rounded-2xl border border-gray-100">
-                                    <div class="text-center">
-                                        <div class="text-[9px] font-black text-blue-600 uppercase mb-2">Épou</div>
-                                        <div class="text-lg font-black text-gray-900">{{ act.husband_first_name }} {{ act.husband_last_name }}</div>
+                                <!-- Époux Informations Détaillées -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <!-- Époux (Mari) -->
+                                    <div class="p-6 bg-blue-50/30 rounded-2xl border border-blue-100/50 space-y-4">
+                                        <div class="flex items-center gap-2 border-b border-blue-100 pb-2">
+                                            <div class="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                            <h4 class="text-xs font-black text-blue-900 uppercase tracking-widest">Épou (Mari)</h4>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <div class="text-xl font-black text-gray-900">{{ act.husband_first_name }} {{ act.husband_last_name }}</div>
+                                            <div class="grid grid-cols-2 gap-4 text-xs">
+                                                <div>
+                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Né le</span>
+                                                    <span class="text-gray-800 font-black">{{ formatDate(act.spouses_metadata?.husband_date_of_birth) || 'Non renseigné' }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">À</span>
+                                                    <span class="text-gray-800 font-bold italic">{{ act.spouses_metadata?.husband_place_of_birth || 'Non renseigné' }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="text-xs pt-1">
+                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Profession</span>
+                                                <span class="text-gray-800 font-black">{{ act.spouses_metadata?.husband_profession || 'Non renseigné' }}</span>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-4 text-xs pt-1">
+                                                <div>
+                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Domicile</span>
+                                                    <span class="text-gray-800 font-bold">{{ act.spouses_metadata?.husband_domicile || 'Non renseigné' }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Résidence</span>
+                                                    <span class="text-gray-800 font-bold">{{ act.spouses_metadata?.husband_residence || 'Non renseigné' }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="text-xs pt-2 border-t border-blue-100/50">
+                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Marié à (épouses existantes)</span>
+                                                <span class="text-blue-700 font-black">{{ act.spouses_metadata?.husband_married_to || 'Aucune autre épouse' }}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="text-center border-l border-gray-200">
-                                        <div class="text-[9px] font-black text-pink-600 uppercase mb-2">Épouse</div>
-                                        <div class="text-lg font-black text-gray-900">{{ act.wife_first_name }} {{ act.wife_last_name }}</div>
+
+                                    <!-- Épouse (Femme) -->
+                                    <div class="p-6 bg-pink-50/30 rounded-2xl border border-pink-100/50 space-y-4">
+                                        <div class="flex items-center gap-2 border-b border-pink-100 pb-2">
+                                            <div class="w-2 h-2 bg-pink-600 rounded-full"></div>
+                                            <h4 class="text-xs font-black text-pink-900 uppercase tracking-widest">Épouse (Femme)</h4>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <div class="text-xl font-black text-gray-900">{{ act.wife_first_name }} {{ act.wife_last_name }}</div>
+                                            <div class="grid grid-cols-2 gap-4 text-xs">
+                                                <div>
+                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Née le</span>
+                                                    <span class="text-gray-800 font-black">{{ formatDate(act.spouses_metadata?.wife_date_of_birth) || 'Non renseignée' }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">À</span>
+                                                    <span class="text-gray-800 font-bold italic">{{ act.spouses_metadata?.wife_place_of_birth || 'Non renseignée' }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="text-xs pt-1">
+                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Profession</span>
+                                                <span class="text-gray-800 font-black">{{ act.spouses_metadata?.wife_profession || 'Non renseignée' }}</span>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-4 text-xs pt-1">
+                                                <div>
+                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Domicile</span>
+                                                    <span class="text-gray-800 font-bold">{{ act.spouses_metadata?.wife_domicile || 'Non renseignée' }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Résidence</span>
+                                                    <span class="text-gray-800 font-bold">{{ act.spouses_metadata?.wife_residence || 'Non renseignée' }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+
+                                <!-- Célébration & Régimes -->
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 pt-4 border-t border-gray-100">
                                     <div>
                                         <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Célébration</h4>
                                         <div class="text-sm font-black text-gray-900">{{ formatDate(act.marriage_date) }}</div>
@@ -197,12 +265,73 @@ const updateStatus = (newStatus) => {
                                         <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Option Matrimoniale</h4>
                                         <div class="text-sm font-black text-gray-900 uppercase tracking-tight">
                                             {{ act.marriage_option === 'monogamie' ? 'Monogamie' : (act.marriage_option === 'limitation_polygamie' ? 'Limitation de polygamie' : (act.marriage_option === 'polygamie' ? 'Polygamie' : act.marriage_option || 'Polygamie')) }}
+                                            <span v-if="act.spouses_metadata?.max_wives" class="text-xs text-yellow-700 font-black block">({{ act.spouses_metadata.max_wives }} épouses max)</span>
                                         </div>
                                     </div>
                                     <div>
                                         <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Régime Matrimonial</h4>
                                         <div class="text-sm font-black text-[#1E690F] uppercase tracking-tight">
                                             {{ act.matrimonial_regime === 'separation_biens' ? 'Séparation des biens' : (act.matrimonial_regime === 'regime_dotal' ? 'Régime dotal' : (act.matrimonial_regime === 'participation_meubles_acquets' ? 'Participation aux meubles et acquêts' : act.matrimonial_regime || 'Séparation des biens')) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Jugement d'autorisation -->
+                                <div v-if="act.is_judgment || act.judgment_number" class="p-5 bg-gray-50 rounded-2xl border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <div class="space-y-1">
+                                        <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Déclaration sur Jugement</div>
+                                        <div class="text-sm font-black text-gray-900">Jugement d'autorisation N° {{ act.judgment_number }}</div>
+                                        <div class="text-xs text-gray-500 font-bold">Rendu le {{ formatDate(act.judgment_date) }}</div>
+                                    </div>
+                                    <div v-if="act.doc_jugement_path" class="flex">
+                                        <a :href="act.doc_jugement_path" target="_blank" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-black text-[#1E690F] uppercase tracking-widest shadow-sm hover:bg-gray-50 transition-all flex items-center gap-1.5">
+                                            <DocumentIcon class="w-4 h-4 text-[#1E690F]" />
+                                            Copie du Jugement
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Parents des Époux -->
+                                <div class="pt-6 border-t border-gray-100 space-y-6">
+                                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">Parents des Époux</h4>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <!-- Parents Époux -->
+                                        <div class="space-y-4 p-5 bg-blue-50/10 rounded-2xl border border-blue-100/30">
+                                            <h5 class="text-[10px] font-black text-blue-900 uppercase tracking-widest border-b border-blue-100/50 pb-1">De l'Époux</h5>
+                                            <!-- Père -->
+                                            <div class="text-xs">
+                                                <span class="text-gray-400 uppercase font-bold text-[9px] block">Père</span>
+                                                <span class="text-gray-800 font-black block">{{ act.spouses_metadata?.husband_father_first_name }} {{ act.spouses_metadata?.husband_father_last_name }}</span>
+                                                <span class="text-gray-500 block">Né le : {{ formatDate(act.spouses_metadata?.husband_father_date_of_birth) || 'Non renseigné' }} | Profession : {{ act.spouses_metadata?.husband_father_profession || 'Non renseigné' }}</span>
+                                                <span class="text-gray-500 block italic">Domicile : {{ act.spouses_metadata?.husband_father_domicile || 'Non renseigné' }}</span>
+                                            </div>
+                                            <!-- Mère -->
+                                            <div class="text-xs pt-2 border-t border-blue-100/30">
+                                                <span class="text-gray-400 uppercase font-bold text-[9px] block">Mère</span>
+                                                <span class="text-gray-800 font-black block">{{ act.spouses_metadata?.husband_mother_first_name }} {{ act.spouses_metadata?.husband_mother_last_name }}</span>
+                                                <span class="text-gray-500 block">Née le : {{ formatDate(act.spouses_metadata?.husband_mother_date_of_birth) || 'Non renseigné' }} | Profession : {{ act.spouses_metadata?.husband_mother_profession || 'Non renseigné' }}</span>
+                                                <span class="text-gray-500 block italic">Domicile : {{ act.spouses_metadata?.husband_mother_domicile || 'Non renseigné' }}</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Parents Épouse -->
+                                        <div class="space-y-4 p-5 bg-pink-50/10 rounded-2xl border border-pink-100/30">
+                                            <h5 class="text-[10px] font-black text-pink-900 uppercase tracking-widest border-b border-pink-100/50 pb-1">De l'Épouse</h5>
+                                            <!-- Père -->
+                                            <div class="text-xs">
+                                                <span class="text-gray-400 uppercase font-bold text-[9px] block">Père</span>
+                                                <span class="text-gray-800 font-black block">{{ act.spouses_metadata?.wife_father_first_name }} {{ act.spouses_metadata?.wife_father_last_name }}</span>
+                                                <span class="text-gray-500 block">Né le : {{ formatDate(act.spouses_metadata?.wife_father_date_of_birth) || 'Non renseigné' }} | Profession : {{ act.spouses_metadata?.wife_father_profession || 'Non renseigné' }}</span>
+                                                <span class="text-gray-500 block italic">Domicile : {{ act.spouses_metadata?.wife_father_domicile || 'Non renseigné' }}</span>
+                                            </div>
+                                            <!-- Mère -->
+                                            <div class="text-xs pt-2 border-t border-pink-100/30">
+                                                <span class="text-gray-400 uppercase font-bold text-[9px] block">Mère</span>
+                                                <span class="text-gray-800 font-black block">{{ act.spouses_metadata?.wife_mother_first_name }} {{ act.spouses_metadata?.wife_mother_last_name }}</span>
+                                                <span class="text-gray-500 block">Née le : {{ formatDate(act.spouses_metadata?.wife_mother_date_of_birth) || 'Non renseigné' }} | Profession : {{ act.spouses_metadata?.wife_mother_profession || 'Non renseigné' }}</span>
+                                                <span class="text-gray-500 block italic">Domicile : {{ act.spouses_metadata?.wife_mother_domicile || 'Non renseigné' }}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -280,26 +409,68 @@ const updateStatus = (newStatus) => {
                                 </div>
                             </div>
 
-                            <div v-if="type === 'mariage' && act.witnesses_metadata" class="grid grid-cols-2 gap-6">
-                                <div v-if="act.witnesses_metadata.witness1_name" class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
-                                    <h4 class="text-[9px] font-black text-gray-400 uppercase mb-1">Témoin 1</h4>
-                                    <p class="text-sm font-black text-gray-900">{{ act.witnesses_metadata.witness1_name }}</p>
-                                    <p v-if="act.witnesses_metadata.witness1_cni" class="text-xs text-gray-500 font-medium mt-1">CNI : {{ act.witnesses_metadata.witness1_cni }}</p>
+                            <!-- Témoins du Mariage -->
+                            <div v-if="type === 'mariage' && act.witnesses_metadata && act.witnesses_metadata.length > 0" class="space-y-4">
+                                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Témoins du Mariage</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div v-for="(witness, idx) in act.witnesses_metadata" :key="idx" class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 space-y-2">
+                                        <div class="flex items-center justify-between border-b border-gray-100 pb-1">
+                                            <h5 class="text-[9px] font-black text-[#1E690F] uppercase tracking-wider">Témoin {{ idx + 1 }}</h5>
+                                            <a v-if="witness.doc_cni_path" :href="witness.doc_cni_path" target="_blank" class="text-[9px] font-black text-[#1E690F] hover:underline flex items-center gap-1">
+                                                <DocumentIcon class="w-3 h-3" />
+                                                Voir CNI (PDF)
+                                            </a>
+                                        </div>
+                                        <p class="text-sm font-black text-gray-900">{{ witness.first_name }} {{ witness.last_name }}</p>
+                                        <div class="grid grid-cols-2 gap-2 text-xs text-gray-500 font-medium">
+                                            <div>CNI : {{ witness.id_number || 'Non renseigné' }}</div>
+                                            <div>Profession : {{ witness.profession || 'Non renseignée' }}</div>
+                                        </div>
+                                        <div class="text-xs text-gray-500 italic">Adresse : {{ witness.address || 'Non renseignée' }}</div>
+                                    </div>
                                 </div>
-                                <div v-if="act.witnesses_metadata.witness2_name" class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
-                                    <h4 class="text-[9px] font-black text-gray-400 uppercase mb-1">Témoin 2</h4>
-                                    <p class="text-sm font-black text-gray-900">{{ act.witnesses_metadata.witness2_name }}</p>
-                                    <p v-if="act.witnesses_metadata.witness2_cni" class="text-xs text-gray-500 font-medium mt-1">CNI : {{ act.witnesses_metadata.witness2_cni }}</p>
-                                </div>
-                                <div v-if="act.witnesses_metadata.witness3_name" class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
-                                    <h4 class="text-[9px] font-black text-gray-400 uppercase mb-1">Témoin 3</h4>
-                                    <p class="text-sm font-black text-gray-900">{{ act.witnesses_metadata.witness3_name }}</p>
-                                    <p v-if="act.witnesses_metadata.witness3_cni" class="text-xs text-gray-500 font-medium mt-1">CNI : {{ act.witnesses_metadata.witness3_cni }}</p>
-                                </div>
-                                <div v-if="act.witnesses_metadata.witness4_name" class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
-                                    <h4 class="text-[9px] font-black text-gray-400 uppercase mb-1">Témoin 4</h4>
-                                    <p class="text-sm font-black text-gray-900">{{ act.witnesses_metadata.witness4_name }}</p>
-                                    <p v-if="act.witnesses_metadata.witness4_cni" class="text-xs text-gray-500 font-medium mt-1">CNI : {{ act.witnesses_metadata.witness4_cni }}</p>
+                            </div>
+
+                            <!-- Pièces Justificatives Mariage (9 catégories) -->
+                            <div v-if="type === 'mariage' && (act.doc_cni_husband_path || act.doc_cni_wife_path || act.doc_birth_husband_path || act.doc_birth_wife_path || act.doc_domicile_path || act.doc_medical_path || act.doc_parental_auth_path || act.doc_jugement_path || act.doc_autres_path)" class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                <h4 class="text-[9px] font-black text-gray-400 uppercase mb-3">Pièces Justificatives</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    <a v-if="act.doc_cni_husband_path" :href="act.doc_cni_husband_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
+                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
+                                        <span class="text-gray-500">CNI Époux :</span> Visualiser
+                                    </a>
+                                    <a v-if="act.doc_cni_wife_path" :href="act.doc_cni_wife_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
+                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
+                                        <span class="text-gray-500">CNI Épouse :</span> Visualiser
+                                    </a>
+                                    <a v-if="act.doc_birth_husband_path" :href="act.doc_birth_husband_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
+                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
+                                        <span class="text-gray-500">Acte Naissance Époux :</span> Visualiser
+                                    </a>
+                                    <a v-if="act.doc_birth_wife_path" :href="act.doc_birth_wife_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
+                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
+                                        <span class="text-gray-500">Acte Naissance Épouse :</span> Visualiser
+                                    </a>
+                                    <a v-if="act.doc_domicile_path" :href="act.doc_domicile_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
+                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
+                                        <span class="text-gray-500">Certif. Domicile :</span> Visualiser
+                                    </a>
+                                    <a v-if="act.doc_medical_path" :href="act.doc_medical_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
+                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
+                                        <span class="text-gray-500">Certif. Médical :</span> Visualiser
+                                    </a>
+                                    <a v-if="act.doc_parental_auth_path" :href="act.doc_parental_auth_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
+                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
+                                        <span class="text-gray-500">Autorisation Parentale :</span> Visualiser
+                                    </a>
+                                    <a v-if="act.doc_jugement_path" :href="act.doc_jugement_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
+                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
+                                        <span class="text-gray-500">Jugement :</span> Visualiser
+                                    </a>
+                                    <a v-if="act.doc_autres_path" :href="act.doc_autres_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline col-span-2">
+                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
+                                        <span class="text-gray-500">Autres pièces :</span> Visualiser
+                                    </a>
                                 </div>
                             </div>
                         </div>

@@ -30,12 +30,28 @@ class MarriageAct extends Model
         'matrimonial_regime',
         'witnesses_metadata',
         'officer_comments',
+        'is_judgment',
+        'judgment_number',
+        'judgment_date',
+        'doc_cni_husband_path',
+        'doc_cni_wife_path',
+        'doc_birth_husband_path',
+        'doc_birth_wife_path',
+        'doc_domicile_path',
+        'doc_medical_path',
+        'doc_parental_auth_path',
+        'doc_jugement_path',
+        'doc_autres_path',
+        'spouses_metadata',
         // NOTE: status, validated_by, validated_at, locked_at etc. managed by the system only.
     ];
 
     protected $casts = [
         'marriage_date' => 'date',
+        'judgment_date' => 'date',
+        'is_judgment' => 'boolean',
         'witnesses_metadata' => 'array',
+        'spouses_metadata' => 'array',
         'validated_at' => 'datetime',
     ];
 

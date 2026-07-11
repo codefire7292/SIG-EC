@@ -93,16 +93,55 @@ const form = useForm({
     marriage_place: props.act?.marriage_place || '',
     marriage_option: props.act?.marriage_option || 'monogamie',
     matrimonial_regime: props.act?.matrimonial_regime || 'separation_biens',
-    witnesses_metadata: props.act?.witnesses_metadata || {
-        witness1_name: '',
-        witness1_cni: '',
-        witness2_name: '',
-        witness2_cni: '',
-        witness3_name: '',
-        witness3_cni: '',
-        witness4_name: '',
-        witness4_cni: ''
+    is_judgment: props.act?.is_judgment || false,
+    judgment_number: props.act?.judgment_number || '',
+    judgment_date: props.act?.judgment_date || '',
+    spouses_metadata: props.act?.spouses_metadata || {
+        husband_date_of_birth: '',
+        husband_place_of_birth: '',
+        husband_profession: '',
+        husband_domicile: '',
+        husband_residence: '',
+        husband_married_to: '',
+        wife_date_of_birth: '',
+        wife_place_of_birth: '',
+        wife_profession: '',
+        wife_domicile: '',
+        wife_residence: '',
+        husband_father_first_name: '',
+        husband_father_last_name: '',
+        husband_father_date_of_birth: '',
+        husband_father_profession: '',
+        husband_father_domicile: '',
+        husband_mother_first_name: '',
+        husband_mother_last_name: '',
+        husband_mother_date_of_birth: '',
+        husband_mother_profession: '',
+        husband_mother_domicile: '',
+        wife_father_first_name: '',
+        wife_father_last_name: '',
+        wife_father_date_of_birth: '',
+        wife_father_profession: '',
+        wife_father_domicile: '',
+        wife_mother_first_name: '',
+        wife_mother_last_name: '',
+        wife_mother_date_of_birth: '',
+        wife_mother_profession: '',
+        wife_mother_domicile: '',
+        max_wives: ''
     },
+    witnesses_metadata: Array.isArray(props.act?.witnesses_metadata)
+        ? props.act.witnesses_metadata
+        : [],
+    // Mariage — Pièces justificatives PDF
+    doc_cni_husband: null,
+    doc_cni_wife: null,
+    doc_birth_husband: null,
+    doc_birth_wife: null,
+    doc_domicile: null,
+    doc_medical: null,
+    doc_parental_auth: null,
+    doc_jugement: null,
 
     // Deces
     deceased_first_name: props.act?.deceased_first_name || '',
@@ -111,6 +150,25 @@ const form = useForm({
     place_of_death: props.act?.place_of_death || '',
     cause_of_death: props.act?.cause_of_death || '',
 });
+
+const addMarriageWitness = () => {
+    if (!Array.isArray(form.witnesses_metadata)) {
+        form.witnesses_metadata = [];
+    }
+    form.witnesses_metadata.push({
+        first_name: '',
+        last_name: '',
+        profession: '',
+        address: '',
+        id_number: '',
+        cni_file: null,
+        doc_cni_path: null
+    });
+};
+
+const removeMarriageWitness = (index) => {
+    form.witnesses_metadata.splice(index, 1);
+};
 
 const addWitness = () => {
     if (!form.parents_metadata.witnesses) {
@@ -160,7 +218,8 @@ const submit = () => {
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
                     <h3 class="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color: #1E690F;">
                         <IdentificationIcon class="h-4 w-4" />
-                        Informations d'Identification
+                        <span v-if="type === 'mariage'">Informations des époux</span>
+                        <span v-else>Informations d'Identification</span>
                     </h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -245,32 +304,100 @@ const submit = () => {
                                 </div>
                             </div>
                         </div>
-
-
-                        <div v-if="type === 'mariage'" class="space-y-6 col-span-full">
-                            <div class="grid grid-cols-2 gap-6">
-                                <div class="p-6 bg-blue-50/50 rounded-2xl border border-blue-100 shadow-sm transition-all hover:shadow-md">
-                                    <h4 class="text-[10px] font-black text-blue-900 uppercase tracking-widest mb-4 flex items-center gap-2">
+                           <div v-if="type === 'mariage'" class="space-y-6 col-span-full">
+                            <!-- Les Époux -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Époux -->
+                                <div class="p-6 bg-blue-50/50 rounded-2xl border border-blue-100 shadow-sm space-y-4">
+                                    <h4 class="text-[10px] font-black text-blue-900 uppercase tracking-widest flex items-center gap-2">
                                         <div class="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
                                         Épou (Mari)
                                     </h4>
-                                    <div class="space-y-4">
-                                        <input v-model="form.husband_first_name" placeholder="Prénoms" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
-                                        <input v-model="form.husband_last_name" placeholder="Nom" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Prénoms</label>
+                                            <input v-model="form.husband_first_name" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                        </div>
+                                        <div>
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Nom</label>
+                                            <input v-model="form.husband_last_name" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Date de naissance</label>
+                                            <input v-model="form.spouses_metadata.husband_date_of_birth" type="date" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Lieu de naissance</label>
+                                            <input v-model="form.spouses_metadata.husband_place_of_birth" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Profession</label>
+                                        <input v-model="form.spouses_metadata.husband_profession" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Domicile</label>
+                                            <input v-model="form.spouses_metadata.husband_domicile" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Résidence</label>
+                                            <input v-model="form.spouses_metadata.husband_residence" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Marié à (identité/nombre des épouses existantes)</label>
+                                        <input v-model="form.spouses_metadata.husband_married_to" type="text" placeholder="Ex: Marié à Aminata Diallo, 1 épouse" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
                                     </div>
                                 </div>
-                                <div class="p-6 bg-pink-50/50 rounded-2xl border border-pink-100 shadow-sm transition-all hover:shadow-md">
-                                    <h4 class="text-[10px] font-black text-pink-900 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                         <div class="w-1.5 h-1.5 bg-pink-600 rounded-full"></div>
+
+                                <!-- Épouse -->
+                                <div class="p-6 bg-pink-50/50 rounded-2xl border border-pink-100 shadow-sm space-y-4">
+                                    <h4 class="text-[10px] font-black text-pink-900 uppercase tracking-widest flex items-center gap-2">
+                                        <div class="w-1.5 h-1.5 bg-pink-600 rounded-full"></div>
                                         Épouse (Femme)
                                     </h4>
-                                    <div class="space-y-4">
-                                        <input v-model="form.wife_first_name" placeholder="Prénoms" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
-                                        <input v-model="form.wife_last_name" placeholder="Nom" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Prénoms</label>
+                                            <input v-model="form.wife_first_name" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                        </div>
+                                        <div>
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Nom</label>
+                                            <input v-model="form.wife_last_name" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Date de naissance</label>
+                                            <input v-model="form.spouses_metadata.wife_date_of_birth" type="date" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Lieu de naissance</label>
+                                            <input v-model="form.spouses_metadata.wife_place_of_birth" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Profession</label>
+                                        <input v-model="form.spouses_metadata.wife_profession" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Domicile</label>
+                                            <input v-model="form.spouses_metadata.wife_domicile" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                        </div>
+                                        <div>
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Résidence</label>
+                                            <input v-model="form.spouses_metadata.wife_residence" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                            <!-- Célébration -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date du Mariage</label>
                                     <input v-model="form.marriage_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
@@ -280,6 +407,8 @@ const submit = () => {
                                     <input v-model="form.marriage_place" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                                 </div>
                             </div>
+
+                            <!-- Régime & Polygamie -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Option Matrimoniale (Pluralité des liens)</label>
@@ -296,6 +425,47 @@ const submit = () => {
                                         <option value="regime_dotal">Régime dotal</option>
                                         <option value="participation_meubles_acquets">Régime communautaire de participation aux meubles et acquêts</option>
                                     </select>
+                                </div>
+                            </div>
+
+                            <!-- Polygamie: Nombre max d'épouses -->
+                            <div v-if="['limitation_polygamie', 'polygamie'].includes(form.marriage_option)" class="p-4 bg-yellow-50/50 rounded-2xl border border-yellow-100 max-w-md">
+                                <label class="block text-[10px] font-black text-yellow-900 uppercase tracking-widest mb-2 pl-1">Nombre maximal d'épouses autorisées (Législation Sénégalaise)</label>
+                                <select v-model="form.spouses_metadata.max_wives" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm">
+                                    <option value="">Sélectionner la limite...</option>
+                                    <option value="1">1 épouse (Monogamie de fait)</option>
+                                    <option value="2">2 épouses</option>
+                                    <option value="3">3 épouses</option>
+                                    <option value="4">4 épouses (Limite légale)</option>
+                                </select>
+                            </div>
+
+                            <!-- Section Jugement (Mariage) -->
+                            <div class="p-6 bg-gray-50 rounded-2xl border border-gray-200/80 space-y-4">
+                                <div class="flex items-center gap-3">
+                                    <input v-model="form.is_judgment" type="checkbox" id="marriage_is_judgment" class="h-4.5 w-4.5 text-[#1E690F] focus:ring-[#1E690F] border-gray-300 rounded" />
+                                    <label for="marriage_is_judgment" class="text-xs font-black text-gray-700 uppercase tracking-wider cursor-pointer">Déclaration sur jugement d'autorisation ?</label>
+                                </div>
+
+                                <div v-if="form.is_judgment" class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Numéro du Jugement</label>
+                                        <input v-model="form.judgment_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date du Jugement</label>
+                                        <input v-model="form.judgment_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Copie du Jugement (PDF)</label>
+                                        <label class="flex flex-col items-center justify-center w-full h-12 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_jugement ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                            <div class="flex items-center gap-2">
+                                                <DocumentIcon class="w-4 h-4" :class="form.doc_jugement ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                                <span class="text-xs text-gray-500 font-bold"><span v-if="form.doc_jugement">{{ form.doc_jugement.name }}</span><span v-else>Téléverser le PDF</span></span>
+                                            </div>
+                                            <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_jugement = e.target.files[0]" />
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -392,6 +562,80 @@ const submit = () => {
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile</label>
                                 <input v-model="form.parents_metadata.mother_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2B: Parents des Époux (Mariage uniquement) -->
+                <div v-if="type === 'mariage'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-8">
+                    <h3 class="text-xs font-black uppercase tracking-widest flex items-center gap-2" style="color: #1E690F;">
+                        <UserGroupIcon class="h-4 w-4" />
+                        Parents des Époux
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Parents de l'époux (Mari) -->
+                        <div class="space-y-6 p-6 bg-blue-50/20 rounded-3xl border border-blue-100/50">
+                            <h4 class="text-xs font-black text-blue-900 uppercase tracking-widest border-b border-blue-100 pb-2">Parents de l'Époux</h4>
+                            <!-- Père de l'époux -->
+                            <div class="space-y-3">
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Père</span>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <input v-model="form.spouses_metadata.husband_father_first_name" placeholder="Prénoms" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                    <input v-model="form.spouses_metadata.husband_father_last_name" placeholder="Nom" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <input v-model="form.spouses_metadata.husband_father_date_of_birth" type="date" placeholder="Date de naissance" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                    <input v-model="form.spouses_metadata.husband_father_profession" placeholder="Profession" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                </div>
+                                <input v-model="form.spouses_metadata.husband_father_domicile" placeholder="Domicile" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                            </div>
+                            
+                            <!-- Mère de l'époux -->
+                            <div class="space-y-3 pt-4 border-t border-blue-100/50">
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Mère</span>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <input v-model="form.spouses_metadata.husband_mother_first_name" placeholder="Prénoms" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                    <input v-model="form.spouses_metadata.husband_mother_last_name" placeholder="Nom" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <input v-model="form.spouses_metadata.husband_mother_date_of_birth" type="date" placeholder="Date de naissance" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                    <input v-model="form.spouses_metadata.husband_mother_profession" placeholder="Profession" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                </div>
+                                <input v-model="form.spouses_metadata.husband_mother_domicile" placeholder="Domicile" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                            </div>
+                        </div>
+
+                        <!-- Parents de l'épouse -->
+                        <div class="space-y-6 p-6 bg-pink-50/20 rounded-3xl border border-pink-100/50">
+                            <h4 class="text-xs font-black text-pink-900 uppercase tracking-widest border-b border-pink-100 pb-2">Parents de l'Épouse</h4>
+                            <!-- Père de l'épouse -->
+                            <div class="space-y-3">
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Père</span>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <input v-model="form.spouses_metadata.wife_father_first_name" placeholder="Prénoms" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                    <input v-model="form.spouses_metadata.wife_father_last_name" placeholder="Nom" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <input v-model="form.spouses_metadata.wife_father_date_of_birth" type="date" placeholder="Date de naissance" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                    <input v-model="form.spouses_metadata.wife_father_profession" placeholder="Profession" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                </div>
+                                <input v-model="form.spouses_metadata.wife_father_domicile" placeholder="Domicile" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                            </div>
+                            
+                            <!-- Mère de l'épouse -->
+                            <div class="space-y-3 pt-4 border-t border-pink-100/50">
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Mère</span>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <input v-model="form.spouses_metadata.wife_mother_first_name" placeholder="Prénoms" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                    <input v-model="form.spouses_metadata.wife_mother_last_name" placeholder="Nom" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <input v-model="form.spouses_metadata.wife_mother_date_of_birth" type="date" placeholder="Date de naissance" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                    <input v-model="form.spouses_metadata.wife_mother_profession" placeholder="Profession" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
+                                </div>
+                                <input v-model="form.spouses_metadata.wife_mother_domicile" placeholder="Domicile" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" />
                             </div>
                         </div>
                     </div>
@@ -508,45 +752,71 @@ const submit = () => {
 
 
 
-                <div v-if="type === 'mariage'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-                    <h3 class="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color: #1E690F;">
-                        <UserGroupIcon class="h-4 w-4" />
-                        Témoins de l'acte
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-4 p-4 bg-gray-50/50 rounded-2xl border border-gray-100/50">
+                <div v-if="type === 'mariage'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-black uppercase tracking-widest flex items-center gap-2" style="color: #1E690F;">
+                            <UserGroupIcon class="h-4 w-4" />
+                            Témoins du Mariage (0 à 4 témoins)
+                        </h3>
+                        <button type="button" @click="addMarriageWitness" v-if="!form.witnesses_metadata || form.witnesses_metadata.length < 4" class="px-4 py-2 bg-green-50 text-[#1E690F] hover:bg-green-100 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-1.5 transition-all">
+                            <PlusIcon class="h-4 w-4" /> Ajouter un témoin
+                        </button>
+                    </div>
+
+                    <div v-if="form.witnesses_metadata && form.witnesses_metadata.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div v-for="(witness, index) in form.witnesses_metadata" :key="index" class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 space-y-4 relative">
+                            <button type="button" @click="removeMarriageWitness(index)" class="absolute top-4 right-4 text-red-500 hover:text-red-700 transition-colors">
+                                <TrashIcon class="h-4 w-4" />
+                            </button>
                             <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                                 <div class="w-1.5 h-1.5 bg-[#1E690F] rounded-full"></div>
-                                Témoin 1
+                                Témoin {{ index + 1 }}
                             </h4>
-                            <input v-model="form.witnesses_metadata.witness1_name" placeholder="Prénoms & Nom" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
-                            <input v-model="form.witnesses_metadata.witness1_cni" placeholder="N° Carte d'Identité Nationale (CNI)" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
-                        </div>
-                        <div class="space-y-4 p-4 bg-gray-50/50 rounded-2xl border border-gray-100/50">
-                            <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                                <div class="w-1.5 h-1.5 bg-[#1E690F] rounded-full"></div>
-                                Témoin 2
-                            </h4>
-                            <input v-model="form.witnesses_metadata.witness2_name" placeholder="Prénoms & Nom" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
-                            <input v-model="form.witnesses_metadata.witness2_cni" placeholder="N° Carte d'Identité Nationale (CNI)" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
-                        </div>
-                        <div class="space-y-4 p-4 bg-gray-50/50 rounded-2xl border border-gray-100/50">
-                            <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                                <div class="w-1.5 h-1.5 bg-[#1E690F] rounded-full"></div>
-                                Témoin 3
-                            </h4>
-                            <input v-model="form.witnesses_metadata.witness3_name" placeholder="Prénoms & Nom" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
-                            <input v-model="form.witnesses_metadata.witness3_cni" placeholder="N° Carte d'Identité Nationale (CNI)" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
-                        </div>
-                        <div class="space-y-4 p-4 bg-gray-50/50 rounded-2xl border border-gray-100/50">
-                            <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                                <div class="w-1.5 h-1.5 bg-[#1E690F] rounded-full"></div>
-                                Témoin 4
-                            </h4>
-                            <input v-model="form.witnesses_metadata.witness4_name" placeholder="Prénoms & Nom" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
-                            <input v-model="form.witnesses_metadata.witness4_cni" placeholder="N° Carte d'Identité Nationale (CNI)" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénom</label>
+                                    <input v-model="witness.first_name" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom</label>
+                                    <input v-model="witness.last_name" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession</label>
+                                    <input v-model="witness.profession" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">N° CNI (ID)</label>
+                                    <input v-model="witness.id_number" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile (Adresse)</label>
+                                <input v-model="witness.address" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                            </div>
+                            <!-- Upload CNI Témoin -->
+                            <div>
+                                <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Copie CNI (PDF)</label>
+                                <label class="flex flex-col items-center justify-center w-full h-12 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="witness.cni_file || witness.doc_cni_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                    <div class="flex items-center gap-2">
+                                        <DocumentIcon class="w-4 h-4" :class="witness.cni_file || witness.doc_cni_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                        <span class="text-xs text-gray-500 font-bold">
+                                            <span v-if="witness.cni_file">{{ witness.cni_file.name }}</span>
+                                            <span v-else-if="witness.doc_cni_path">CNI Déjà téléversée (Modifier)</span>
+                                            <span v-else>Téléverser la CNI (PDF)</span>
+                                        </span>
+                                    </div>
+                                    <input type="file" class="hidden" accept="application/pdf" @change="(e) => witness.cni_file = e.target.files[0]" />
+                                </label>
+                                <div v-if="witness.doc_cni_path && !witness.cni_file" class="text-[9px] text-[#1E690F] font-bold mt-1">
+                                    <a :href="witness.doc_cni_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    <p v-else class="text-xs text-gray-400 italic">Aucun témoin renseigné pour cet acte.</p>
                 </div>
 
                 <!-- Pièces justificatives — Naissance (5 catégories PDF) -->
@@ -604,32 +874,147 @@ const submit = () => {
                     </div>
                 </div>
 
-                <!-- Document Justificatif PDF (Mariage uniquement) -->
+                <!-- Pièces justificatives — Mariage (PDFs par catégorie) -->
                 <div v-if="type === 'mariage'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
                     <h3 class="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color: #1E690F;">
                         <DocumentArrowUpIcon class="h-4 w-4" />
-                        Document Justificatif Obligatoire (PDF)
+                        Pièces Justificatives (PDF par catégorie)
                     </h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-center w-full">
-                            <label class="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-3xl cursor-pointer hover:bg-gray-50/50 transition-all"
-                                   :class="form.certificate_file ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
-                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <DocumentIcon class="w-10 h-10 mb-3" :class="form.certificate_file || form.certificate_path ? 'text-[#1E690F]' : 'text-gray-400'" />
-                                    <p class="mb-2 text-sm text-gray-500 font-bold">
-                                        <span v-if="form.certificate_file">Fichier sélectionné : {{ form.certificate_file.name }}</span>
-                                        <span v-else-if="form.certificate_path">Modifier le document justificatif PDF</span>
-                                        <span v-else>Glisser-déposer le certificat ou cliquer pour téléverser</span>
-                                    </p>
-                                    <p class="text-xs text-gray-400">Format autorisé : PDF uniquement (Max 10 Mo)</p>
-                                </div>
-                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.certificate_file = e.target.files[0]" />
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- CNI Époux -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Époux</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_husband || props.act?.doc_cni_husband_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_husband || props.act?.doc_cni_husband_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_cni_husband">{{ form.doc_cni_husband.name }}</span>
+                                    <span v-else-if="props.act?.doc_cni_husband_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_cni_husband = e.target.files[0]" />
                             </label>
+                            <div v-if="props.act?.doc_cni_husband_path && !form.doc_cni_husband" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_cni_husband_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
                         </div>
-                        <div v-if="form.certificate_path && !form.certificate_file" class="flex items-center gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                            <CheckCircleIcon class="w-5 h-5 text-[#1E690F]" />
-                            <span class="text-xs font-bold text-gray-600">Un document justificatif existe déjà.</span>
-                            <a :href="form.certificate_path" target="_blank" class="text-xs font-black text-[#1E690F] hover:underline ml-auto">Visualiser</a>
+                        
+                        <!-- CNI Épouse -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Épouse</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_wife || props.act?.doc_cni_wife_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_wife || props.act?.doc_cni_wife_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_cni_wife">{{ form.doc_cni_wife.name }}</span>
+                                    <span v-else-if="props.act?.doc_cni_wife_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_cni_wife = e.target.files[0]" />
+                            </label>
+                            <div v-if="props.act?.doc_cni_wife_path && !form.doc_cni_wife" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_cni_wife_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
+                        </div>
+
+                        <!-- Acte de Naissance Époux -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Époux</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_birth_husband || props.act?.doc_birth_husband_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_birth_husband || props.act?.doc_birth_husband_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_birth_husband">{{ form.doc_birth_husband.name }}</span>
+                                    <span v-else-if="props.act?.doc_birth_husband_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_birth_husband = e.target.files[0]" />
+                            </label>
+                            <div v-if="props.act?.doc_birth_husband_path && !form.doc_birth_husband" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_birth_husband_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
+                        </div>
+
+                        <!-- Acte de Naissance Épouse -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Épouse</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_birth_wife || props.act?.doc_birth_wife_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_birth_wife || props.act?.doc_birth_wife_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_birth_wife">{{ form.doc_birth_wife.name }}</span>
+                                    <span v-else-if="props.act?.doc_birth_wife_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_birth_wife = e.target.files[0]" />
+                            </label>
+                            <div v-if="props.act?.doc_birth_wife_path && !form.doc_birth_wife" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_birth_wife_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
+                        </div>
+
+                        <!-- Certificat de Domicile -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Domicile</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_domicile || props.act?.doc_domicile_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_domicile || props.act?.doc_domicile_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_domicile">{{ form.doc_domicile.name }}</span>
+                                    <span v-else-if="props.act?.doc_domicile_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_domicile = e.target.files[0]" />
+                            </label>
+                            <div v-if="props.act?.doc_domicile_path && !form.doc_domicile" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_domicile_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
+                        </div>
+
+                        <!-- Certificat Médical Prénuptial -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat Médical Prénuptial</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_medical || props.act?.doc_medical_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_medical || props.act?.doc_medical_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_medical">{{ form.doc_medical.name }}</span>
+                                    <span v-else-if="props.act?.doc_medical_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_medical = e.target.files[0]" />
+                            </label>
+                            <div v-if="props.act?.doc_medical_path && !form.doc_medical" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_medical_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
+                        </div>
+
+                        <!-- Autorisation parentale -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autorisation parentale (si mineur)</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_parental_auth || props.act?.doc_parental_auth_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_parental_auth || props.act?.doc_parental_auth_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_parental_auth">{{ form.doc_parental_auth.name }}</span>
+                                    <span v-else-if="props.act?.doc_parental_auth_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_parental_auth = e.target.files[0]" />
+                            </label>
+                            <div v-if="props.act?.doc_parental_auth_path && !form.doc_parental_auth" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_parental_auth_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
+                        </div>
+
+                        <!-- Autres pièces -->
+                        <div class="md:col-span-2 lg:col-span-2">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autres Pièces Justificatives</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_autres || props.act?.doc_autres_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_autres || props.act?.doc_autres_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_autres">{{ form.doc_autres.name }}</span>
+                                    <span v-else-if="props.act?.doc_autres_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_autres = e.target.files[0]" />
+                            </label>
+                            <div v-if="props.act?.doc_autres_path && !form.doc_autres" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_autres_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -650,11 +1035,11 @@ const submit = () => {
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
                     <h3 class="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color: #1E690F;">
                         <PlusCircleIcon class="h-4 w-4" />
-                        {{ type === 'naissance' ? 'Mentions Marginales' : "Observations de l'Officier" }}
+                        {{ ['naissance', 'mariage'].includes(type) ? 'Mentions Marginales' : "Observations de l'Officier" }}
                     </h3>
                     <div>
                         <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">
-                            {{ type === 'naissance' ? 'Mentions marginales' : 'Commentaires officiels' }}
+                            {{ ['naissance', 'mariage'].includes(type) ? 'Mentions marginales' : 'Commentaires officiels' }}
                         </label>
                         <textarea v-model="form.officer_comments" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" rows="3" placeholder="Notes additionnelles, mentions marginales..."></textarea>
                     </div>
