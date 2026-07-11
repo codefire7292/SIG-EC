@@ -21,15 +21,36 @@ class DeathAct extends Model
         'uuid',
         'deceased_first_name',
         'deceased_last_name',
+        'gender',
+        'date_of_birth',
         'date_of_death',
+        'time_of_death',
         'place_of_death',
+        'health_facility',
+        'act_registration_date',
         'cause_of_death',
+        'is_judgment',
+        'judgment_number',
+        'judgment_date',
+        'judgment_court',
+        'doc_death_cert_path',
+        'doc_deceased_id_path',
+        'doc_declarant_id_path',
+        'doc_jugement_path',
+        'doc_autres_path',
+        'death_metadata',
+        'witnesses_metadata',
         'officer_comments',
-        // NOTE: status, validated_by, validated_at, locked_at etc. managed by the system only.
     ];
 
     protected $casts = [
         'date_of_death' => 'date',
+        'date_of_birth' => 'date',
+        'act_registration_date' => 'date',
+        'judgment_date' => 'date',
+        'is_judgment' => 'boolean',
+        'death_metadata' => 'array',
+        'witnesses_metadata' => 'array',
         'validated_at' => 'datetime',
     ];
 

@@ -11,7 +11,8 @@ import {
     ClockIcon,
     CheckBadgeIcon,
     PencilSquareIcon,
-    PlusCircleIcon
+    PlusCircleIcon,
+    DocumentIcon
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -338,19 +339,134 @@ const updateStatus = (newStatus) => {
                             </div>
 
                             <!-- Deces Context -->
-                            <div v-if="type === 'deces'" class="grid grid-cols-2 gap-8">
-                                <div class="col-span-full">
-                                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Défunt</h4>
-                                    <div class="text-xl font-black text-gray-900">{{ act.deceased_first_name }} {{ act.deceased_last_name }}</div>
+                            <div v-if="type === 'deces'" class="space-y-8">
+                                <!-- Acte & Défunt Details -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <!-- Informations de l'Acte de Décès -->
+                                    <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-150 space-y-4">
+                                        <div class="flex items-center gap-2 border-b border-gray-250 pb-2">
+                                            <div class="w-2 h-2 bg-[#1E690F] rounded-full"></div>
+                                            <h4 class="text-xs font-black text-gray-900 uppercase tracking-widest">Acte de Décès</h4>
+                                        </div>
+                                        <div class="space-y-3 text-xs">
+                                            <div>
+                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Date du Décès</span>
+                                                <span class="text-gray-900 font-black text-sm">{{ formatDate(act.date_of_death) }}<span v-if="act.time_of_death" class="text-gray-500 font-medium ml-2">à {{ act.time_of_death }}</span></span>
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Lieu du Décès</span>
+                                                <span class="text-gray-800 font-bold">{{ act.place_of_death }}</span>
+                                            </div>
+                                            <div v-if="act.health_facility">
+                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Formation Sanitaire</span>
+                                                <span class="text-green-700 font-bold">{{ act.health_facility }}</span>
+                                            </div>
+                                            <div v-if="act.act_registration_date">
+                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Date d'Inscription</span>
+                                                <span class="text-gray-800 font-bold">Fait à Enampore, le {{ formatDate(act.act_registration_date) }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Informations du Défunt -->
+                                    <div class="p-6 bg-red-50/10 rounded-2xl border border-red-100/30 space-y-4">
+                                        <div class="flex items-center gap-2 border-b border-red-100/50 pb-2">
+                                            <div class="w-2 h-2 bg-red-600 rounded-full"></div>
+                                            <h4 class="text-xs font-black text-red-900 uppercase tracking-widest">Le Défunt</h4>
+                                        </div>
+                                        <div class="space-y-3 text-xs">
+                                            <div>
+                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Identité</span>
+                                                <span class="text-gray-900 font-black text-base block">{{ act.deceased_first_name }} {{ act.deceased_last_name }}</span>
+                                                <span class="text-xs font-bold text-red-600">{{ act.gender === 'M' ? 'Masculin' : 'Féminin' }}</span>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Né(e) le</span>
+                                                    <span class="text-gray-850 font-bold">{{ formatDate(act.date_of_birth) }}<span v-if="act.death_metadata?.time_of_birth" class="text-gray-500 font-medium ml-1">à {{ act.death_metadata.time_of_birth }}</span></span>
+                                                </div>
+                                                <div>
+                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">À</span>
+                                                    <span class="text-gray-850 font-bold italic">{{ act.death_metadata?.place_of_birth || '-' }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Profession</span>
+                                                    <span class="text-gray-850 font-bold">{{ act.death_metadata?.profession || '-' }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Domicile</span>
+                                                    <span class="text-gray-850 font-bold">{{ act.death_metadata?.domicile || '-' }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-4 pt-1 border-t border-red-100/50">
+                                                <div>
+                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Situation Matrimoniale</span>
+                                                    <span class="text-gray-850 font-bold">{{ act.death_metadata?.marital_status || '-' }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Précédemment marié à</span>
+                                                    <span class="text-gray-850 font-bold">{{ act.death_metadata?.previously_married_to || '-' }}</span>
+                                                </div>
+                                            </div>
+                                            <div v-if="act.cause_of_death">
+                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Cause du Décès (Optionnel)</span>
+                                                <span class="text-gray-850 font-medium italic">"{{ act.cause_of_death }}"</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Décès</h4>
-                                    <div class="text-sm font-black text-gray-900">{{ formatDate(act.date_of_death) }}</div>
-                                    <div class="text-xs font-bold text-gray-500 italic">{{ act.place_of_death }}</div>
+
+                                <!-- Jugement d'autorisation -->
+                                <div v-if="act.is_judgment || act.judgment_number" class="p-5 bg-gray-50 rounded-2xl border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <div class="space-y-1">
+                                        <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Déclaration sur Jugement</div>
+                                        <div class="text-sm font-black text-gray-900">Jugement d'autorisation N° {{ act.judgment_number }}</div>
+                                        <div class="text-xs text-gray-500 font-bold">Rendu le {{ formatDate(act.judgment_date) }} par la juridiction : {{ act.judgment_court }}</div>
+                                    </div>
+                                    <div v-if="act.doc_jugement_path" class="flex">
+                                        <a :href="act.doc_jugement_path" target="_blank" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-black text-[#1E690F] uppercase tracking-widest shadow-sm hover:bg-gray-50 transition-all flex items-center gap-1.5">
+                                            <DocumentIcon class="w-4 h-4 text-[#1E690F]" />
+                                            Copie du Jugement
+                                        </a>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Cause</h4>
-                                    <div class="text-sm font-bold text-gray-700">{{ act.cause_of_death || 'Non renseignée' }}</div>
+
+                                <!-- Parents du Défunt -->
+                                <div class="pt-6 border-t border-gray-100 space-y-6">
+                                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">Parents du Défunt</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <!-- Père -->
+                                        <div class="p-5 bg-blue-50/10 rounded-2xl border border-blue-100/30 text-xs space-y-2">
+                                            <span class="text-gray-400 uppercase font-bold text-[9px] block">Père du Défunt</span>
+                                            <span class="text-gray-800 font-black block text-sm">{{ act.death_metadata?.father_first_name }} {{ act.death_metadata?.father_last_name }}</span>
+                                            <div v-if="act.death_metadata?.father_date_of_birth" class="text-gray-500 font-medium">Né le : {{ formatDate(act.death_metadata.father_date_of_birth) }}</div>
+                                            <div v-if="act.death_metadata?.father_profession" class="text-gray-500 font-medium">Profession : {{ act.death_metadata.father_profession }}</div>
+                                            <div v-if="act.death_metadata?.father_domicile" class="text-gray-500 font-medium italic">Domicile : {{ act.death_metadata.father_domicile }}</div>
+                                        </div>
+                                        <!-- Mère -->
+                                        <div class="p-5 bg-pink-50/10 rounded-2xl border border-pink-100/30 text-xs space-y-2">
+                                            <span class="text-gray-400 uppercase font-bold text-[9px] block">Mère du Défunt</span>
+                                            <span class="text-gray-800 font-black block text-sm">{{ act.death_metadata?.mother_first_name }} {{ act.death_metadata?.mother_last_name }}</span>
+                                            <div v-if="act.death_metadata?.mother_date_of_birth" class="text-gray-500 font-medium">Née le : {{ formatDate(act.death_metadata.mother_date_of_birth) }}</div>
+                                            <div v-if="act.death_metadata?.mother_profession" class="text-gray-500 font-medium">Profession : {{ act.death_metadata.mother_profession }}</div>
+                                            <div v-if="act.death_metadata?.mother_domicile" class="text-gray-500 font-medium italic">Domicile : {{ act.death_metadata.mother_domicile }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Déclarant -->
+                                <div v-if="act.death_metadata?.declarant_first_name || act.death_metadata?.declarant_last_name" class="pt-6 border-t border-gray-100">
+                                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Déclarant du Décès</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs p-5 bg-gray-50/50 rounded-2xl border border-gray-100">
+                                        <div><span class="text-gray-400">Nom complet :</span> <span class="font-bold text-gray-900">{{ act.death_metadata.declarant_first_name }} {{ act.death_metadata.declarant_last_name }}</span></div>
+                                        <div v-if="act.death_metadata.declarant_relationship"><span class="text-gray-400">Degré de parenté / Relation :</span> <span class="font-bold text-gray-900">{{ act.death_metadata.declarant_relationship }}</span></div>
+                                        <div v-if="act.death_metadata.declarant_profession"><span class="text-gray-400">Profession :</span> <span class="font-bold text-gray-900">{{ act.death_metadata.declarant_profession }}</span></div>
+                                        <div v-if="act.death_metadata.declarant_address"><span class="text-gray-400">Adresse :</span> <span class="font-bold text-gray-900">{{ act.death_metadata.declarant_address }}</span></div>
+                                        <div v-if="act.death_metadata.declarant_id_number"><span class="text-gray-400">N° Identification (CNI) :</span> <span class="font-bold text-gray-900">{{ act.death_metadata.declarant_id_number }}</span></div>
+                                        <div v-if="act.death_metadata.declarant_date_time"><span class="text-gray-400">Déclaré le :</span> <span class="font-bold text-gray-900">{{ formatDate(act.death_metadata.declarant_date_time) }}</span></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -386,7 +502,7 @@ const updateStatus = (newStatus) => {
                         
                         <div class="space-y-6">
                             <div v-if="act.officer_comments" class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                <h4 class="text-[9px] font-black text-gray-400 uppercase mb-2">{{ type === 'naissance' ? 'Mentions marginales' : "Observations de l'officier" }}</h4>
+                                <h4 class="text-[9px] font-black text-gray-400 uppercase mb-2">{{ ['naissance', 'mariage', 'deces'].includes(type) ? 'Mentions marginales' : "Observations de l'officier" }}</h4>
                                 <p class="text-sm text-gray-700 italic">"{{ act.officer_comments }}"</p>
                             </div>
 
@@ -409,9 +525,9 @@ const updateStatus = (newStatus) => {
                                 </div>
                             </div>
 
-                            <!-- Témoins du Mariage -->
-                            <div v-if="type === 'mariage' && act.witnesses_metadata && act.witnesses_metadata.length > 0" class="space-y-4">
-                                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Témoins du Mariage</h4>
+                            <!-- Témoins du Mariage / Décès -->
+                            <div v-if="['mariage', 'deces'].includes(type) && act.witnesses_metadata && act.witnesses_metadata.length > 0" class="space-y-4">
+                                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">{{ type === 'mariage' ? 'Témoins du Mariage' : 'Témoins du Décès' }}</h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div v-for="(witness, idx) in act.witnesses_metadata" :key="idx" class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 space-y-2">
                                         <div class="flex items-center justify-between border-b border-gray-100 pb-1">
@@ -466,6 +582,33 @@ const updateStatus = (newStatus) => {
                                     <a v-if="act.doc_jugement_path" :href="act.doc_jugement_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
                                         <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
                                         <span class="text-gray-500">Jugement :</span> Visualiser
+                                    </a>
+                                    <a v-if="act.doc_autres_path" :href="act.doc_autres_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline col-span-2">
+                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
+                                        <span class="text-gray-500">Autres pièces :</span> Visualiser
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Pièces Justificatives Décès (5 catégories) -->
+                            <div v-if="type === 'deces' && (act.doc_death_cert_path || act.doc_deceased_id_path || act.doc_declarant_id_path || act.doc_jugement_path || act.doc_autres_path)" class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                <h4 class="text-[9px] font-black text-gray-400 uppercase mb-3">Pièces Justificatives</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    <a v-if="act.doc_death_cert_path" :href="act.doc_death_cert_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
+                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
+                                        <span class="text-gray-500">Certificat de Décès :</span> Visualiser
+                                    </a>
+                                    <a v-if="act.doc_deceased_id_path" :href="act.doc_deceased_id_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
+                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
+                                        <span class="text-gray-500">Identité du Défunt :</span> Visualiser
+                                    </a>
+                                    <a v-if="act.doc_declarant_id_path" :href="act.doc_declarant_id_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
+                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
+                                        <span class="text-gray-500">CNI du Déclarant :</span> Visualiser
+                                    </a>
+                                    <a v-if="act.doc_jugement_path" :href="act.doc_jugement_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
+                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
+                                        <span class="text-gray-500">Copie du Jugement :</span> Visualiser
                                     </a>
                                     <a v-if="act.doc_autres_path" :href="act.doc_autres_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline col-span-2">
                                         <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />

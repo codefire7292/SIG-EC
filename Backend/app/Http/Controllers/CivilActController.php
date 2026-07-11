@@ -171,6 +171,14 @@ class CivilActController extends Controller
                 'doc_jugement'       => 'doc_jugement_path',
                 'doc_autres'         => 'doc_autres_path',
             ];
+        } elseif ($type === 'deces') {
+            $docFields = [
+                'doc_death_cert'    => 'doc_death_cert_path',
+                'doc_deceased_id'   => 'doc_deceased_id_path',
+                'doc_declarant_id'  => 'doc_declarant_id_path',
+                'doc_jugement'      => 'doc_jugement_path',
+                'doc_autres'        => 'doc_autres_path',
+            ];
         }
         foreach ($docFields as $fileKey => $pathKey) {
             if ($request->hasFile($fileKey)) {
@@ -179,8 +187,8 @@ class CivilActController extends Controller
             }
         }
 
-        // Témoins dynamiques mariage (avec CNI)
-        if ($type === 'mariage') {
+        // Témoins dynamiques (avec CNI)
+        if ($type === 'mariage' || $type === 'deces') {
             $witnesses = $request->input('witnesses_metadata', []);
             if (is_array($witnesses)) {
                 foreach ($witnesses as $index => &$witness) {
@@ -284,6 +292,14 @@ class CivilActController extends Controller
                 'doc_jugement'       => 'doc_jugement_path',
                 'doc_autres'         => 'doc_autres_path',
             ];
+        } elseif ($type === 'deces') {
+            $docFields = [
+                'doc_death_cert'    => 'doc_death_cert_path',
+                'doc_deceased_id'   => 'doc_deceased_id_path',
+                'doc_declarant_id'  => 'doc_declarant_id_path',
+                'doc_jugement'      => 'doc_jugement_path',
+                'doc_autres'        => 'doc_autres_path',
+            ];
         }
         foreach ($docFields as $fileKey => $pathKey) {
             if ($request->hasFile($fileKey)) {
@@ -292,8 +308,8 @@ class CivilActController extends Controller
             }
         }
 
-        // Témoins dynamiques mariage (avec CNI)
-        if ($type === 'mariage') {
+        // Témoins dynamiques (avec CNI)
+        if ($type === 'mariage' || $type === 'deces') {
             $witnesses = $request->input('witnesses_metadata', []);
             if (is_array($witnesses)) {
                 foreach ($witnesses as $index => &$witness) {
@@ -449,11 +465,61 @@ class CivilActController extends Controller
 
         if ($type === 'deces') {
             return array_merge($common, [
-                'deceased_first_name' => 'required|string',
-                'deceased_last_name' => 'required|string',
-                'date_of_death' => 'required|date',
-                'place_of_death' => 'required|string',
-                'cause_of_death' => 'nullable|string',
+                'deceased_first_name'                       => 'required|string',
+                'deceased_last_name'                        => 'required|string',
+                'gender'                                    => 'required|in:M,F',
+                'date_of_birth'                             => 'required|date',
+                'date_of_death'                             => 'required|date',
+                'time_of_death'                             => 'nullable|date_format:H:i',
+                'place_of_death'                            => 'required|string',
+                'health_facility'                           => 'nullable|string',
+                'act_registration_date'                     => 'nullable|date',
+                'cause_of_death'                            => 'nullable|string',
+                'is_judgment'                               => 'nullable|boolean',
+                'judgment_number'                           => 'nullable|required_if:is_judgment,true|string',
+                'judgment_date'                             => 'nullable|required_if:is_judgment,true|date',
+                'judgment_court'                            => 'nullable|required_if:is_judgment,true|string',
+                // Death Metadata JSON
+                'death_metadata'                            => 'nullable|array',
+                'death_metadata.time_of_birth'              => 'nullable|string',
+                'death_metadata.place_of_birth'             => 'nullable|string',
+                'death_metadata.profession'                 => 'nullable|string',
+                'death_metadata.domicile'                   => 'nullable|string',
+                'death_metadata.marital_status'             => 'nullable|string',
+                'death_metadata.previously_married_to'      => 'nullable|string',
+                // Parents of deceased
+                'death_metadata.father_first_name'          => 'nullable|string',
+                'death_metadata.father_last_name'           => 'nullable|string',
+                'death_metadata.father_date_of_birth'       => 'nullable|date',
+                'death_metadata.father_profession'          => 'nullable|string',
+                'death_metadata.father_domicile'            => 'nullable|string',
+                'death_metadata.mother_first_name'          => 'nullable|string',
+                'death_metadata.mother_last_name'           => 'nullable|string',
+                'death_metadata.mother_date_of_birth'       => 'nullable|date',
+                'death_metadata.mother_profession'          => 'nullable|string',
+                'death_metadata.mother_domicile'            => 'nullable|string',
+                // Declarant
+                'death_metadata.declarant_first_name'       => 'nullable|string',
+                'death_metadata.declarant_last_name'        => 'nullable|string',
+                'death_metadata.declarant_profession'       => 'nullable|string',
+                'death_metadata.declarant_address'          => 'nullable|string',
+                'death_metadata.declarant_relationship'     => 'nullable|string',
+                'death_metadata.declarant_id_number'        => 'nullable|string',
+                'death_metadata.declarant_date_time'        => 'nullable|string',
+                // Witnesses (dynamic)
+                'witnesses_metadata'                        => 'nullable|array',
+                'witnesses_metadata.*.first_name'           => 'nullable|string',
+                'witnesses_metadata.*.last_name'            => 'nullable|string',
+                'witnesses_metadata.*.profession'           => 'nullable|string',
+                'witnesses_metadata.*.address'              => 'nullable|string',
+                'witnesses_metadata.*.id_number'            => 'nullable|string',
+                'witnesses_metadata.*.cni_file'             => 'nullable|file|mimes:pdf|max:10240',
+                // Documents PDF separate
+                'doc_death_cert'                            => 'nullable|file|mimes:pdf|max:10240',
+                'doc_deceased_id'                           => 'nullable|file|mimes:pdf|max:10240',
+                'doc_declarant_id'                          => 'nullable|file|mimes:pdf|max:10240',
+                'doc_jugement'                              => 'nullable|file|mimes:pdf|max:10240',
+                'doc_autres'                                => 'nullable|file|mimes:pdf|max:10240',
             ]);
         }
 

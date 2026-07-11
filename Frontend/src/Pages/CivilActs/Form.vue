@@ -149,6 +149,49 @@ const form = useForm({
     date_of_death: props.act?.date_of_death || '',
     place_of_death: props.act?.place_of_death || '',
     cause_of_death: props.act?.cause_of_death || '',
+    time_of_death: props.act?.time_of_death || '',
+    health_facility: props.act?.health_facility || '',
+    act_registration_date: props.act?.act_registration_date || '',
+    gender: props.act?.gender || 'M',
+    date_of_birth: props.act?.date_of_birth || '',
+    
+    // Pièces justificatives PDF Décès
+    doc_death_cert: null,
+    doc_deceased_id: null,
+    doc_declarant_id: null,
+    doc_jugement: null,
+    doc_autres: null,
+
+    // Death Metadata JSON
+    death_metadata: props.act?.death_metadata || {
+        time_of_birth: '',
+        place_of_birth: '',
+        profession: '',
+        domicile: '',
+        marital_status: 'Célibataire',
+        previously_married_to: '',
+        
+        // Parents
+        father_first_name: '',
+        father_last_name: '',
+        father_date_of_birth: '',
+        father_profession: '',
+        father_domicile: '',
+        mother_first_name: '',
+        mother_last_name: '',
+        mother_date_of_birth: '',
+        mother_profession: '',
+        mother_domicile: '',
+
+        // Declarant
+        declarant_first_name: '',
+        declarant_last_name: '',
+        declarant_profession: '',
+        declarant_address: '',
+        declarant_relationship: '',
+        declarant_id_number: '',
+        declarant_date_time: '',
+    },
 });
 
 const addMarriageWitness = () => {
@@ -471,29 +514,127 @@ const submit = () => {
                         </div>
 
                         <div v-if="type === 'deces'" class="space-y-6 col-span-full">
-                            <div class="grid grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms du défunt</label>
-                                    <input v-model="form.deceased_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                            <!-- Informations de l'acte -->
+                            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-150 space-y-4">
+                                <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                                    <div class="w-1.5 h-1.5 bg-[#1E690F] rounded-full"></div>
+                                    Informations de l'acte de décès
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date du Décès</label>
+                                        <input v-model="form.date_of_death" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Heure du Décès</label>
+                                        <input v-model="form.time_of_death" type="time" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date d'inscription de l'acte</label>
+                                        <input v-model="form.act_registration_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom du défunt</label>
-                                    <input v-model="form.deceased_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu du Décès</label>
+                                        <input v-model="form.place_of_death" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required placeholder="Ex : Enampore" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Formation Sanitaire (Lieu de décès)</label>
+                                        <input v-model="form.health_facility" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Ex : Poste de santé d'Enampore" />
+                                    </div>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date du Décès</label>
-                                    <input v-model="form.date_of_death" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+
+                            <!-- Informations sur le défunt -->
+                            <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-150 space-y-4">
+                                <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                                    <div class="w-1.5 h-1.5 bg-[#1E690F] rounded-full"></div>
+                                    Informations sur le défunt
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms du défunt</label>
+                                        <input v-model="form.deceased_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom du défunt</label>
+                                        <input v-model="form.deceased_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Sexe</label>
+                                        <select v-model="form.gender" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold">
+                                            <option value="M">Masculin</option>
+                                            <option value="F">Féminin</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de Naissance du défunt</label>
+                                        <input v-model="form.date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Heure de Naissance (si disponible)</label>
+                                        <input v-model="form.death_metadata.time_of_birth" type="time" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de Naissance</label>
+                                        <input v-model="form.death_metadata.place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession du défunt</label>
+                                        <input v-model="form.death_metadata.profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile du défunt</label>
+                                        <input v-model="form.death_metadata.domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Situation Matrimoniale</label>
+                                        <select v-model="form.death_metadata.marital_status" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold">
+                                            <option value="Célibataire">Célibataire</option>
+                                            <option value="Marié(e)">Marié(e)</option>
+                                            <option value="Divorcé(e)">Divorcé(e)</option>
+                                            <option value="Veuf/Veuve">Veuf/Veuve</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Précédemment marié à</label>
+                                        <input v-model="form.death_metadata.previously_married_to" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Nom du conjoint/précédent conjoint" />
+                                    </div>
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu du Décès</label>
-                                    <input v-model="form.place_of_death" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Cause du Décès (Optionnel)</label>
+                                    <textarea v-model="form.cause_of_death" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" rows="2"></textarea>
                                 </div>
                             </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Cause du Décès (Optionnel)</label>
-                                <textarea v-model="form.cause_of_death" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" rows="2"></textarea>
+
+                            <!-- Section Jugement (Décès) -->
+                            <div class="p-6 bg-gray-50 rounded-2xl border border-gray-200/80 space-y-4">
+                                <div class="flex items-center gap-3">
+                                    <input v-model="form.is_judgment" type="checkbox" id="death_is_judgment" class="h-4.5 w-4.5 text-[#1E690F] focus:ring-[#1E690F] border-gray-300 rounded" />
+                                    <label for="death_is_judgment" class="text-xs font-black text-gray-700 uppercase tracking-wider cursor-pointer">Déclaration sur jugement d'autorisation ?</label>
+                                </div>
+
+                                <div v-if="form.is_judgment" class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Numéro du Jugement</label>
+                                        <input v-model="form.judgment_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date du Jugement</label>
+                                        <input v-model="form.judgment_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Juridiction</label>
+                                        <input v-model="form.judgment_court" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" placeholder="Ex : Tribunal de Kolda" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -562,6 +703,79 @@ const submit = () => {
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile</label>
                                 <input v-model="form.parents_metadata.mother_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2C: Parents du Défunt (Décès uniquement) -->
+                <div v-if="type === 'deces'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                    <h3 class="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color: #1E690F;">
+                        <UserGroupIcon class="h-4 w-4" />
+                        Filiation &amp; Détails Parents du Défunt
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Père du défunt -->
+                        <div class="p-6 bg-blue-50/40 rounded-2xl border border-blue-100 space-y-4">
+                            <h4 class="text-[10px] font-black text-blue-900 uppercase tracking-widest flex items-center gap-2">
+                                <div class="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
+                                Père du défunt
+                            </h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénom du Père</label>
+                                    <input v-model="form.death_metadata.father_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom du Père</label>
+                                    <input v-model="form.death_metadata.father_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance</label>
+                                    <input v-model="form.death_metadata.father_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession</label>
+                                    <input v-model="form.death_metadata.father_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile</label>
+                                <input v-model="form.death_metadata.father_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
+                        </div>
+
+                        <!-- Mère du défunt -->
+                        <div class="p-6 bg-pink-50/40 rounded-2xl border border-pink-100 space-y-4">
+                            <h4 class="text-[10px] font-black text-pink-900 uppercase tracking-widest flex items-center gap-2">
+                                <div class="w-1.5 h-1.5 bg-pink-500 rounded-full"></div>
+                                Mère du défunt
+                            </h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénom de la Mère</label>
+                                    <input v-model="form.death_metadata.mother_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom de la Mère</label>
+                                    <input v-model="form.death_metadata.mother_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance</label>
+                                    <input v-model="form.death_metadata.mother_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession</label>
+                                    <input v-model="form.death_metadata.mother_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile</label>
+                                <input v-model="form.death_metadata.mother_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
                             </div>
                         </div>
                     </div>
@@ -689,7 +903,48 @@ const submit = () => {
                             </div>
                         </div>
                     </div>
-                    <p v-else class="text-xs text-gray-400 italic">Cocher la case ci-dessus si le déclarant est différent des parents.</p>
+                </div>
+
+                <!-- Section 3C: Déclarant (Décès uniquement) -->
+                <div v-if="type === 'deces'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
+                    <h3 class="text-xs font-black uppercase tracking-widest flex items-center gap-2" style="color: #1E690F;">
+                        <UserIcon class="h-4 w-4" />
+                        Déclarant du Décès
+                    </h3>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms du Déclarant</label>
+                            <input v-model="form.death_metadata.declarant_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom du Déclarant</label>
+                            <input v-model="form.death_metadata.declarant_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession</label>
+                            <input v-model="form.death_metadata.declarant_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Numéro d'Identification (CNI)</label>
+                            <input v-model="form.death_metadata.declarant_id_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Adresse du Déclarant</label>
+                            <input v-model="form.death_metadata.declarant_address" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Degré de parenté / Relation avec le défunt</label>
+                            <input v-model="form.death_metadata.declarant_relationship" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Ex : Fils, Conjoint, Voisin..." />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date et heure de la déclaration</label>
+                        <input v-model="form.death_metadata.declarant_date_time" type="datetime-local" class="w-full md:w-72 px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                    </div>
                 </div>
 
                 <!-- Témoins (Naissance) -->
@@ -752,13 +1007,13 @@ const submit = () => {
 
 
 
-                <div v-if="type === 'mariage'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
+                <div v-if="['mariage', 'deces'].includes(type)" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
                     <div class="flex items-center justify-between">
                         <h3 class="text-xs font-black uppercase tracking-widest flex items-center gap-2" style="color: #1E690F;">
                             <UserGroupIcon class="h-4 w-4" />
-                            Témoins du Mariage (0 à 4 témoins)
+                            {{ type === 'mariage' ? 'Témoins du Mariage (0 à 4 témoins)' : 'Témoins du Décès' }}
                         </h3>
-                        <button type="button" @click="addMarriageWitness" v-if="!form.witnesses_metadata || form.witnesses_metadata.length < 4" class="px-4 py-2 bg-green-50 text-[#1E690F] hover:bg-green-100 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-1.5 transition-all">
+                        <button type="button" @click="addMarriageWitness" v-if="!form.witnesses_metadata || (type === 'mariage' ? form.witnesses_metadata.length < 4 : form.witnesses_metadata.length < 10)" class="px-4 py-2 bg-green-50 text-[#1E690F] hover:bg-green-100 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-1.5 transition-all">
                             <PlusIcon class="h-4 w-4" /> Ajouter un témoin
                         </button>
                     </div>
@@ -1019,6 +1274,100 @@ const submit = () => {
                     </div>
                 </div>
 
+                <!-- Pièces justificatives — Décès (PDFs par catégorie) -->
+                <div v-if="type === 'deces'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                    <h3 class="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color: #1E690F;">
+                        <DocumentArrowUpIcon class="h-4 w-4" />
+                        Pièces Justificatives (PDF par catégorie)
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Certificat de Décès -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Décès / Médical</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_death_cert || props.act?.doc_death_cert_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_death_cert || props.act?.doc_death_cert_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_death_cert">{{ form.doc_death_cert.name }}</span>
+                                    <span v-else-if="props.act?.doc_death_cert_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_death_cert = e.target.files[0]" />
+                            </label>
+                            <div v-if="props.act?.doc_death_cert_path && !form.doc_death_cert" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_death_cert_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
+                        </div>
+
+                        <!-- Pièce d'identité du défunt -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Pièce d'identité du défunt</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_deceased_id || props.act?.doc_deceased_id_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_deceased_id || props.act?.doc_deceased_id_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_deceased_id">{{ form.doc_deceased_id.name }}</span>
+                                    <span v-else-if="props.act?.doc_deceased_id_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_deceased_id = e.target.files[0]" />
+                            </label>
+                            <div v-if="props.act?.doc_deceased_id_path && !form.doc_deceased_id" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_deceased_id_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
+                        </div>
+
+                        <!-- CNI du Déclarant -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Déclarant</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_declarant_id || props.act?.doc_declarant_id_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_declarant_id || props.act?.doc_declarant_id_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_declarant_id">{{ form.doc_declarant_id.name }}</span>
+                                    <span v-else-if="props.act?.doc_declarant_id_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_declarant_id = e.target.files[0]" />
+                            </label>
+                            <div v-if="props.act?.doc_declarant_id_path && !form.doc_declarant_id" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_declarant_id_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
+                        </div>
+
+                        <!-- Copie du Jugement -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Copie du Jugement</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_jugement || props.act?.doc_jugement_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_jugement || props.act?.doc_jugement_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_jugement">{{ form.doc_jugement.name }}</span>
+                                    <span v-else-if="props.act?.doc_jugement_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_jugement = e.target.files[0]" />
+                            </label>
+                            <div v-if="props.act?.doc_jugement_path && !form.doc_jugement" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_jugement_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
+                        </div>
+
+                        <!-- Autres pièces -->
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autres Pièces Justificatives</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_autres || props.act?.doc_autres_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_autres || props.act?.doc_autres_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_autres">{{ form.doc_autres.name }}</span>
+                                    <span v-else-if="props.act?.doc_autres_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_autres = e.target.files[0]" />
+                            </label>
+                            <div v-if="props.act?.doc_autres_path && !form.doc_autres" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_autres_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Date d'inscription de l'acte (Naissance) -->
                 <div v-if="type === 'naissance'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
                     <h3 class="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color: #1E690F;">
@@ -1035,11 +1384,11 @@ const submit = () => {
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
                     <h3 class="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color: #1E690F;">
                         <PlusCircleIcon class="h-4 w-4" />
-                        {{ ['naissance', 'mariage'].includes(type) ? 'Mentions Marginales' : "Observations de l'Officier" }}
+                        {{ ['naissance', 'mariage', 'deces'].includes(type) ? 'Mentions Marginales' : "Observations de l'Officier" }}
                     </h3>
                     <div>
                         <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">
-                            {{ ['naissance', 'mariage'].includes(type) ? 'Mentions marginales' : 'Commentaires officiels' }}
+                            {{ ['naissance', 'mariage', 'deces'].includes(type) ? 'Mentions marginales' : 'Commentaires officiels' }}
                         </label>
                         <textarea v-model="form.officer_comments" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" rows="3" placeholder="Notes additionnelles, mentions marginales..."></textarea>
                     </div>
