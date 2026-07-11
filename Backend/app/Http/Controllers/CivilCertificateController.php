@@ -180,6 +180,10 @@ class CivilCertificateController extends Controller
         $year = now()->year;
         $centerId = array_search($centerCode, ['DEF' => 1]) ?: 1;
 
+        if (!\App\Models\CivilRegistrationCenter::where('id', $centerId)->exists()) {
+            return back()->with('error', "Le centre d'état civil spécifié (ID {$centerId}) n'existe pas. Veuillez le créer dans l'administration.");
+        }
+
         $registry = \App\Models\Registry::firstOrCreate(
             [
                 'civil_registration_center_id' => $centerId,

@@ -100,6 +100,9 @@ class CivilActController extends Controller
         $validated = $request->validate($rules);
 
         $centerId = 1;
+        if (!\App\Models\CivilRegistrationCenter::where('id', $centerId)->exists()) {
+            return back()->with('error', "Le centre d'état civil par défaut (ID {$centerId}) n'existe pas. Veuillez le créer dans l'administration.");
+        }
         
         $year = now()->year;
         if ($type === 'naissance' && !empty($validated['date_of_birth'])) {
@@ -237,6 +240,10 @@ class CivilActController extends Controller
         // If the year of the event has been modified, we must reassign to the correct registry
         if ($act->registry && $act->registry->year != $year) {
             $centerId = $act->registry->civil_registration_center_id ?? 1;
+
+            if (!\App\Models\CivilRegistrationCenter::where('id', $centerId)->exists()) {
+                return back()->with('error', "Le centre d'état civil spécifié (ID {$centerId}) n'existe pas. Veuillez le créer dans l'administration.");
+            }
 
             $newRegistry = \App\Models\Registry::firstOrCreate(
                 [
