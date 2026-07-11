@@ -17,7 +17,7 @@ class DocumentGenerationService
     {
         // 1. Generate QR Code
         $verificationUrl = route('certificates.verify', $certificate->uuid);
-        $qrCodeBase64 = base64_encode(QrCode::format('png')
+        $qrCodeBase64 = base64_encode(QrCode::format('svg')
             ->size(150)
             ->errorCorrection('H')
             ->generate($verificationUrl));

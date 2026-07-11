@@ -72,7 +72,7 @@
         </div>
 
         <div class="qr-code">
-            <img src="data:image/png;base64,{{ $qrCode }}" width="100">
+            <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="100">
             <div style="font-size: 8px; text-align: center; margin-top: 5px;">Scanner pour vérifier l'authenticité</div>
         </div>
         
