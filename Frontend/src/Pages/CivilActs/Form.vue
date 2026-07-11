@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { useForm, Head } from '@inertiajs/vue3';
+import { useForm, Head, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { 
     CalendarIcon, 
@@ -12,6 +12,8 @@ import {
     DocumentIcon,
     CheckCircleIcon,
     UserIcon,
+    PlusIcon,
+    TrashIcon,
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
