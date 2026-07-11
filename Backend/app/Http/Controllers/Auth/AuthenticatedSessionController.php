@@ -66,7 +66,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('civil-certificates.index'));
+        return redirect()->intended(route('dashboard'));
     }
 
     /**
@@ -136,6 +136,6 @@ class AuthenticatedSessionController extends Controller
         // Refresh user in guard
         Auth::setUser($user);
 
-        return redirect()->route('civil-certificates.index')->with('success', 'Votre profil a été mis à jour avec succès.');
+        return redirect()->route('dashboard')->with('success', 'Votre profil a été mis à jour avec succès.');
     }
 }

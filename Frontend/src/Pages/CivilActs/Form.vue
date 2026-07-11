@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useForm, Head } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { 
@@ -10,7 +10,8 @@ import {
     PlusCircleIcon,
     DocumentArrowUpIcon,
     DocumentIcon,
-    CheckCircleIcon
+    CheckCircleIcon,
+    UserIcon,
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -29,17 +30,25 @@ const title = computed(() => {
     }
 });
 
+// Affichage conditionnel de la section Déclarant
+const hasDeclarant = ref(
+    !!(props.act?.parents_metadata?.declarant_first_name || props.act?.parents_metadata?.declarant_last_name)
+);
+
 const form = useForm({
     // Common
     officer_comments: props.act?.officer_comments || '',
     certificate_file: null,
     certificate_path: props.act?.certificate_path || null,
     
-    // Naissance
+    // Naissance — Identité de l'enfant
     first_name: props.act?.first_name || '',
     last_name: props.act?.last_name || '',
     date_of_birth: props.act?.date_of_birth || '',
+    time_of_birth: props.act?.time_of_birth || '',
     place_of_birth: props.act?.place_of_birth || '',
+    health_facility: props.act?.health_facility || '',
+    act_registration_date: props.act?.act_registration_date || '',
     gender: props.act?.gender || 'M',
     is_judgment: props.act?.is_judgment || false,
     judgment_number: props.act?.judgment_number || '',
@@ -49,9 +58,27 @@ const form = useForm({
     mother_name: props.act?.mother_name || '',
     parents_metadata: props.act?.parents_metadata || {
         father_profession: '',
+        father_date_of_birth: '',
+        father_place_of_birth: '',
+        father_domicile: '',
         mother_profession: '',
-        residence: ''
+        mother_date_of_birth: '',
+        mother_place_of_birth: '',
+        mother_domicile: '',
+        declarant_first_name: '',
+        declarant_last_name: '',
+        declarant_profession: '',
+        declarant_address: '',
+        declarant_id_number: '',
+        declarant_date: '',
+        declarant_judgment_ref: '',
     },
+    // Naissance — Pièces justificatives PDF
+    doc_cni_pere: null,
+    doc_cni_mere: null,
+    doc_acte_naissance: null,
+    doc_cni_declarant: null,
+    doc_autres: null,
 
     // Mariage
     husband_first_name: props.act?.husband_first_name || '',
@@ -123,7 +150,7 @@ const submit = () => {
                                     <input v-model="form.last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold transition-all" required />
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-6">
+                            <div class="grid grid-cols-3 gap-6">
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Sexe</label>
                                     <select v-model="form.gender" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold">
@@ -135,10 +162,20 @@ const submit = () => {
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de Naissance</label>
                                     <input v-model="form.date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                                 </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Heure de Naissance</label>
+                                    <input v-model="form.time_of_birth" type="time" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de Naissance</label>
-                                <input v-model="form.place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de Naissance</label>
+                                    <input v-model="form.place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Formation Sanitaire (lieu d'accouchement)</label>
+                                    <input v-model="form.health_facility" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Ex : Centre de Santé d'Enampore" />
+                                </div>
                             </div>
                             <div class="flex items-center gap-2 py-2">
                                 <input id="is_judgment" v-model="form.is_judgment" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-[#1E690F] focus:ring-[#1E690F] focus:border-[#1E690F]" />
@@ -165,6 +202,7 @@ const submit = () => {
                                 </div>
                             </div>
                         </div>
+
 
                         <div v-if="type === 'mariage'" class="space-y-6 col-span-full">
                             <div class="grid grid-cols-2 gap-6">
@@ -248,35 +286,125 @@ const submit = () => {
                     </div>
                 </div>
 
-                <!-- Section 2: Métadonnées Spécifiques -->
+                <!-- Section 2: Filiation & Détails Parents -->
                 <div v-if="type === 'naissance'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
                     <h3 class="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color: #1E690F;">
                         <UserGroupIcon class="h-4 w-4" />
-                        Filiation & Détails Parents
+                        Filiation &amp; Détails Parents
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms & Nom du Père</label>
-                            <input v-model="form.father_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Père -->
+                        <div class="p-6 bg-blue-50/40 rounded-2xl border border-blue-100 space-y-4">
+                            <h4 class="text-[10px] font-black text-blue-900 uppercase tracking-widest flex items-center gap-2">
+                                <div class="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
+                                Père
+                            </h4>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms &amp; Nom du Père</label>
+                                <input v-model="form.father_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession</label>
+                                <input v-model="form.parents_metadata.father_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance</label>
+                                    <input v-model="form.parents_metadata.father_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de naissance</label>
+                                    <input v-model="form.parents_metadata.father_place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile</label>
+                                <input v-model="form.parents_metadata.father_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession du Père</label>
-                            <input v-model="form.parents_metadata.father_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
-                        </div>
-                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms & Nom de la Mère</label>
-                            <input v-model="form.mother_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession de la Mère</label>
-                            <input v-model="form.parents_metadata.mother_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
-                        </div>
-                        <div class="col-span-full">
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile des parents</label>
-                            <input v-model="form.parents_metadata.residence" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                        <!-- Mère -->
+                        <div class="p-6 bg-pink-50/40 rounded-2xl border border-pink-100 space-y-4">
+                            <h4 class="text-[10px] font-black text-pink-900 uppercase tracking-widest flex items-center gap-2">
+                                <div class="w-1.5 h-1.5 bg-pink-500 rounded-full"></div>
+                                Mère
+                            </h4>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms &amp; Nom de la Mère</label>
+                                <input v-model="form.mother_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession</label>
+                                <input v-model="form.parents_metadata.mother_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance</label>
+                                    <input v-model="form.parents_metadata.mother_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de naissance</label>
+                                    <input v-model="form.parents_metadata.mother_place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile</label>
+                                <input v-model="form.parents_metadata.mother_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Section 3: Déclarant -->
+                <div v-if="type === 'naissance'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xs font-black uppercase tracking-widest flex items-center gap-2" style="color: #1E690F;">
+                            <UserIcon class="h-4 w-4" />
+                            Déclarant
+                        </h3>
+                        <label class="flex items-center gap-2 cursor-pointer select-none">
+                            <input id="hasDeclarant" v-model="hasDeclarant" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-[#1E690F] focus:ring-[#1E690F]" />
+                            <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Déclarant différent des parents</span>
+                        </label>
+                    </div>
+                    <div v-if="hasDeclarant" class="space-y-6">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms du Déclarant</label>
+                                <input v-model="form.parents_metadata.declarant_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom du Déclarant</label>
+                                <input v-model="form.parents_metadata.declarant_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession</label>
+                                <input v-model="form.parents_metadata.declarant_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Numéro d'Identification</label>
+                                <input v-model="form.parents_metadata.declarant_id_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Adresse du Déclarant</label>
+                            <input v-model="form.parents_metadata.declarant_address" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de Déclaration</label>
+                                <input v-model="form.parents_metadata.declarant_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">N° et Date du Jugement d'Autorisation</label>
+                                <input v-model="form.parents_metadata.declarant_judgment_ref" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Ex : N°12 du 01/01/2026" />
+                            </div>
+                        </div>
+                    </div>
+                    <p v-else class="text-xs text-gray-400 italic">Cocher la case ci-dessus si le déclarant est différent des parents.</p>
+                </div>
+
 
                 <div v-if="type === 'mariage'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
                     <h3 class="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color: #1E690F;">
@@ -319,8 +447,63 @@ const submit = () => {
                     </div>
                 </div>
 
-                <!-- Document Justificatif PDF (Naissance & Mariage) -->
-                <div v-if="type === 'naissance' || type === 'mariage'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                <!-- Pièces justificatives — Naissance (5 catégories PDF) -->
+                <div v-if="type === 'naissance'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                    <h3 class="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color: #1E690F;">
+                        <DocumentArrowUpIcon class="h-4 w-4" />
+                        Pièces Justificatives (PDF par catégorie)
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- CNI Père -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Père</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_pere ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_pere ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2"><span v-if="form.doc_cni_pere">{{ form.doc_cni_pere.name }}</span><span v-else>Cliquer pour téléverser (PDF)</span></p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_cni_pere = e.target.files[0]" />
+                            </label>
+                        </div>
+                        <!-- CNI Mère -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de la Mère</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_mere ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_mere ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2"><span v-if="form.doc_cni_mere">{{ form.doc_cni_mere.name }}</span><span v-else>Cliquer pour téléverser (PDF)</span></p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_cni_mere = e.target.files[0]" />
+                            </label>
+                        </div>
+                        <!-- Acte / Attestation de naissance -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte / Attestation de Naissance</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_acte_naissance ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_acte_naissance ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2"><span v-if="form.doc_acte_naissance">{{ form.doc_acte_naissance.name }}</span><span v-else>Cliquer pour téléverser (PDF)</span></p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_acte_naissance = e.target.files[0]" />
+                            </label>
+                        </div>
+                        <!-- CNI Déclarant -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Déclarant</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_declarant ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_declarant ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2"><span v-if="form.doc_cni_declarant">{{ form.doc_cni_declarant.name }}</span><span v-else>Cliquer pour téléverser (PDF)</span></p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_cni_declarant = e.target.files[0]" />
+                            </label>
+                        </div>
+                        <!-- Autres pièces -->
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autres Pièces Justificatives (si nécessaire)</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_autres ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_autres ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2"><span v-if="form.doc_autres">{{ form.doc_autres.name }}</span><span v-else>Cliquer pour téléverser (PDF)</span></p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_autres = e.target.files[0]" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Document Justificatif PDF (Mariage uniquement) -->
+                <div v-if="type === 'mariage'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
                     <h3 class="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color: #1E690F;">
                         <DocumentArrowUpIcon class="h-4 w-4" />
                         Document Justificatif Obligatoire (PDF)
@@ -349,14 +532,28 @@ const submit = () => {
                     </div>
                 </div>
 
-                <!-- Section 3: Remarques de l'Officier -->
+                <!-- Date d'inscription de l'acte (Naissance) -->
+                <div v-if="type === 'naissance'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                    <h3 class="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color: #1E690F;">
+                        <CalendarIcon class="h-4 w-4" />
+                        Date d'Inscription de l'Acte
+                    </h3>
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Fait à Enampore, le</label>
+                        <input v-model="form.act_registration_date" type="date" class="w-full md:w-72 px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                    </div>
+                </div>
+
+                <!-- Mentions marginales / Observations -->
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
                     <h3 class="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color: #1E690F;">
                         <PlusCircleIcon class="h-4 w-4" />
-                        Observations de l'Officier
+                        {{ type === 'naissance' ? 'Mentions Marginales' : "Observations de l'Officier" }}
                     </h3>
                     <div>
-                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Commentaires officiels</label>
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">
+                            {{ type === 'naissance' ? 'Mentions marginales' : 'Commentaires officiels' }}
+                        </label>
                         <textarea v-model="form.officer_comments" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" rows="3" placeholder="Notes additionnelles, mentions marginales..."></textarea>
                     </div>
                 </div>

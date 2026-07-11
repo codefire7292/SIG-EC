@@ -89,18 +89,21 @@ const updateStatus = (newStatus) => {
                         
                         <div class="p-8 space-y-8">
                             <!-- Naissance Context -->
-                            <div v-if="type === 'naissance'" class="grid grid-cols-2 gap-8">
-                                <div>
-                                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Enfant</h4>
-                                    <div class="text-xl font-black text-gray-900">{{ act.first_name }} {{ act.last_name }}</div>
-                                    <div class="text-sm font-bold text-blue-600">{{ act.gender === 'M' ? 'Masculin' : 'Féminin' }}</div>
+                            <div v-if="type === 'naissance'" class="space-y-6">
+                                <div class="grid grid-cols-2 gap-8">
+                                    <div>
+                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Enfant</h4>
+                                        <div class="text-xl font-black text-gray-900">{{ act.first_name }} {{ act.last_name }}</div>
+                                        <div class="text-sm font-bold text-blue-600">{{ act.gender === 'M' ? 'Masculin' : 'Féminin' }}</div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Naissance</h4>
+                                        <div class="text-sm font-black text-gray-900">{{ formatDate(act.date_of_birth) }}<span v-if="act.time_of_birth" class="text-gray-500 font-medium ml-2">à {{ act.time_of_birth }}</span></div>
+                                        <div class="text-xs font-bold text-gray-500 italic">{{ act.place_of_birth }}</div>
+                                        <div v-if="act.health_facility" class="text-xs font-bold text-green-700 mt-1">Formation : {{ act.health_facility }}</div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Naissance</h4>
-                                    <div class="text-sm font-black text-gray-900">{{ formatDate(act.date_of_birth) }}</div>
-                                    <div class="text-xs font-bold text-gray-500 italic">{{ act.place_of_birth }}</div>
-                                </div>
-                                <div v-if="act.is_judgment" class="col-span-full p-4 bg-green-50/50 rounded-2xl border border-green-100 flex flex-wrap gap-6 items-center">
+                                <div v-if="act.is_judgment" class="p-4 bg-green-50/50 rounded-2xl border border-green-100 flex flex-wrap gap-6 items-center">
                                     <div class="px-3 py-1 bg-[#1E690F] text-white rounded-full text-[9px] font-black uppercase tracking-wider">Jugement de Naissance</div>
                                     <div>
                                         <div class="text-[9px] font-black text-gray-400 uppercase">Numéro du Jugement</div>
@@ -115,14 +118,32 @@ const updateStatus = (newStatus) => {
                                         <div class="text-xs font-black text-gray-900">{{ act.judgment_court }}</div>
                                     </div>
                                 </div>
-                                <div class="col-span-full pt-4 border-t border-gray-50 grid grid-cols-2 gap-8">
+                                <div class="pt-4 border-t border-gray-50 grid grid-cols-2 gap-8">
                                     <div>
                                         <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Père</h4>
                                         <div class="text-sm font-bold text-gray-700">{{ act.father_name || 'Non renseigné' }}</div>
+                                        <div v-if="act.parents_metadata?.father_date_of_birth" class="text-xs text-gray-500">Né le {{ formatDate(act.parents_metadata.father_date_of_birth) }}<span v-if="act.parents_metadata.father_place_of_birth"> — {{ act.parents_metadata.father_place_of_birth }}</span></div>
+                                        <div v-if="act.parents_metadata?.father_domicile" class="text-xs text-gray-500">Domicile : {{ act.parents_metadata.father_domicile }}</div>
+                                        <div v-if="act.parents_metadata?.father_profession" class="text-xs text-gray-500">Profession : {{ act.parents_metadata.father_profession }}</div>
                                     </div>
                                     <div>
                                         <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Mère</h4>
                                         <div class="text-sm font-bold text-gray-700">{{ act.mother_name || 'Non renseignée' }}</div>
+                                        <div v-if="act.parents_metadata?.mother_date_of_birth" class="text-xs text-gray-500">Née le {{ formatDate(act.parents_metadata.mother_date_of_birth) }}<span v-if="act.parents_metadata.mother_place_of_birth"> — {{ act.parents_metadata.mother_place_of_birth }}</span></div>
+                                        <div v-if="act.parents_metadata?.mother_domicile" class="text-xs text-gray-500">Domicile : {{ act.parents_metadata.mother_domicile }}</div>
+                                        <div v-if="act.parents_metadata?.mother_profession" class="text-xs text-gray-500">Profession : {{ act.parents_metadata.mother_profession }}</div>
+                                    </div>
+                                </div>
+                                <!-- Déclarant -->
+                                <div v-if="act.parents_metadata?.declarant_first_name || act.parents_metadata?.declarant_last_name" class="pt-4 border-t border-gray-50">
+                                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Déclarant</h4>
+                                    <div class="grid grid-cols-2 gap-4 text-xs">
+                                        <div><span class="text-gray-400">Nom :</span> <span class="font-bold text-gray-900">{{ act.parents_metadata.declarant_first_name }} {{ act.parents_metadata.declarant_last_name }}</span></div>
+                                        <div v-if="act.parents_metadata.declarant_profession"><span class="text-gray-400">Profession :</span> <span class="font-bold text-gray-900">{{ act.parents_metadata.declarant_profession }}</span></div>
+                                        <div v-if="act.parents_metadata.declarant_address"><span class="text-gray-400">Adresse :</span> <span class="font-bold text-gray-900">{{ act.parents_metadata.declarant_address }}</span></div>
+                                        <div v-if="act.parents_metadata.declarant_id_number"><span class="text-gray-400">ID :</span> <span class="font-bold text-gray-900">{{ act.parents_metadata.declarant_id_number }}</span></div>
+                                        <div v-if="act.parents_metadata.declarant_date"><span class="text-gray-400">Déclaration le :</span> <span class="font-bold text-gray-900">{{ formatDate(act.parents_metadata.declarant_date) }}</span></div>
+                                        <div v-if="act.parents_metadata.declarant_judgment_ref"><span class="text-gray-400">Réf. Jugement :</span> <span class="font-bold text-gray-900">{{ act.parents_metadata.declarant_judgment_ref }}</span></div>
                                     </div>
                                 </div>
                             </div>
@@ -212,22 +233,25 @@ const updateStatus = (newStatus) => {
                         
                         <div class="space-y-6">
                             <div v-if="act.officer_comments" class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                <h4 class="text-[9px] font-black text-gray-400 uppercase mb-2">Observations de l'officier</h4>
+                                <h4 class="text-[9px] font-black text-gray-400 uppercase mb-2">{{ type === 'naissance' ? 'Mentions marginales' : "Observations de l'officier" }}</h4>
                                 <p class="text-sm text-gray-700 italic">"{{ act.officer_comments }}"</p>
                             </div>
 
-                            <div v-if="type === 'naissance' && act.parents_metadata" class="grid grid-cols-2 gap-6">
-                                <div v-if="act.parents_metadata.father_profession">
-                                    <h4 class="text-[9px] font-black text-gray-400 uppercase mb-1">Profession du Père</h4>
-                                    <p class="text-xs font-bold text-gray-900">{{ act.parents_metadata.father_profession }}</p>
+                            <div v-if="type === 'naissance' && act.parents_metadata" class="space-y-4">
+                                <div v-if="act.act_registration_date" class="p-4 bg-green-50/50 rounded-2xl border border-green-100">
+                                    <h4 class="text-[9px] font-black text-gray-400 uppercase mb-1">Date d'Inscription</h4>
+                                    <p class="text-sm font-black text-gray-900">Fait à Enampore, le {{ formatDate(act.act_registration_date) }}</p>
                                 </div>
-                                <div v-if="act.parents_metadata.mother_profession">
-                                    <h4 class="text-[9px] font-black text-gray-400 uppercase mb-1">Profession de la Mère</h4>
-                                    <p class="text-xs font-bold text-gray-900">{{ act.parents_metadata.mother_profession }}</p>
-                                </div>
-                                <div v-if="act.parents_metadata.residence" class="col-span-full">
-                                    <h4 class="text-[9px] font-black text-gray-400 uppercase mb-1">Domicile des parents</h4>
-                                    <p class="text-xs font-bold text-gray-900">{{ act.parents_metadata.residence }}</p>
+                                <!-- Pièces justificatives -->
+                                <div v-if="act.doc_cni_pere_path || act.doc_cni_mere_path || act.doc_acte_naissance_path || act.doc_cni_declarant_path || act.doc_autres_path" class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                    <h4 class="text-[9px] font-black text-gray-400 uppercase mb-3">Pièces Justificatives</h4>
+                                    <div class="space-y-2">
+                                        <a v-if="act.doc_cni_pere_path" :href="act.doc_cni_pere_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">CNI Père :</span> Visualiser le PDF</a>
+                                        <a v-if="act.doc_cni_mere_path" :href="act.doc_cni_mere_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">CNI Mère :</span> Visualiser le PDF</a>
+                                        <a v-if="act.doc_acte_naissance_path" :href="act.doc_acte_naissance_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">Acte/Attestation :</span> Visualiser le PDF</a>
+                                        <a v-if="act.doc_cni_declarant_path" :href="act.doc_cni_declarant_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">CNI Déclarant :</span> Visualiser le PDF</a>
+                                        <a v-if="act.doc_autres_path" :href="act.doc_autres_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">Autres pièces :</span> Visualiser le PDF</a>
+                                    </div>
                                 </div>
                             </div>
 

@@ -5,6 +5,19 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title inertia>{{ config('app.name', 'SIG-EC') }}</title>
+
+        <!-- Open Graph / Link Preview -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ url('/') }}">
+        <meta property="og:title" content="{{ config('app.name', 'SIG-EC') }}">
+        <meta property="og:description" content="Système d'Information de Gestion de l'État Civil">
+        <meta property="og:image" content="{{ asset('images/logo.png') }}">
+        
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ config('app.name', 'SIG-EC') }}">
+        <meta name="twitter:description" content="Système d'Information de Gestion de l'État Civil">
+        <meta name="twitter:image" content="{{ asset('images/logo.png') }}">
         
         <!-- Favicon -->
         <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">

@@ -148,6 +148,21 @@ class CivilActController extends Controller
             $data['certificate_path'] = '/storage/' . $path;
         }
 
+        // Pièces justificatives par catégorie
+        $docFields = [
+            'doc_cni_pere'       => 'doc_cni_pere_path',
+            'doc_cni_mere'       => 'doc_cni_mere_path',
+            'doc_acte_naissance' => 'doc_acte_naissance_path',
+            'doc_cni_declarant'  => 'doc_cni_declarant_path',
+            'doc_autres'         => 'doc_autres_path',
+        ];
+        foreach ($docFields as $fileKey => $pathKey) {
+            if ($request->hasFile($fileKey)) {
+                $path = $request->file($fileKey)->store('certificates/pieces', 'public');
+                $data[$pathKey] = '/storage/' . $path;
+            }
+        }
+
         $act = $model->create($data);
 
         return redirect()->route("acts.{$type}.show", $act->id)
@@ -215,6 +230,21 @@ class CivilActController extends Controller
             $data['certificate_path'] = '/storage/' . $path;
         }
 
+        // Pièces justificatives par catégorie
+        $docFields = [
+            'doc_cni_pere'       => 'doc_cni_pere_path',
+            'doc_cni_mere'       => 'doc_cni_mere_path',
+            'doc_acte_naissance' => 'doc_acte_naissance_path',
+            'doc_cni_declarant'  => 'doc_cni_declarant_path',
+            'doc_autres'         => 'doc_autres_path',
+        ];
+        foreach ($docFields as $fileKey => $pathKey) {
+            if ($request->hasFile($fileKey)) {
+                $path = $request->file($fileKey)->store('certificates/pieces', 'public');
+                $data[$pathKey] = '/storage/' . $path;
+            }
+        }
+
         $act->update($data);
 
         return redirect()->route("acts.{$type}.show", $act->id)
@@ -231,21 +261,43 @@ class CivilActController extends Controller
 
         if ($type === 'naissance') {
             return array_merge($common, [
-                'first_name' => 'required|string',
-                'last_name' => 'required|string',
-                'date_of_birth' => 'required|date',
-                'place_of_birth' => 'required|string',
-                'gender' => 'required|in:M,F',
-                'is_judgment' => 'nullable|boolean',
-                'judgment_number' => 'nullable|required_if:is_judgment,true|string',
-                'judgment_date' => 'nullable|required_if:is_judgment,true|date',
-                'judgment_court' => 'nullable|required_if:is_judgment,true|string',
-                'father_name' => 'nullable|string',
-                'mother_name' => 'nullable|string',
-                'parents_metadata' => 'nullable|array',
-                'parents_metadata.father_profession' => 'nullable|string',
-                'parents_metadata.mother_profession' => 'nullable|string',
-                'parents_metadata.residence' => 'nullable|string',
+                'first_name'                              => 'required|string',
+                'last_name'                               => 'required|string',
+                'date_of_birth'                           => 'required|date',
+                'time_of_birth'                           => 'nullable|date_format:H:i',
+                'place_of_birth'                          => 'required|string',
+                'health_facility'                         => 'nullable|string',
+                'act_registration_date'                   => 'nullable|date',
+                'gender'                                  => 'required|in:M,F',
+                'is_judgment'                             => 'nullable|boolean',
+                'judgment_number'                         => 'nullable|required_if:is_judgment,true|string',
+                'judgment_date'                           => 'nullable|required_if:is_judgment,true|date',
+                'judgment_court'                          => 'nullable|required_if:is_judgment,true|string',
+                'father_name'                             => 'nullable|string',
+                'mother_name'                             => 'nullable|string',
+                'parents_metadata'                        => 'nullable|array',
+                'parents_metadata.father_profession'      => 'nullable|string',
+                'parents_metadata.father_date_of_birth'   => 'nullable|date',
+                'parents_metadata.father_place_of_birth'  => 'nullable|string',
+                'parents_metadata.father_domicile'        => 'nullable|string',
+                'parents_metadata.mother_profession'      => 'nullable|string',
+                'parents_metadata.mother_date_of_birth'   => 'nullable|date',
+                'parents_metadata.mother_place_of_birth'  => 'nullable|string',
+                'parents_metadata.mother_domicile'        => 'nullable|string',
+                // Section Déclarant
+                'parents_metadata.declarant_first_name'   => 'nullable|string',
+                'parents_metadata.declarant_last_name'    => 'nullable|string',
+                'parents_metadata.declarant_profession'   => 'nullable|string',
+                'parents_metadata.declarant_address'      => 'nullable|string',
+                'parents_metadata.declarant_id_number'    => 'nullable|string',
+                'parents_metadata.declarant_date'         => 'nullable|date',
+                'parents_metadata.declarant_judgment_ref' => 'nullable|string',
+                // Pièces justificatives PDF
+                'doc_cni_pere'                            => 'nullable|file|mimes:pdf|max:10240',
+                'doc_cni_mere'                            => 'nullable|file|mimes:pdf|max:10240',
+                'doc_acte_naissance'                      => 'nullable|file|mimes:pdf|max:10240',
+                'doc_cni_declarant'                       => 'nullable|file|mimes:pdf|max:10240',
+                'doc_autres'                              => 'nullable|file|mimes:pdf|max:10240',
             ]);
         }
 
