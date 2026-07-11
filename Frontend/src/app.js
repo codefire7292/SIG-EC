@@ -10,6 +10,11 @@ import { ensureCsrf } from '@/services/api';
 
 const appName = import.meta.env.VITE_APP_NAME || 'SIG-EC';
 
+// Ajuster dynamiquement l'URL de base de Ziggy selon l'hôte actuel (localhost en dev, sig-ec.creinit.com en prod)
+if (typeof window !== 'undefined') {
+    Ziggy.url = window.location.origin;
+}
+
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
