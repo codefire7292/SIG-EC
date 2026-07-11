@@ -117,6 +117,14 @@ const updateStatus = (newStatus) => {
                                         <div class="text-[9px] font-black text-gray-400 uppercase">Tribunal</div>
                                         <div class="text-xs font-black text-gray-900">{{ act.judgment_court }}</div>
                                     </div>
+                                    <div v-if="act.parents_metadata?.judgment_auth_date">
+                                        <div class="text-[9px] font-black text-gray-400 uppercase">Date Autorisation</div>
+                                        <div class="text-xs font-black text-gray-900">{{ formatDate(act.parents_metadata.judgment_auth_date) }}</div>
+                                    </div>
+                                    <div v-if="act.parents_metadata?.judgment_auth_ref">
+                                        <div class="text-[9px] font-black text-gray-400 uppercase">Réf. Autorisation</div>
+                                        <div class="text-xs font-black text-gray-900">{{ act.parents_metadata.judgment_auth_ref }}</div>
+                                    </div>
                                 </div>
                                 <div class="pt-4 border-t border-gray-50 grid grid-cols-2 gap-8">
                                     <div>
@@ -144,6 +152,22 @@ const updateStatus = (newStatus) => {
                                         <div v-if="act.parents_metadata.declarant_id_number"><span class="text-gray-400">ID :</span> <span class="font-bold text-gray-900">{{ act.parents_metadata.declarant_id_number }}</span></div>
                                         <div v-if="act.parents_metadata.declarant_date"><span class="text-gray-400">Déclaration le :</span> <span class="font-bold text-gray-900">{{ formatDate(act.parents_metadata.declarant_date) }}</span></div>
                                         <div v-if="act.parents_metadata.declarant_judgment_ref"><span class="text-gray-400">Réf. Jugement :</span> <span class="font-bold text-gray-900">{{ act.parents_metadata.declarant_judgment_ref }}</span></div>
+                                    </div>
+                                </div>
+                                <!-- Témoins -->
+                                <div v-if="act.parents_metadata?.witnesses && act.parents_metadata.witnesses.length > 0" class="pt-4 border-t border-gray-50">
+                                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Témoins de l'acte</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div v-for="(witness, index) in act.parents_metadata.witnesses" :key="index" class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100/50 text-xs">
+                                            <div class="font-black text-[#1E690F] uppercase tracking-wider mb-2">Témoin {{ index + 1 }}</div>
+                                            <div class="space-y-1.5">
+                                                <div><span class="text-gray-400">Nom :</span> <span class="font-bold text-gray-900">{{ witness.first_name }} {{ witness.last_name }}</span></div>
+                                                <div><span class="text-gray-400">Né(e) le :</span> <span class="font-bold text-gray-900">{{ formatDate(witness.date_of_birth) }}<span v-if="witness.place_of_birth"> à {{ witness.place_of_birth }}</span></span></div>
+                                                <div><span class="text-gray-400">Profession :</span> <span class="font-bold text-gray-900">{{ witness.profession }}</span></div>
+                                                <div><span class="text-gray-400">Adresse :</span> <span class="font-bold text-gray-900">{{ witness.address }}</span></div>
+                                                <div><span class="text-gray-400">N° ID :</span> <span class="font-bold text-gray-900">{{ witness.id_number }}</span></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -243,13 +267,14 @@ const updateStatus = (newStatus) => {
                                     <p class="text-sm font-black text-gray-900">Fait à Enampore, le {{ formatDate(act.act_registration_date) }}</p>
                                 </div>
                                 <!-- Pièces justificatives -->
-                                <div v-if="act.doc_cni_pere_path || act.doc_cni_mere_path || act.doc_acte_naissance_path || act.doc_cni_declarant_path || act.doc_autres_path" class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                <div v-if="act.doc_cni_pere_path || act.doc_cni_mere_path || act.doc_acte_naissance_path || act.doc_cni_declarant_path || act.doc_autres_path || act.doc_jugement_path" class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
                                     <h4 class="text-[9px] font-black text-gray-400 uppercase mb-3">Pièces Justificatives</h4>
                                     <div class="space-y-2">
                                         <a v-if="act.doc_cni_pere_path" :href="act.doc_cni_pere_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">CNI Père :</span> Visualiser le PDF</a>
                                         <a v-if="act.doc_cni_mere_path" :href="act.doc_cni_mere_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">CNI Mère :</span> Visualiser le PDF</a>
                                         <a v-if="act.doc_acte_naissance_path" :href="act.doc_acte_naissance_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">Acte/Attestation :</span> Visualiser le PDF</a>
                                         <a v-if="act.doc_cni_declarant_path" :href="act.doc_cni_declarant_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">CNI Déclarant :</span> Visualiser le PDF</a>
+                                        <a v-if="act.doc_jugement_path" :href="act.doc_jugement_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">Copie du Jugement :</span> Visualiser le PDF</a>
                                         <a v-if="act.doc_autres_path" :href="act.doc_autres_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">Autres pièces :</span> Visualiser le PDF</a>
                                     </div>
                                 </div>

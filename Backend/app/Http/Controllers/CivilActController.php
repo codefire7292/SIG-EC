@@ -155,6 +155,7 @@ class CivilActController extends Controller
             'doc_acte_naissance' => 'doc_acte_naissance_path',
             'doc_cni_declarant'  => 'doc_cni_declarant_path',
             'doc_autres'         => 'doc_autres_path',
+            'doc_jugement'       => 'doc_jugement_path',
         ];
         foreach ($docFields as $fileKey => $pathKey) {
             if ($request->hasFile($fileKey)) {
@@ -237,6 +238,7 @@ class CivilActController extends Controller
             'doc_acte_naissance' => 'doc_acte_naissance_path',
             'doc_cni_declarant'  => 'doc_cni_declarant_path',
             'doc_autres'         => 'doc_autres_path',
+            'doc_jugement'       => 'doc_jugement_path',
         ];
         foreach ($docFields as $fileKey => $pathKey) {
             if ($request->hasFile($fileKey)) {
@@ -292,12 +294,25 @@ class CivilActController extends Controller
                 'parents_metadata.declarant_id_number'    => 'nullable|string',
                 'parents_metadata.declarant_date'         => 'nullable|date',
                 'parents_metadata.declarant_judgment_ref' => 'nullable|string',
+                // Section Jugement (si déclaration sur jugement)
+                'parents_metadata.judgment_auth_date'     => 'nullable|date',
+                'parents_metadata.judgment_auth_ref'      => 'nullable|string',
+                // Section Témoins (0 à 2)
+                'parents_metadata.witnesses'               => 'nullable|array',
+                'parents_metadata.witnesses.*.first_name'  => 'nullable|string',
+                'parents_metadata.witnesses.*.last_name'   => 'nullable|string',
+                'parents_metadata.witnesses.*.date_of_birth' => 'nullable|date',
+                'parents_metadata.witnesses.*.place_of_birth' => 'nullable|string',
+                'parents_metadata.witnesses.*.profession'  => 'nullable|string',
+                'parents_metadata.witnesses.*.address'     => 'nullable|string',
+                'parents_metadata.witnesses.*.id_number'   => 'nullable|string',
                 // Pièces justificatives PDF
                 'doc_cni_pere'                            => 'nullable|file|mimes:pdf|max:10240',
                 'doc_cni_mere'                            => 'nullable|file|mimes:pdf|max:10240',
                 'doc_acte_naissance'                      => 'nullable|file|mimes:pdf|max:10240',
                 'doc_cni_declarant'                       => 'nullable|file|mimes:pdf|max:10240',
                 'doc_autres'                              => 'nullable|file|mimes:pdf|max:10240',
+                'doc_jugement'                            => 'nullable|file|mimes:pdf|max:10240',
             ]);
         }
 

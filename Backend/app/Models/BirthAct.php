@@ -35,12 +35,12 @@ class BirthAct extends Model
         'mother_name',
         'parents_metadata',
         'officer_comments',
-        // Pièces justificatives — fichiers PDF distincts par catégorie
         'doc_cni_pere_path',
         'doc_cni_mere_path',
         'doc_acte_naissance_path',
         'doc_cni_declarant_path',
         'doc_autres_path',
+        'doc_jugement_path',
         // NOTE: status, validated_by, validated_at, locked_at, is_locked, parent_id, version_number,
         // rectification_reason, is_current are managed by the system only — never from user HTTP input.
     ];

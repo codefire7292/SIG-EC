@@ -56,22 +56,25 @@ const form = useForm({
     judgment_court: props.act?.judgment_court || '',
     father_name: props.act?.father_name || '',
     mother_name: props.act?.mother_name || '',
-    parents_metadata: props.act?.parents_metadata || {
-        father_profession: '',
-        father_date_of_birth: '',
-        father_place_of_birth: '',
-        father_domicile: '',
-        mother_profession: '',
-        mother_date_of_birth: '',
-        mother_place_of_birth: '',
-        mother_domicile: '',
-        declarant_first_name: '',
-        declarant_last_name: '',
-        declarant_profession: '',
-        declarant_address: '',
-        declarant_id_number: '',
-        declarant_date: '',
-        declarant_judgment_ref: '',
+    parents_metadata: {
+        father_profession: props.act?.parents_metadata?.father_profession || '',
+        father_date_of_birth: props.act?.parents_metadata?.father_date_of_birth || '',
+        father_place_of_birth: props.act?.parents_metadata?.father_place_of_birth || '',
+        father_domicile: props.act?.parents_metadata?.father_domicile || '',
+        mother_profession: props.act?.parents_metadata?.mother_profession || '',
+        mother_date_of_birth: props.act?.parents_metadata?.mother_date_of_birth || '',
+        mother_place_of_birth: props.act?.parents_metadata?.mother_place_of_birth || '',
+        mother_domicile: props.act?.parents_metadata?.mother_domicile || '',
+        declarant_first_name: props.act?.parents_metadata?.declarant_first_name || '',
+        declarant_last_name: props.act?.parents_metadata?.declarant_last_name || '',
+        declarant_profession: props.act?.parents_metadata?.declarant_profession || '',
+        declarant_address: props.act?.parents_metadata?.declarant_address || '',
+        declarant_id_number: props.act?.parents_metadata?.declarant_id_number || '',
+        declarant_date: props.act?.parents_metadata?.declarant_date || '',
+        declarant_judgment_ref: props.act?.parents_metadata?.declarant_judgment_ref || '',
+        judgment_auth_date: props.act?.parents_metadata?.judgment_auth_date || '',
+        judgment_auth_ref: props.act?.parents_metadata?.judgment_auth_ref || '',
+        witnesses: props.act?.parents_metadata?.witnesses || [],
     },
     // Naissance — Pièces justificatives PDF
     doc_cni_pere: null,
@@ -79,6 +82,7 @@ const form = useForm({
     doc_acte_naissance: null,
     doc_cni_declarant: null,
     doc_autres: null,
+    doc_jugement: null,
 
     // Mariage
     husband_first_name: props.act?.husband_first_name || '',
@@ -107,6 +111,27 @@ const form = useForm({
     place_of_death: props.act?.place_of_death || '',
     cause_of_death: props.act?.cause_of_death || '',
 });
+
+const addWitness = () => {
+    if (!form.parents_metadata.witnesses) {
+        form.parents_metadata.witnesses = [];
+    }
+    if (form.parents_metadata.witnesses.length < 2) {
+        form.parents_metadata.witnesses.push({
+            first_name: '',
+            last_name: '',
+            date_of_birth: '',
+            place_of_birth: '',
+            profession: '',
+            address: '',
+            id_number: '',
+        });
+    }
+};
+
+const removeWitness = (index) => {
+    form.parents_metadata.witnesses.splice(index, 1);
+};
 
 const submit = () => {
     if (props.is_edit) {
@@ -181,10 +206,10 @@ const submit = () => {
                                 <input id="is_judgment" v-model="form.is_judgment" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-[#1E690F] focus:ring-[#1E690F] focus:border-[#1E690F]" />
                                 <label for="is_judgment" class="text-xs font-black text-gray-700 uppercase tracking-wider cursor-pointer">Cet acte fait suite à un Jugement de Naissance</label>
                             </div>
-                            <div v-if="form.is_judgment" class="p-6 bg-green-50/30 rounded-2xl border border-green-100/50 space-y-4 col-span-full">
+                            <div v-if="form.is_judgment" class="p-6 bg-green-50/30 rounded-2xl border border-green-100/50 space-y-6 col-span-full">
                                 <h4 class="text-[10px] font-black text-[#1E690F] uppercase tracking-widest flex items-center gap-2">
                                     <div class="w-1.5 h-1.5 bg-[#1E690F] rounded-full"></div>
-                                    Références du Jugement
+                                    Références du Jugement & d'Autorisation
                                 </h4>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div>
@@ -196,8 +221,26 @@ const submit = () => {
                                         <input v-model="form.judgment_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
                                     </div>
                                     <div>
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Tribunal</label>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Juridiction (Tribunal)</label>
                                         <input v-model="form.judgment_court" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" placeholder="Tribunal d'Instance" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de l'Autorisation (si distincte)</label>
+                                        <input v-model="form.parents_metadata.judgment_auth_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Référence de l'Autorisation</label>
+                                        <input v-model="form.parents_metadata.judgment_auth_ref" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Réf. Autorisation" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Pièce Justificative (Copie Jugement PDF)</label>
+                                        <label class="flex flex-col items-center justify-center w-full h-12 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_jugement ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                            <div class="flex items-center gap-2">
+                                                <DocumentIcon class="w-4 h-4" :class="form.doc_jugement ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                                <span class="text-xs text-gray-500 font-bold"><span v-if="form.doc_jugement">{{ form.doc_jugement.name }}</span><span v-else>Téléverser le PDF</span></span>
+                                            </div>
+                                            <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_jugement = e.target.files[0]" />
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -404,6 +447,65 @@ const submit = () => {
                     </div>
                     <p v-else class="text-xs text-gray-400 italic">Cocher la case ci-dessus si le déclarant est différent des parents.</p>
                 </div>
+
+                <!-- Témoins (Naissance) -->
+                <div v-if="type === 'naissance'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xs font-black uppercase tracking-widest flex items-center gap-2" style="color: #1E690F;">
+                            <UserGroupIcon class="h-4 w-4" />
+                            Témoins (Optionnel, 0 à 2 témoins)
+                        </h3>
+                        <button v-if="!form.parents_metadata.witnesses || form.parents_metadata.witnesses.length < 2" 
+                                type="button" 
+                                @click="addWitness" 
+                                class="px-4 py-2 bg-green-50 text-[#1E690F] hover:bg-green-100 text-xs font-bold rounded-xl flex items-center gap-1 transition-all">
+                            <PlusCircleIcon class="h-4 w-4" />
+                            Ajouter un Témoin
+                        </button>
+                    </div>
+                    <div v-if="form.parents_metadata.witnesses && form.parents_metadata.witnesses.length > 0" class="space-y-6">
+                        <div v-for="(witness, index) in form.parents_metadata.witnesses" :key="index" class="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Témoin {{ index + 1 }}</h4>
+                                <button type="button" @click="removeWitness(index)" class="text-xs font-bold text-red-600 hover:text-red-800 flex items-center gap-1">
+                                    Supprimer
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms</label>
+                                    <input v-model="witness.first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom</label>
+                                    <input v-model="witness.last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de Naissance</label>
+                                    <input v-model="witness.date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de Naissance</label>
+                                    <input v-model="witness.place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession</label>
+                                    <input v-model="witness.profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Numéro d'Identification (CNI ou autre)</label>
+                                    <input v-model="witness.id_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Adresse</label>
+                                    <input v-model="witness.address" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p v-else class="text-xs text-gray-400 italic">Aucun témoin renseigné pour cet acte.</p>
+                </div>
+
 
 
                 <div v-if="type === 'mariage'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
