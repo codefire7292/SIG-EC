@@ -37,6 +37,11 @@ const hasDeclarant = ref(
     !!(props.act?.parents_metadata?.declarant_first_name || props.act?.parents_metadata?.declarant_last_name)
 );
 
+const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    return dateStr.substring(0, 10);
+};
+
 const form = useForm({
     // Common
     officer_comments: props.act?.officer_comments || '',
@@ -46,25 +51,25 @@ const form = useForm({
     // Naissance — Identité de l'enfant
     first_name: props.act?.first_name || '',
     last_name: props.act?.last_name || '',
-    date_of_birth: props.act?.date_of_birth || '',
+    date_of_birth: formatDate(props.act?.date_of_birth),
     time_of_birth: props.act?.time_of_birth || '',
     place_of_birth: props.act?.place_of_birth || '',
     health_facility: props.act?.health_facility || '',
-    act_registration_date: props.act?.act_registration_date || '',
+    act_registration_date: formatDate(props.act?.act_registration_date),
     gender: props.act?.gender || 'M',
     is_judgment: props.act?.is_judgment || false,
     judgment_number: props.act?.judgment_number || '',
-    judgment_date: props.act?.judgment_date || '',
+    judgment_date: formatDate(props.act?.judgment_date),
     judgment_court: props.act?.judgment_court || '',
     father_name: props.act?.father_name || '',
     mother_name: props.act?.mother_name || '',
     parents_metadata: {
         father_profession: props.act?.parents_metadata?.father_profession || '',
-        father_date_of_birth: props.act?.parents_metadata?.father_date_of_birth || '',
+        father_date_of_birth: formatDate(props.act?.parents_metadata?.father_date_of_birth),
         father_place_of_birth: props.act?.parents_metadata?.father_place_of_birth || '',
         father_domicile: props.act?.parents_metadata?.father_domicile || '',
         mother_profession: props.act?.parents_metadata?.mother_profession || '',
-        mother_date_of_birth: props.act?.parents_metadata?.mother_date_of_birth || '',
+        mother_date_of_birth: formatDate(props.act?.parents_metadata?.mother_date_of_birth),
         mother_place_of_birth: props.act?.parents_metadata?.mother_place_of_birth || '',
         mother_domicile: props.act?.parents_metadata?.mother_domicile || '',
         declarant_first_name: props.act?.parents_metadata?.declarant_first_name || '',
@@ -72,11 +77,14 @@ const form = useForm({
         declarant_profession: props.act?.parents_metadata?.declarant_profession || '',
         declarant_address: props.act?.parents_metadata?.declarant_address || '',
         declarant_id_number: props.act?.parents_metadata?.declarant_id_number || '',
-        declarant_date: props.act?.parents_metadata?.declarant_date || '',
+        declarant_date: formatDate(props.act?.parents_metadata?.declarant_date),
         declarant_judgment_ref: props.act?.parents_metadata?.declarant_judgment_ref || '',
-        judgment_auth_date: props.act?.parents_metadata?.judgment_auth_date || '',
+        judgment_auth_date: formatDate(props.act?.parents_metadata?.judgment_auth_date),
         judgment_auth_ref: props.act?.parents_metadata?.judgment_auth_ref || '',
-        witnesses: props.act?.parents_metadata?.witnesses || [],
+        witnesses: (props.act?.parents_metadata?.witnesses || []).map(w => ({
+            ...w,
+            date_of_birth: formatDate(w.date_of_birth)
+        })),
     },
     // Naissance — Pièces justificatives PDF
     doc_cni_pere: null,
@@ -91,14 +99,22 @@ const form = useForm({
     husband_last_name: props.act?.husband_last_name || '',
     wife_first_name: props.act?.wife_first_name || '',
     wife_last_name: props.act?.wife_last_name || '',
-    marriage_date: props.act?.marriage_date || '',
+    marriage_date: formatDate(props.act?.marriage_date),
     marriage_place: props.act?.marriage_place || '',
     marriage_option: props.act?.marriage_option || 'monogamie',
     matrimonial_regime: props.act?.matrimonial_regime || 'separation_biens',
     is_judgment: props.act?.is_judgment || false,
     judgment_number: props.act?.judgment_number || '',
-    judgment_date: props.act?.judgment_date || '',
-    spouses_metadata: props.act?.spouses_metadata || {
+    judgment_date: formatDate(props.act?.judgment_date),
+    spouses_metadata: props.act?.spouses_metadata ? {
+        ...props.act.spouses_metadata,
+        husband_date_of_birth: formatDate(props.act.spouses_metadata.husband_date_of_birth),
+        wife_date_of_birth: formatDate(props.act.spouses_metadata.wife_date_of_birth),
+        husband_father_date_of_birth: formatDate(props.act.spouses_metadata.husband_father_date_of_birth),
+        husband_mother_date_of_birth: formatDate(props.act.spouses_metadata.husband_mother_date_of_birth),
+        wife_father_date_of_birth: formatDate(props.act.spouses_metadata.wife_father_date_of_birth),
+        wife_mother_date_of_birth: formatDate(props.act.spouses_metadata.wife_mother_date_of_birth),
+    } : {
         husband_date_of_birth: '',
         husband_place_of_birth: '',
         husband_profession: '',
@@ -148,14 +164,14 @@ const form = useForm({
     // Deces
     deceased_first_name: props.act?.deceased_first_name || '',
     deceased_last_name: props.act?.deceased_last_name || '',
-    date_of_death: props.act?.date_of_death || '',
+    date_of_death: formatDate(props.act?.date_of_death),
     place_of_death: props.act?.place_of_death || '',
     cause_of_death: props.act?.cause_of_death || '',
     time_of_death: props.act?.time_of_death || '',
     health_facility: props.act?.health_facility || '',
-    act_registration_date: props.act?.act_registration_date || '',
+    act_registration_date: formatDate(props.act?.act_registration_date),
     gender: props.act?.gender || 'M',
-    date_of_birth: props.act?.date_of_birth || '',
+    date_of_birth: formatDate(props.act?.date_of_birth),
     
     // Pièces justificatives PDF Décès
     doc_death_cert: null,
@@ -165,7 +181,11 @@ const form = useForm({
     doc_autres: null,
 
     // Death Metadata JSON
-    death_metadata: props.act?.death_metadata || {
+    death_metadata: props.act?.death_metadata ? {
+        ...props.act.death_metadata,
+        father_date_of_birth: formatDate(props.act.death_metadata.father_date_of_birth),
+        mother_date_of_birth: formatDate(props.act.death_metadata.mother_date_of_birth),
+    } : {
         time_of_birth: '',
         place_of_birth: '',
         profession: '',

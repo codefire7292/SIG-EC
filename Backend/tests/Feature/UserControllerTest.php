@@ -39,6 +39,23 @@ class UserControllerTest extends TestCase
         $this->assertFalse($user->fresh()->hasRole('Agent'));
     }
 
+    public function test_user_can_update_own_name_and_email()
+    {
+        $user = User::factory()->create();
+        $user->assignRole('Super Admin');
+        $user->givePermissionTo('manage-users');
+
+        $response = $this->actingAs($user)->put(route('admin.users.update', $user->id), [
+            'name' => 'New Name',
+            'email' => 'newemail@example.com',
+            'role' => 'Super Admin', // same role
+        ]);
+
+        $response->assertRedirect(route('admin.users.index'));
+        $this->assertEquals('New Name', $user->fresh()->name);
+        $this->assertEquals('newemail@example.com', $user->fresh()->email);
+    }
+
     public function test_user_can_update_other_user_role()
     {
         $admin = User::factory()->create();
