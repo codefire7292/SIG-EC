@@ -79,6 +79,10 @@ class UserController extends Controller
             'role' => 'required|string|exists:roles,name',
         ]);
 
+        if ((int) $user->id === (int) auth()->id() && !$user->hasRole($validated['role'])) {
+            return back()->withErrors(['role' => 'Vous ne pouvez pas modifier votre propre rôle.']);
+        }
+
         $user->update([
             'name' => $validated['name'],
             'email' => $validated['email'],

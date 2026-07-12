@@ -55,7 +55,7 @@ const isProfileOpen = ref(false)
                         </div>
                         <div class="hidden sm:block text-left">
                             <p class="text-sm font-bold text-gray-800 leading-none">{{ page.props.auth.user.name }}</p>
-                            <p class="text-[10px] mt-0.5 uppercase font-black tracking-tighter" style="color: #1E690F;">Officier d'État Civil</p>
+                            <p class="text-[10px] mt-0.5 uppercase font-black tracking-tighter" style="color: #1E690F;">{{ page.props.auth.user.role || 'Officier d\'État Civil' }}</p>
                         </div>
                         <ChevronDownIcon class="h-4 w-4 text-gray-400 transition-transform duration-200" :class="isProfileOpen ? 'rotate-180' : ''" />
                     </button>
