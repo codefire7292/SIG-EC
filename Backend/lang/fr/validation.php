@@ -219,5 +219,25 @@ return [
         'parents_metadata.witnesses.*.profession' => 'profession du témoin',
         'parents_metadata.witnesses.*.address' => 'adresse du témoin',
         'parents_metadata.witnesses.*.id_number' => 'numéro de pièce du témoin',
+
+        // Pièces justificatives
+        'doc_cni_pere' => 'CNI du père',
+        'doc_cni_mere' => 'CNI de la mère',
+        'doc_acte_naissance' => 'acte / attestation de naissance',
+        'doc_cni_declarant' => 'CNI du déclarant',
+        'doc_jugement' => 'document du jugement',
+        'doc_autres' => 'autres pièces justificatives',
+
+        'doc_cni_husband' => 'CNI de l\'époux',
+        'doc_cni_wife' => 'CNI de l\'épouse',
+        'doc_birth_husband' => 'acte de naissance de l\'époux',
+        'doc_birth_wife' => 'acte de naissance de l\'épouse',
+        'doc_domicile' => 'justificatif de domicile / résidence',
+        'doc_medical' => 'certificat médical',
+        'doc_parental_auth' => 'autorisation parentale',
+
+        'doc_death_cert' => 'certificat / constat de décès',
+        'doc_deceased_id' => 'pièce d\'identité du défunt',
+        'doc_declarant_id' => 'pièce d\'identité du déclarant',
     ],
 ];

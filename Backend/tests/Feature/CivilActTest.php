@@ -63,7 +63,11 @@ class CivilActTest extends TestCase
                 'mother_place_of_birth' => 'Dakar',
                 'mother_domicile' => 'Dakar Plateau',
             ],
-            'officer_comments' => 'Enregistrement initial'
+            'officer_comments' => 'Enregistrement initial',
+            'doc_cni_pere' => \Illuminate\Http\UploadedFile::fake()->create('cni_pere.pdf', 100, 'application/pdf'),
+            'doc_cni_mere' => \Illuminate\Http\UploadedFile::fake()->create('cni_mere.pdf', 100, 'application/pdf'),
+            'doc_acte_naissance' => \Illuminate\Http\UploadedFile::fake()->create('acte_naissance.pdf', 100, 'application/pdf'),
+            'doc_cni_declarant' => \Illuminate\Http\UploadedFile::fake()->create('cni_declarant.pdf', 100, 'application/pdf'),
         ]);
 
         $response->assertStatus(302);

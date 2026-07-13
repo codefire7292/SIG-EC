@@ -1147,48 +1147,83 @@ const submit = () => {
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- CNI Père -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Père</label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_pere ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
-                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_pere ? 'text-[#1E690F]' : 'text-gray-400'" />
-                                <p class="text-xs text-gray-500 font-bold text-center px-2"><span v-if="form.doc_cni_pere">{{ form.doc_cni_pere.name }}</span><span v-else>Cliquer pour téléverser (PDF)</span></p>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Père <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_pere || props.act?.doc_cni_pere_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_pere || props.act?.doc_cni_pere_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_cni_pere">{{ form.doc_cni_pere.name }}</span>
+                                    <span v-else-if="props.act?.doc_cni_pere_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
                                 <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_cni_pere = e.target.files[0]" />
                             </label>
+                            <div v-if="props.act?.doc_cni_pere_path && !form.doc_cni_pere" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_cni_pere_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
                         </div>
                         <!-- CNI Mère -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de la Mère</label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_mere ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
-                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_mere ? 'text-[#1E690F]' : 'text-gray-400'" />
-                                <p class="text-xs text-gray-500 font-bold text-center px-2"><span v-if="form.doc_cni_mere">{{ form.doc_cni_mere.name }}</span><span v-else>Cliquer pour téléverser (PDF)</span></p>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de la Mère <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_mere || props.act?.doc_cni_mere_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_mere || props.act?.doc_cni_mere_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_cni_mere">{{ form.doc_cni_mere.name }}</span>
+                                    <span v-else-if="props.act?.doc_cni_mere_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
                                 <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_cni_mere = e.target.files[0]" />
                             </label>
+                            <div v-if="props.act?.doc_cni_mere_path && !form.doc_cni_mere" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_cni_mere_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
                         </div>
                         <!-- Acte / Attestation de naissance -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte / Attestation de Naissance</label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_acte_naissance ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
-                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_acte_naissance ? 'text-[#1E690F]' : 'text-gray-400'" />
-                                <p class="text-xs text-gray-500 font-bold text-center px-2"><span v-if="form.doc_acte_naissance">{{ form.doc_acte_naissance.name }}</span><span v-else>Cliquer pour téléverser (PDF)</span></p>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte / Attestation de Naissance <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_acte_naissance || props.act?.doc_acte_naissance_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_acte_naissance || props.act?.doc_acte_naissance_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_acte_naissance">{{ form.doc_acte_naissance.name }}</span>
+                                    <span v-else-if="props.act?.doc_acte_naissance_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
                                 <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_acte_naissance = e.target.files[0]" />
                             </label>
+                            <div v-if="props.act?.doc_acte_naissance_path && !form.doc_acte_naissance" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_acte_naissance_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
                         </div>
                         <!-- CNI Déclarant -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Déclarant</label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_declarant ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
-                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_declarant ? 'text-[#1E690F]' : 'text-gray-400'" />
-                                <p class="text-xs text-gray-500 font-bold text-center px-2"><span v-if="form.doc_cni_declarant">{{ form.doc_cni_declarant.name }}</span><span v-else>Cliquer pour téléverser (PDF)</span></p>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Déclarant <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_declarant || props.act?.doc_cni_declarant_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_declarant || props.act?.doc_cni_declarant_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_cni_declarant">{{ form.doc_cni_declarant.name }}</span>
+                                    <span v-else-if="props.act?.doc_cni_declarant_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
                                 <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_cni_declarant = e.target.files[0]" />
                             </label>
+                            <div v-if="props.act?.doc_cni_declarant_path && !form.doc_cni_declarant" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_cni_declarant_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
                         </div>
                         <!-- Autres pièces -->
                         <div class="md:col-span-2">
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autres Pièces Justificatives (si nécessaire)</label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_autres ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
-                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_autres ? 'text-[#1E690F]' : 'text-gray-400'" />
-                                <p class="text-xs text-gray-500 font-bold text-center px-2"><span v-if="form.doc_autres">{{ form.doc_autres.name }}</span><span v-else>Cliquer pour téléverser (PDF)</span></p>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_autres || props.act?.doc_autres_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_autres || props.act?.doc_autres_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_autres">{{ form.doc_autres.name }}</span>
+                                    <span v-else-if="props.act?.doc_autres_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                </p>
                                 <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_autres = e.target.files[0]" />
                             </label>
+                            <div v-if="props.act?.doc_autres_path && !form.doc_autres" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_autres_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1202,7 +1237,7 @@ const submit = () => {
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- CNI Époux -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Époux</label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Époux <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_husband || props.act?.doc_cni_husband_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_husband || props.act?.doc_cni_husband_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1219,7 +1254,7 @@ const submit = () => {
                         
                         <!-- CNI Épouse -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Épouse</label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Épouse <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_wife || props.act?.doc_cni_wife_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_wife || props.act?.doc_cni_wife_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1236,7 +1271,7 @@ const submit = () => {
 
                         <!-- Acte de Naissance Époux -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Époux</label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Époux <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_birth_husband || props.act?.doc_birth_husband_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_birth_husband || props.act?.doc_birth_husband_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1253,7 +1288,7 @@ const submit = () => {
 
                         <!-- Acte de Naissance Épouse -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Épouse</label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Épouse <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_birth_wife || props.act?.doc_birth_wife_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_birth_wife || props.act?.doc_birth_wife_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1270,7 +1305,7 @@ const submit = () => {
 
                         <!-- Certificat de Domicile -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Domicile</label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Domicile <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_domicile || props.act?.doc_domicile_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_domicile || props.act?.doc_domicile_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1287,7 +1322,7 @@ const submit = () => {
 
                         <!-- Certificat Médical Prénuptial -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat Médical Prénuptial</label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat Médical Prénuptial <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_medical || props.act?.doc_medical_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_medical || props.act?.doc_medical_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1347,7 +1382,7 @@ const submit = () => {
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- Certificat de Décès -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Décès / Médical</label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Décès / Médical <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_death_cert || props.act?.doc_death_cert_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_death_cert || props.act?.doc_death_cert_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1364,7 +1399,7 @@ const submit = () => {
 
                         <!-- Pièce d'identité du défunt -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Pièce d'identité du défunt</label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Pièce d'identité du défunt <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_deceased_id || props.act?.doc_deceased_id_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_deceased_id || props.act?.doc_deceased_id_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1381,7 +1416,7 @@ const submit = () => {
 
                         <!-- CNI du Déclarant -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Déclarant</label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Déclarant <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_declarant_id || props.act?.doc_declarant_id_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_declarant_id || props.act?.doc_declarant_id_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
