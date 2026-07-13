@@ -251,10 +251,34 @@ class CivilActTest extends TestCase
             'gender' => 'M',
             'date_of_birth' => '1980-01-01',
             'date_of_death' => '2024-05-01',
+            'time_of_death' => '14:30',
             'place_of_death' => 'Dakar',
+            'health_facility' => 'Poste de Santé',
+            'act_registration_date' => '2024-05-02',
             'death_metadata' => [
+                'place_of_birth' => 'Dakar',
+                'profession' => 'Commerçant',
+                'domicile' => 'Dakar',
+                'marital_status' => 'Célibataire',
+                
+                'father_first_name' => 'Jean',
+                'father_last_name' => 'Doe',
+                'father_date_of_birth' => '1950-01-01',
+                'father_profession' => 'Retraité',
+                'father_domicile' => 'Dakar',
+                
+                'mother_first_name' => 'Marie',
+                'mother_last_name' => 'Doe',
+                'mother_date_of_birth' => '1955-01-01',
+                'mother_profession' => 'Ménagère',
+                'mother_domicile' => 'Dakar',
+                
                 'declarant_first_name' => 'Jane',
                 'declarant_last_name' => 'Doe',
+                'declarant_profession' => 'Enseignante',
+                'declarant_address' => 'Dakar',
+                'declarant_relationship' => 'Sœur',
+                'declarant_id_number' => '123456789',
                 'declarant_date_time' => '2024-05-02 10:00:00'
             ]
         ]);

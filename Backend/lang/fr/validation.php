@@ -284,5 +284,44 @@ return [
         'spouses_metadata.wife_mother_date_of_birth' => 'date de naissance de la mère de l\'épouse',
         'spouses_metadata.wife_mother_profession' => 'profession de la mère de l\'épouse',
         'spouses_metadata.wife_mother_domicile' => 'domicile de la mère de l\'épouse',
+
+        // Décès (Death)
+        'deceased_first_name' => 'prénom du défunt',
+        'deceased_last_name' => 'nom du défunt',
+        'gender' => 'sexe',
+        'date_of_birth' => 'date de naissance',
+        'date_of_death' => 'date de décès',
+        'time_of_death' => 'heure du décès',
+        'place_of_death' => 'lieu du décès',
+        'health_facility' => 'formation sanitaire',
+        'act_registration_date' => 'date d\'inscription de l\'acte',
+        'cause_of_death' => 'cause du décès',
+
+        // Death metadata
+        'death_metadata.place_of_birth' => 'lieu de naissance du défunt',
+        'death_metadata.profession' => 'profession du défunt',
+        'death_metadata.domicile' => 'domicile du défunt',
+        'death_metadata.marital_status' => 'situation matrimoniale du défunt',
+
+        // Parents du défunt
+        'death_metadata.father_first_name' => 'prénom du père du défunt',
+        'death_metadata.father_last_name' => 'nom du père du défunt',
+        'death_metadata.father_date_of_birth' => 'date de naissance du père du défunt',
+        'death_metadata.father_profession' => 'profession du père du défunt',
+        'death_metadata.father_domicile' => 'domicile du père du défunt',
+        'death_metadata.mother_first_name' => 'prénom de la mère du défunt',
+        'death_metadata.mother_last_name' => 'nom de la mère du défunt',
+        'death_metadata.mother_date_of_birth' => 'date de naissance de la mère du défunt',
+        'death_metadata.mother_profession' => 'profession de la mère du défunt',
+        'death_metadata.mother_domicile' => 'domicile de la mère du défunt',
+
+        // Déclarant
+        'death_metadata.declarant_first_name' => 'prénom du déclarant',
+        'death_metadata.declarant_last_name' => 'nom du déclarant',
+        'death_metadata.declarant_profession' => 'profession du déclarant',
+        'death_metadata.declarant_address' => 'adresse du déclarant',
+        'death_metadata.declarant_relationship' => 'degré de parenté du déclarant',
+        'death_metadata.declarant_id_number' => 'numéro d\'identification (CNI) du déclarant',
+        'death_metadata.declarant_date_time' => 'date et heure de la déclaration',
     ],
 ];
