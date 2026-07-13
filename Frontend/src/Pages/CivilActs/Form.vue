@@ -42,6 +42,11 @@ const formatDate = (dateStr) => {
     return dateStr.substring(0, 10);
 };
 
+const formatTime = (timeStr) => {
+    if (!timeStr) return '';
+    return timeStr.substring(0, 5);
+};
+
 const formatDateTimeLocal = (dateTimeStr) => {
     if (!dateTimeStr) return '';
     let clean = dateTimeStr.replace(' ', 'T');
@@ -61,7 +66,7 @@ const form = useForm({
     first_name: props.act?.first_name || '',
     last_name: props.act?.last_name || '',
     date_of_birth: formatDate(props.act?.date_of_birth),
-    time_of_birth: props.act?.time_of_birth || '',
+    time_of_birth: formatTime(props.act?.time_of_birth),
     place_of_birth: props.act?.place_of_birth || '',
     health_facility: props.act?.health_facility || '',
     act_registration_date: formatDate(props.act?.act_registration_date),
