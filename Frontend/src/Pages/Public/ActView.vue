@@ -318,7 +318,7 @@ const spousesMeta = computed(() => props.act?.spouses_metadata ?? null)
                         <h2 class="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-3 mb-6">Pièces justificatives</h2>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             <a v-for="doc in docs" :key="doc.key"
-                               :href="`/storage/${act[doc.key]}`" target="_blank"
+                               :href="act[doc.key].startsWith('/storage') ? act[doc.key] : `/storage/${act[doc.key]}`" target="_blank"
                                class="flex items-center gap-3 p-4 bg-gray-50 border border-gray-200 rounded-2xl hover:bg-[#1E690F] hover:border-[#1E690F] hover:text-white transition-all duration-200 group">
                                 <PaperClipIcon class="h-4 w-4 text-gray-400 group-hover:text-white shrink-0" />
                                 <span class="text-xs font-bold text-gray-700 group-hover:text-white leading-tight">{{ doc.label }}</span>
