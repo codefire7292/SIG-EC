@@ -246,7 +246,7 @@ return [
         'wife_first_name' => 'prénom de l\'épouse',
         'wife_last_name' => 'nom de l\'épouse',
         'marriage_date' => 'date du mariage',
-        'marriage_place' => 'lieu du mariage',
+        'marriage_place' => 'lieu de célébration',
 
         // Spouses metadata details
         'spouses_metadata' => 'informations des époux',
