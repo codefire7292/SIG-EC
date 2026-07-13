@@ -97,7 +97,11 @@ class CivilActController extends Controller
 
         $type = $request->route('type');
         $rules = $this->getValidationRules($type);
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, [
+            'file' => 'Le fichier doit être valide.',
+            'mimes' => 'Le document doit être au format PDF.',
+            'max' => 'La taille du fichier ne doit pas dépasser 2 Mo.',
+        ]);
 
         $centerId = 1;
         if (!\App\Models\CivilRegistrationCenter::where('id', $centerId)->exists()) {
@@ -222,7 +226,11 @@ class CivilActController extends Controller
         $act = $model->with('registry')->findOrFail($id);
 
         $rules = $this->getValidationRules($type, $id);
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, [
+            'file' => 'Le fichier doit être valide.',
+            'mimes' => 'Le document doit être au format PDF.',
+            'max' => 'La taille du fichier ne doit pas dépasser 2 Mo.',
+        ]);
 
         // TECHNICAL RULE: Filter out dot-notation keys
         $data = array_filter($validated, fn($key) => !str_contains($key, '.'), ARRAY_FILTER_USE_KEY);
@@ -340,7 +348,7 @@ class CivilActController extends Controller
     {
         $common = [
             'officer_comments' => 'nullable|string',
-            'certificate_file' => 'nullable|file|mimes:pdf|max:10240',
+            'certificate_file' => 'nullable|file|mimes:pdf|max:2048',
             'certificate_path' => 'nullable|string',
         ];
 
@@ -390,12 +398,12 @@ class CivilActController extends Controller
                 'parents_metadata.witnesses.*.address'     => 'nullable|string',
                 'parents_metadata.witnesses.*.id_number'   => 'nullable|string',
                 // Pièces justificatives PDF
-                'doc_cni_pere'                            => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:10240',
-                'doc_cni_mere'                            => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:10240',
-                'doc_acte_naissance'                      => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:10240',
-                'doc_cni_declarant'                       => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:10240',
-                'doc_autres'                              => 'nullable|file|mimes:pdf|max:10240',
-                'doc_jugement'                            => ($id ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:10240',
+                'doc_cni_pere'                            => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:2048',
+                'doc_cni_mere'                            => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:2048',
+                'doc_acte_naissance'                      => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:2048',
+                'doc_cni_declarant'                       => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:2048',
+                'doc_autres'                              => 'nullable|file|mimes:pdf|max:2048',
+                'doc_jugement'                            => ($id ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:2048',
             ]);
         }
 
@@ -456,17 +464,17 @@ class CivilActController extends Controller
                 'witnesses_metadata.*.profession'              => 'nullable|string',
                 'witnesses_metadata.*.address'                 => 'nullable|string',
                 'witnesses_metadata.*.id_number'               => 'nullable|string',
-                'witnesses_metadata.*.cni_file'                => 'nullable|file|mimes:pdf|max:10240',
+                'witnesses_metadata.*.cni_file'                => 'nullable|file|mimes:pdf|max:2048',
                 // Documents PDF separate
-                'doc_cni_husband'                              => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:10240',
-                'doc_cni_wife'                                 => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:10240',
-                'doc_birth_husband'                            => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:10240',
-                'doc_birth_wife'                               => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:10240',
-                'doc_domicile'                                 => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:10240',
-                'doc_medical'                                  => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:10240',
-                'doc_parental_auth'                            => 'nullable|file|mimes:pdf|max:10240',
-                'doc_jugement'                                 => ($id ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:10240',
-                'doc_autres'                                   => 'nullable|file|mimes:pdf|max:10240',
+                'doc_cni_husband'                              => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:2048',
+                'doc_cni_wife'                                 => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:2048',
+                'doc_birth_husband'                            => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:2048',
+                'doc_birth_wife'                               => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:2048',
+                'doc_domicile'                                 => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:2048',
+                'doc_medical'                                  => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:2048',
+                'doc_parental_auth'                            => 'nullable|file|mimes:pdf|max:2048',
+                'doc_jugement'                                 => ($id ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:2048',
+                'doc_autres'                                   => 'nullable|file|mimes:pdf|max:2048',
             ]);
         }
 
@@ -520,13 +528,13 @@ class CivilActController extends Controller
                 'witnesses_metadata.*.profession'           => 'nullable|string',
                 'witnesses_metadata.*.address'              => 'nullable|string',
                 'witnesses_metadata.*.id_number'            => 'nullable|string',
-                'witnesses_metadata.*.cni_file'             => 'nullable|file|mimes:pdf|max:10240',
+                'witnesses_metadata.*.cni_file'             => 'nullable|file|mimes:pdf|max:2048',
                 // Documents PDF separate
-                'doc_death_cert'                            => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:10240',
-                'doc_deceased_id'                           => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:10240',
-                'doc_declarant_id'                          => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:10240',
-                'doc_jugement'                              => ($id ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:10240',
-                'doc_autres'                                => 'nullable|file|mimes:pdf|max:10240',
+                'doc_death_cert'                            => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:2048',
+                'doc_deceased_id'                           => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:2048',
+                'doc_declarant_id'                          => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:2048',
+                'doc_jugement'                              => ($id ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:2048',
+                'doc_autres'                                => 'nullable|file|mimes:pdf|max:2048',
             ]);
         }
 

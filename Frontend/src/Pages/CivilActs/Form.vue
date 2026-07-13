@@ -1237,15 +1237,15 @@ const submit = () => {
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- CNI Époux -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Époux <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Époux (PDF, max. 2 Mo) <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_husband || props.act?.doc_cni_husband_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_husband || props.act?.doc_cni_husband_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_cni_husband">{{ form.doc_cni_husband.name }}</span>
                                     <span v-else-if="props.act?.doc_cni_husband_path">Document existant (Modifier)</span>
-                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF, max. 2 Mo)</span>
                                 </p>
-                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_cni_husband = e.target.files[0]" />
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => handleFileChange(e, 'doc_cni_husband')" />
                             </label>
                             <div v-if="props.act?.doc_cni_husband_path && !form.doc_cni_husband" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
                                 <a :href="props.act.doc_cni_husband_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
@@ -1254,15 +1254,15 @@ const submit = () => {
                         
                         <!-- CNI Épouse -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Épouse <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Épouse (PDF, max. 2 Mo) <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_wife || props.act?.doc_cni_wife_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_wife || props.act?.doc_cni_wife_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_cni_wife">{{ form.doc_cni_wife.name }}</span>
                                     <span v-else-if="props.act?.doc_cni_wife_path">Document existant (Modifier)</span>
-                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF, max. 2 Mo)</span>
                                 </p>
-                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_cni_wife = e.target.files[0]" />
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => handleFileChange(e, 'doc_cni_wife')" />
                             </label>
                             <div v-if="props.act?.doc_cni_wife_path && !form.doc_cni_wife" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
                                 <a :href="props.act.doc_cni_wife_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
@@ -1271,15 +1271,15 @@ const submit = () => {
 
                         <!-- Acte de Naissance Époux -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Époux <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Époux (PDF, max. 2 Mo) <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_birth_husband || props.act?.doc_birth_husband_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_birth_husband || props.act?.doc_birth_husband_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_birth_husband">{{ form.doc_birth_husband.name }}</span>
                                     <span v-else-if="props.act?.doc_birth_husband_path">Document existant (Modifier)</span>
-                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF, max. 2 Mo)</span>
                                 </p>
-                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_birth_husband = e.target.files[0]" />
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => handleFileChange(e, 'doc_birth_husband')" />
                             </label>
                             <div v-if="props.act?.doc_birth_husband_path && !form.doc_birth_husband" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
                                 <a :href="props.act.doc_birth_husband_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
@@ -1288,15 +1288,15 @@ const submit = () => {
 
                         <!-- Acte de Naissance Épouse -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Épouse <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Épouse (PDF, max. 2 Mo) <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_birth_wife || props.act?.doc_birth_wife_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_birth_wife || props.act?.doc_birth_wife_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_birth_wife">{{ form.doc_birth_wife.name }}</span>
                                     <span v-else-if="props.act?.doc_birth_wife_path">Document existant (Modifier)</span>
-                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF, max. 2 Mo)</span>
                                 </p>
-                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_birth_wife = e.target.files[0]" />
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => handleFileChange(e, 'doc_birth_wife')" />
                             </label>
                             <div v-if="props.act?.doc_birth_wife_path && !form.doc_birth_wife" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
                                 <a :href="props.act.doc_birth_wife_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
@@ -1305,15 +1305,15 @@ const submit = () => {
 
                         <!-- Certificat de Domicile -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Domicile <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Domicile (PDF, max. 2 Mo) <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_domicile || props.act?.doc_domicile_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_domicile || props.act?.doc_domicile_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_domicile">{{ form.doc_domicile.name }}</span>
                                     <span v-else-if="props.act?.doc_domicile_path">Document existant (Modifier)</span>
-                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF, max. 2 Mo)</span>
                                 </p>
-                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_domicile = e.target.files[0]" />
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => handleFileChange(e, 'doc_domicile')" />
                             </label>
                             <div v-if="props.act?.doc_domicile_path && !form.doc_domicile" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
                                 <a :href="props.act.doc_domicile_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
@@ -1322,15 +1322,15 @@ const submit = () => {
 
                         <!-- Certificat Médical Prénuptial -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat Médical Prénuptial <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat Médical Prénuptial (PDF, max. 2 Mo) <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_medical || props.act?.doc_medical_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_medical || props.act?.doc_medical_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_medical">{{ form.doc_medical.name }}</span>
                                     <span v-else-if="props.act?.doc_medical_path">Document existant (Modifier)</span>
-                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF, max. 2 Mo)</span>
                                 </p>
-                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_medical = e.target.files[0]" />
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => handleFileChange(e, 'doc_medical')" />
                             </label>
                             <div v-if="props.act?.doc_medical_path && !form.doc_medical" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
                                 <a :href="props.act.doc_medical_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
@@ -1339,15 +1339,15 @@ const submit = () => {
 
                         <!-- Autorisation parentale -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autorisation parentale (si mineur)</label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autorisation parentale (si mineur, PDF, max. 2 Mo)</label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_parental_auth || props.act?.doc_parental_auth_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_parental_auth || props.act?.doc_parental_auth_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_parental_auth">{{ form.doc_parental_auth.name }}</span>
                                     <span v-else-if="props.act?.doc_parental_auth_path">Document existant (Modifier)</span>
-                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF, max. 2 Mo)</span>
                                 </p>
-                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_parental_auth = e.target.files[0]" />
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => handleFileChange(e, 'doc_parental_auth')" />
                             </label>
                             <div v-if="props.act?.doc_parental_auth_path && !form.doc_parental_auth" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
                                 <a :href="props.act.doc_parental_auth_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
@@ -1356,15 +1356,15 @@ const submit = () => {
 
                         <!-- Autres pièces -->
                         <div class="md:col-span-2 lg:col-span-2">
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autres Pièces Justificatives</label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autres Pièces Justificatives (PDF, max. 2 Mo)</label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_autres || props.act?.doc_autres_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_autres || props.act?.doc_autres_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_autres">{{ form.doc_autres.name }}</span>
                                     <span v-else-if="props.act?.doc_autres_path">Document existant (Modifier)</span>
-                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF, max. 2 Mo)</span>
                                 </p>
-                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_autres = e.target.files[0]" />
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => handleFileChange(e, 'doc_autres')" />
                             </label>
                             <div v-if="props.act?.doc_autres_path && !form.doc_autres" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
                                 <a :href="props.act.doc_autres_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
@@ -1382,15 +1382,15 @@ const submit = () => {
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- Certificat de Décès -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Décès / Médical <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Décès / Médical (PDF, max. 2 Mo) <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_death_cert || props.act?.doc_death_cert_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_death_cert || props.act?.doc_death_cert_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_death_cert">{{ form.doc_death_cert.name }}</span>
                                     <span v-else-if="props.act?.doc_death_cert_path">Document existant (Modifier)</span>
-                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF, max. 2 Mo)</span>
                                 </p>
-                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_death_cert = e.target.files[0]" />
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => handleFileChange(e, 'doc_death_cert')" />
                             </label>
                             <div v-if="props.act?.doc_death_cert_path && !form.doc_death_cert" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
                                 <a :href="props.act.doc_death_cert_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
@@ -1399,15 +1399,15 @@ const submit = () => {
 
                         <!-- Pièce d'identité du défunt -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Pièce d'identité du défunt <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Pièce d'identité du défunt (PDF, max. 2 Mo) <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_deceased_id || props.act?.doc_deceased_id_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_deceased_id || props.act?.doc_deceased_id_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_deceased_id">{{ form.doc_deceased_id.name }}</span>
                                     <span v-else-if="props.act?.doc_deceased_id_path">Document existant (Modifier)</span>
-                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF, max. 2 Mo)</span>
                                 </p>
-                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_deceased_id = e.target.files[0]" />
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => handleFileChange(e, 'doc_deceased_id')" />
                             </label>
                             <div v-if="props.act?.doc_deceased_id_path && !form.doc_deceased_id" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
                                 <a :href="props.act.doc_deceased_id_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
@@ -1416,15 +1416,15 @@ const submit = () => {
 
                         <!-- CNI du Déclarant -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Déclarant <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Déclarant (PDF, max. 2 Mo) <span v-if="!props.act" class="text-red-500">*</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_declarant_id || props.act?.doc_declarant_id_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_declarant_id || props.act?.doc_declarant_id_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_declarant_id">{{ form.doc_declarant_id.name }}</span>
                                     <span v-else-if="props.act?.doc_declarant_id_path">Document existant (Modifier)</span>
-                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF, max. 2 Mo)</span>
                                 </p>
-                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_declarant_id = e.target.files[0]" />
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => handleFileChange(e, 'doc_declarant_id')" />
                             </label>
                             <div v-if="props.act?.doc_declarant_id_path && !form.doc_declarant_id" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
                                 <a :href="props.act.doc_declarant_id_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
@@ -1433,15 +1433,15 @@ const submit = () => {
 
                         <!-- Copie du Jugement -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Copie du Jugement</label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Copie du Jugement (PDF, max. 2 Mo)</label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_jugement || props.act?.doc_jugement_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_jugement || props.act?.doc_jugement_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_jugement">{{ form.doc_jugement.name }}</span>
                                     <span v-else-if="props.act?.doc_jugement_path">Document existant (Modifier)</span>
-                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF, max. 2 Mo)</span>
                                 </p>
-                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_jugement = e.target.files[0]" />
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => handleFileChange(e, 'doc_jugement')" />
                             </label>
                             <div v-if="props.act?.doc_jugement_path && !form.doc_jugement" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
                                 <a :href="props.act.doc_jugement_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
@@ -1450,15 +1450,15 @@ const submit = () => {
 
                         <!-- Autres pièces -->
                         <div class="md:col-span-2">
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autres Pièces Justificatives</label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autres Pièces Justificatives (PDF, max. 2 Mo)</label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_autres || props.act?.doc_autres_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_autres || props.act?.doc_autres_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_autres">{{ form.doc_autres.name }}</span>
                                     <span v-else-if="props.act?.doc_autres_path">Document existant (Modifier)</span>
-                                    <span v-else>Cliquer pour téléverser (PDF)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF, max. 2 Mo)</span>
                                 </p>
-                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => form.doc_autres = e.target.files[0]" />
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => handleFileChange(e, 'doc_autres')" />
                             </label>
                             <div v-if="props.act?.doc_autres_path && !form.doc_autres" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
                                 <a :href="props.act.doc_autres_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
