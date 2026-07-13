@@ -300,7 +300,7 @@ const submit = () => {
                 </div>
                 <ul class="list-disc pl-5 text-xs font-bold space-y-1">
                     <li v-for="(error, field) in form.errors" :key="field">
-                        {{ field }} : {{ error }}
+                        {{ error }}
                     </li>
                 </ul>
             </div>
