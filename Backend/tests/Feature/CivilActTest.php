@@ -46,14 +46,22 @@ class CivilActTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Doe',
             'date_of_birth' => '2024-01-01',
+            'time_of_birth' => '10:00',
             'place_of_birth' => 'Dakar',
+            'health_facility' => 'Centre de Santé',
+            'act_registration_date' => '2024-01-02',
             'gender' => 'M',
             'father_name' => 'Father Doe',
             'mother_name' => 'Mother Doe',
             'parents_metadata' => [
                 'father_profession' => 'Ingénieur',
+                'father_date_of_birth' => '1990-01-01',
+                'father_place_of_birth' => 'Dakar',
+                'father_domicile' => 'Dakar Plateau',
                 'mother_profession' => 'Médecin',
-                'residence' => 'Dakar Plateau'
+                'mother_date_of_birth' => '1992-02-02',
+                'mother_place_of_birth' => 'Dakar',
+                'mother_domicile' => 'Dakar Plateau',
             ],
             'officer_comments' => 'Enregistrement initial'
         ]);
@@ -92,8 +100,23 @@ class CivilActTest extends TestCase
             'first_name' => 'Janet',
             'last_name' => 'Doe',
             'date_of_birth' => '2024-02-01',
+            'time_of_birth' => '12:00',
             'place_of_birth' => 'Rufisque',
+            'health_facility' => 'Poste de Santé',
+            'act_registration_date' => '2024-02-02',
             'gender' => 'F',
+            'father_name' => 'Father Doe',
+            'mother_name' => 'Mother Doe',
+            'parents_metadata' => [
+                'father_profession' => 'Ingénieur',
+                'father_date_of_birth' => '1990-01-01',
+                'father_place_of_birth' => 'Dakar',
+                'father_domicile' => 'Dakar Plateau',
+                'mother_profession' => 'Médecin',
+                'mother_date_of_birth' => '1992-02-02',
+                'mother_place_of_birth' => 'Dakar',
+                'mother_domicile' => 'Dakar Plateau',
+            ],
             'officer_comments' => 'Nom corrigé'
         ]);
 
