@@ -170,7 +170,38 @@ class CivilActTest extends TestCase
             'marriage_date' => '2024-06-01',
             'marriage_place' => 'Verona',
             'spouses_metadata' => [
-                'husband_profession' => 'Poète'
+                'husband_date_of_birth' => '1995-05-05',
+                'husband_place_of_birth' => 'Dakar',
+                'husband_profession' => 'Poète',
+                'husband_domicile' => 'Dakar',
+                'husband_residence' => 'Dakar',
+                'wife_date_of_birth' => '1997-07-07',
+                'wife_place_of_birth' => 'Dakar',
+                'wife_profession' => 'Médecin',
+                'wife_domicile' => 'Dakar',
+                'wife_residence' => 'Dakar',
+                
+                'husband_father_first_name' => 'Father',
+                'husband_father_last_name' => 'Montague',
+                'husband_father_date_of_birth' => '1960-01-01',
+                'husband_father_profession' => 'Commerçant',
+                'husband_father_domicile' => 'Dakar',
+                'husband_mother_first_name' => 'Mother',
+                'husband_mother_last_name' => 'Montague',
+                'husband_mother_date_of_birth' => '1965-01-01',
+                'husband_mother_profession' => 'Ménagère',
+                'husband_mother_domicile' => 'Dakar',
+                
+                'wife_father_first_name' => 'Father',
+                'wife_father_last_name' => 'Capulet',
+                'wife_father_date_of_birth' => '1962-01-01',
+                'wife_father_profession' => 'Commerçant',
+                'wife_father_domicile' => 'Dakar',
+                'wife_mother_first_name' => 'Mother',
+                'wife_mother_last_name' => 'Capulet',
+                'wife_mother_date_of_birth' => '1967-01-01',
+                'wife_mother_profession' => 'Ménagère',
+                'wife_mother_domicile' => 'Dakar',
             ]
         ]);
 

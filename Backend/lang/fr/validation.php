@@ -239,5 +239,50 @@ return [
         'doc_death_cert' => 'certificat / constat de décès',
         'doc_deceased_id' => 'pièce d\'identité du défunt',
         'doc_declarant_id' => 'pièce d\'identité du déclarant',
+
+        // Époux & Épouse
+        'husband_first_name' => 'prénom de l\'époux',
+        'husband_last_name' => 'nom de l\'époux',
+        'wife_first_name' => 'prénom de l\'épouse',
+        'wife_last_name' => 'nom de l\'épouse',
+        'marriage_date' => 'date du mariage',
+        'marriage_place' => 'lieu du mariage',
+
+        // Spouses metadata details
+        'spouses_metadata' => 'informations des époux',
+        'spouses_metadata.husband_date_of_birth' => 'date de naissance de l\'époux',
+        'spouses_metadata.husband_place_of_birth' => 'lieu de naissance de l\'époux',
+        'spouses_metadata.husband_profession' => 'profession de l\'époux',
+        'spouses_metadata.husband_domicile' => 'domicile de l\'époux',
+        'spouses_metadata.husband_residence' => 'résidence de l\'époux',
+        'spouses_metadata.wife_date_of_birth' => 'date de naissance de l\'épouse',
+        'spouses_metadata.wife_place_of_birth' => 'lieu de naissance de l\'épouse',
+        'spouses_metadata.wife_profession' => 'profession de l\'épouse',
+        'spouses_metadata.wife_domicile' => 'domicile de l\'épouse',
+        'spouses_metadata.wife_residence' => 'résidence de l\'épouse',
+
+        // Husband Parents
+        'spouses_metadata.husband_father_first_name' => 'prénom du père de l\'époux',
+        'spouses_metadata.husband_father_last_name' => 'nom du père de l\'époux',
+        'spouses_metadata.husband_father_date_of_birth' => 'date de naissance du père de l\'époux',
+        'spouses_metadata.husband_father_profession' => 'profession du père de l\'époux',
+        'spouses_metadata.husband_father_domicile' => 'domicile du père de l\'époux',
+        'spouses_metadata.husband_mother_first_name' => 'prénom de la mère de l\'époux',
+        'spouses_metadata.husband_mother_last_name' => 'nom de la mère de l\'époux',
+        'spouses_metadata.husband_mother_date_of_birth' => 'date de naissance de la mère de l\'époux',
+        'spouses_metadata.husband_mother_profession' => 'profession de la mère de l\'époux',
+        'spouses_metadata.husband_mother_domicile' => 'domicile de la mère de l\'époux',
+
+        // Wife Parents
+        'spouses_metadata.wife_father_first_name' => 'prénom du père de l\'épouse',
+        'spouses_metadata.wife_father_last_name' => 'nom du père de l\'épouse',
+        'spouses_metadata.wife_father_date_of_birth' => 'date de naissance du père de l\'épouse',
+        'spouses_metadata.wife_father_profession' => 'profession du père de l\'épouse',
+        'spouses_metadata.wife_father_domicile' => 'domicile du père de l\'épouse',
+        'spouses_metadata.wife_mother_first_name' => 'prénom de la mère de l\'épouse',
+        'spouses_metadata.wife_mother_last_name' => 'nom de la mère de l\'épouse',
+        'spouses_metadata.wife_mother_date_of_birth' => 'date de naissance de la mère de l\'épouse',
+        'spouses_metadata.wife_mother_profession' => 'profession de la mère de l\'épouse',
+        'spouses_metadata.wife_mother_domicile' => 'domicile de la mère de l\'épouse',
     ],
 ];
