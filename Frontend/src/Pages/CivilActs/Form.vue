@@ -509,7 +509,7 @@ const submit = () => {
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Copie du Jugement (PDF)</label>
-                                        <label class="flex flex-col items-center justify-center w-full h-12 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_jugement ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                        <label class="flex flex-col items-center justify-center w-full h-12 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_jugement ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                             <div class="flex items-center gap-2">
                                                 <DocumentIcon class="w-4 h-4" :class="form.doc_jugement ? 'text-[#1E690F]' : 'text-gray-400'" />
                                                 <span class="text-xs text-gray-500 font-bold"><span v-if="form.doc_jugement">{{ form.doc_jugement.name }}</span><span v-else>Téléverser le PDF</span></span>
@@ -957,7 +957,7 @@ const submit = () => {
                             </div>
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Pièce Justificative (Copie Jugement PDF)</label>
-                                <label class="flex flex-col items-center justify-center w-full h-12 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_jugement ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <label class="flex flex-col items-center justify-center w-full h-12 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_jugement ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                     <div class="flex items-center gap-2">
                                         <DocumentIcon class="w-4 h-4" :class="form.doc_jugement ? 'text-[#1E690F]' : 'text-gray-400'" />
                                         <span class="text-xs text-gray-500 font-bold"><span v-if="form.doc_jugement">{{ form.doc_jugement.name }}</span><span v-else>Téléverser le PDF</span></span>
@@ -1118,7 +1118,7 @@ const submit = () => {
                             <!-- Upload CNI Témoin -->
                             <div>
                                 <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Copie CNI (PDF)</label>
-                                <label class="flex flex-col items-center justify-center w-full h-12 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="witness.cni_file || witness.doc_cni_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                                <label class="flex flex-col items-center justify-center w-full h-12 border-2 border-dashed rounded-xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="witness.cni_file || witness.doc_cni_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                     <div class="flex items-center gap-2">
                                         <DocumentIcon class="w-4 h-4" :class="witness.cni_file || witness.doc_cni_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                         <span class="text-xs text-gray-500 font-bold">
@@ -1148,7 +1148,7 @@ const submit = () => {
                         <!-- CNI Père -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Père <span v-if="!props.act" class="text-red-500">*</span></label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_pere || props.act?.doc_cni_pere_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_pere || props.act?.doc_cni_pere_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_pere || props.act?.doc_cni_pere_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_cni_pere">{{ form.doc_cni_pere.name }}</span>
@@ -1164,7 +1164,7 @@ const submit = () => {
                         <!-- CNI Mère -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de la Mère <span v-if="!props.act" class="text-red-500">*</span></label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_mere || props.act?.doc_cni_mere_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_mere || props.act?.doc_cni_mere_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_mere || props.act?.doc_cni_mere_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_cni_mere">{{ form.doc_cni_mere.name }}</span>
@@ -1180,7 +1180,7 @@ const submit = () => {
                         <!-- Acte / Attestation de naissance -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte / Attestation de Naissance <span v-if="!props.act" class="text-red-500">*</span></label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_acte_naissance || props.act?.doc_acte_naissance_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_acte_naissance || props.act?.doc_acte_naissance_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_acte_naissance || props.act?.doc_acte_naissance_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_acte_naissance">{{ form.doc_acte_naissance.name }}</span>
@@ -1196,7 +1196,7 @@ const submit = () => {
                         <!-- CNI Déclarant -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Déclarant <span v-if="!props.act" class="text-red-500">*</span></label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_declarant || props.act?.doc_cni_declarant_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_declarant || props.act?.doc_cni_declarant_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_declarant || props.act?.doc_cni_declarant_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_cni_declarant">{{ form.doc_cni_declarant.name }}</span>
@@ -1212,7 +1212,7 @@ const submit = () => {
                         <!-- Autres pièces -->
                         <div class="md:col-span-2">
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autres Pièces Justificatives (si nécessaire)</label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_autres || props.act?.doc_autres_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_autres || props.act?.doc_autres_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_autres || props.act?.doc_autres_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_autres">{{ form.doc_autres.name }}</span>
@@ -1238,7 +1238,7 @@ const submit = () => {
                         <!-- CNI Époux -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Époux <span v-if="!props.act" class="text-red-500">*</span></label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_husband || props.act?.doc_cni_husband_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_husband || props.act?.doc_cni_husband_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_husband || props.act?.doc_cni_husband_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_cni_husband">{{ form.doc_cni_husband.name }}</span>
@@ -1255,7 +1255,7 @@ const submit = () => {
                         <!-- CNI Épouse -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Épouse <span v-if="!props.act" class="text-red-500">*</span></label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_wife || props.act?.doc_cni_wife_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_wife || props.act?.doc_cni_wife_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_wife || props.act?.doc_cni_wife_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_cni_wife">{{ form.doc_cni_wife.name }}</span>
@@ -1272,7 +1272,7 @@ const submit = () => {
                         <!-- Acte de Naissance Époux -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Époux <span v-if="!props.act" class="text-red-500">*</span></label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_birth_husband || props.act?.doc_birth_husband_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_birth_husband || props.act?.doc_birth_husband_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_birth_husband || props.act?.doc_birth_husband_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_birth_husband">{{ form.doc_birth_husband.name }}</span>
@@ -1289,7 +1289,7 @@ const submit = () => {
                         <!-- Acte de Naissance Épouse -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Épouse <span v-if="!props.act" class="text-red-500">*</span></label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_birth_wife || props.act?.doc_birth_wife_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_birth_wife || props.act?.doc_birth_wife_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_birth_wife || props.act?.doc_birth_wife_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_birth_wife">{{ form.doc_birth_wife.name }}</span>
@@ -1306,7 +1306,7 @@ const submit = () => {
                         <!-- Certificat de Domicile -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Domicile <span v-if="!props.act" class="text-red-500">*</span></label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_domicile || props.act?.doc_domicile_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_domicile || props.act?.doc_domicile_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_domicile || props.act?.doc_domicile_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_domicile">{{ form.doc_domicile.name }}</span>
@@ -1323,7 +1323,7 @@ const submit = () => {
                         <!-- Certificat Médical Prénuptial -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat Médical Prénuptial <span v-if="!props.act" class="text-red-500">*</span></label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_medical || props.act?.doc_medical_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_medical || props.act?.doc_medical_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_medical || props.act?.doc_medical_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_medical">{{ form.doc_medical.name }}</span>
@@ -1340,7 +1340,7 @@ const submit = () => {
                         <!-- Autorisation parentale -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autorisation parentale (si mineur)</label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_parental_auth || props.act?.doc_parental_auth_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_parental_auth || props.act?.doc_parental_auth_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_parental_auth || props.act?.doc_parental_auth_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_parental_auth">{{ form.doc_parental_auth.name }}</span>
@@ -1357,7 +1357,7 @@ const submit = () => {
                         <!-- Autres pièces -->
                         <div class="md:col-span-2 lg:col-span-2">
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autres Pièces Justificatives</label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_autres || props.act?.doc_autres_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_autres || props.act?.doc_autres_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_autres || props.act?.doc_autres_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_autres">{{ form.doc_autres.name }}</span>
@@ -1383,7 +1383,7 @@ const submit = () => {
                         <!-- Certificat de Décès -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Décès / Médical <span v-if="!props.act" class="text-red-500">*</span></label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_death_cert || props.act?.doc_death_cert_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_death_cert || props.act?.doc_death_cert_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_death_cert || props.act?.doc_death_cert_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_death_cert">{{ form.doc_death_cert.name }}</span>
@@ -1400,7 +1400,7 @@ const submit = () => {
                         <!-- Pièce d'identité du défunt -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Pièce d'identité du défunt <span v-if="!props.act" class="text-red-500">*</span></label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_deceased_id || props.act?.doc_deceased_id_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_deceased_id || props.act?.doc_deceased_id_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_deceased_id || props.act?.doc_deceased_id_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_deceased_id">{{ form.doc_deceased_id.name }}</span>
@@ -1417,7 +1417,7 @@ const submit = () => {
                         <!-- CNI du Déclarant -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Déclarant <span v-if="!props.act" class="text-red-500">*</span></label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_declarant_id || props.act?.doc_declarant_id_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_declarant_id || props.act?.doc_declarant_id_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_declarant_id || props.act?.doc_declarant_id_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_declarant_id">{{ form.doc_declarant_id.name }}</span>
@@ -1434,7 +1434,7 @@ const submit = () => {
                         <!-- Copie du Jugement -->
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Copie du Jugement</label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_jugement || props.act?.doc_jugement_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_jugement || props.act?.doc_jugement_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_jugement || props.act?.doc_jugement_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_jugement">{{ form.doc_jugement.name }}</span>
@@ -1451,7 +1451,7 @@ const submit = () => {
                         <!-- Autres pièces -->
                         <div class="md:col-span-2">
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Autres Pièces Justificatives</label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_autres || props.act?.doc_autres_path ? 'border-[#1E690F] bg-green-50/20' : 'border-gray-300 bg-white'">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_autres || props.act?.doc_autres_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_autres || props.act?.doc_autres_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
                                     <span v-if="form.doc_autres">{{ form.doc_autres.name }}</span>
