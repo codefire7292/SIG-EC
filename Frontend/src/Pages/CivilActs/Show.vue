@@ -78,7 +78,10 @@ const effectiveDeclarant = computed(() => {
 const authUser = usePage().props.auth.user;
 
 const hasRole = (role) => {
-    return authUser.roles && authUser.roles.map(r => r.name).includes(role);
+    if (!authUser) return false;
+    if (authUser.role === role) return true;
+    if (authUser.roles && Array.isArray(authUser.roles) && authUser.roles.map(r => r.name).includes(role)) return true;
+    return false;
 };
 
 const showStatusModal = ref(false);
