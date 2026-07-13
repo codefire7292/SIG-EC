@@ -42,6 +42,15 @@ const formatDate = (dateStr) => {
     return dateStr.substring(0, 10);
 };
 
+const formatDateTimeLocal = (dateTimeStr) => {
+    if (!dateTimeStr) return '';
+    let clean = dateTimeStr.replace(' ', 'T');
+    if (clean.length >= 16) {
+        return clean.substring(0, 16);
+    }
+    return clean;
+};
+
 const form = useForm({
     // Common
     officer_comments: props.act?.officer_comments || '',
@@ -185,6 +194,7 @@ const form = useForm({
         ...props.act.death_metadata,
         father_date_of_birth: formatDate(props.act.death_metadata.father_date_of_birth),
         mother_date_of_birth: formatDate(props.act.death_metadata.mother_date_of_birth),
+        declarant_date_time: formatDateTimeLocal(props.act.death_metadata.declarant_date_time),
     } : {
         time_of_birth: '',
         place_of_birth: '',

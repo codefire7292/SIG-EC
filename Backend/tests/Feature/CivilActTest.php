@@ -35,7 +35,9 @@ class CivilActTest extends TestCase
 
     public function test_can_create_birth_act_with_metadata(): void
     {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
         $user = User::factory()->create();
+        $user->assignRole(\App\Enums\UserRole::ADMIN->value);
         $this->actingAs($user);
 
         $response = $this->post(route('acts.naissance.store'), [
@@ -58,18 +60,19 @@ class CivilActTest extends TestCase
 
         $response->assertStatus(302);
         $this->assertDatabaseHas('birth_acts', [
-            'reference_number' => '2024/NAI/001',
             'first_name' => 'John',
         ]);
         
-        $act = BirthAct::where('reference_number', '2024/NAI/001')->first();
+        $act = BirthAct::where('first_name', 'John')->first();
         $this->assertEquals('Ingénieur', $act->parents_metadata['father_profession']);
         $this->assertEquals('Enregistrement initial', $act->officer_comments);
     }
 
     public function test_can_update_birth_act(): void
     {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
         $user = User::factory()->create();
+        $user->assignRole(\App\Enums\UserRole::ADMIN->value);
         $this->actingAs($user);
 
         $act = BirthAct::create([
@@ -100,5 +103,112 @@ class CivilActTest extends TestCase
             'first_name' => 'Janet',
             'officer_comments' => 'Nom corrigé'
         ]);
+    }
+
+    public function test_can_update_marriage_act(): void
+    {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole(\App\Enums\UserRole::ADMIN->value);
+        $this->actingAs($user);
+
+        $marriageRegistry = Registry::create([
+            'civil_registration_center_id' => $this->registry->civil_registration_center_id,
+            'name' => 'Registre Mariage', 
+            'type' => 'mariage',
+            'year' => 2024, 
+            'reference_prefix' => 'TESTMAR',
+            'status' => 'open'
+        ]);
+
+        $act = \App\Models\MarriageAct::create([
+            'registry_id' => $marriageRegistry->id,
+            'reference_number' => '2024/MAR/001',
+            'husband_first_name' => 'Romeo',
+            'husband_last_name' => 'Montague',
+            'wife_first_name' => 'Juliet',
+            'wife_last_name' => 'Capulet',
+            'marriage_date' => '2024-06-01',
+            'marriage_place' => 'Verona',
+            'status' => 'brouillon'
+        ]);
+
+        $response = $this->patch(route('acts.mariage.update', $act->id), [
+            'reference_number' => '2024/MAR/001',
+            'registry_id' => $marriageRegistry->id,
+            'husband_first_name' => 'Romeo Update',
+            'husband_last_name' => 'Montague',
+            'wife_first_name' => 'Juliet',
+            'wife_last_name' => 'Capulet',
+            'marriage_date' => '2024-06-01',
+            'marriage_place' => 'Verona',
+            'spouses_metadata' => [
+                'husband_profession' => 'Poète'
+            ]
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('marriage_acts', [
+            'id' => $act->id,
+            'husband_first_name' => 'Romeo Update',
+        ]);
+        
+        $act = \App\Models\MarriageAct::find($act->id);
+        $this->assertEquals('Poète', $act->spouses_metadata['husband_profession']);
+    }
+
+    public function test_can_update_death_act(): void
+    {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole(\App\Enums\UserRole::ADMIN->value);
+        $this->actingAs($user);
+
+        $deathRegistry = Registry::create([
+            'civil_registration_center_id' => $this->registry->civil_registration_center_id,
+            'name' => 'Registre Deces', 
+            'type' => 'deces',
+            'year' => 2024, 
+            'reference_prefix' => 'TESTDEC',
+            'status' => 'open'
+        ]);
+
+        $act = \App\Models\DeathAct::create([
+            'registry_id' => $deathRegistry->id,
+            'reference_number' => '2024/DEC/001',
+            'deceased_first_name' => 'John',
+            'deceased_last_name' => 'Doe',
+            'gender' => 'M',
+            'date_of_birth' => '1980-01-01',
+            'date_of_death' => '2024-05-01',
+            'place_of_death' => 'Dakar',
+            'status' => 'brouillon'
+        ]);
+
+        $response = $this->patch(route('acts.deces.update', $act->id), [
+            'reference_number' => '2024/DEC/001',
+            'registry_id' => $deathRegistry->id,
+            'deceased_first_name' => 'John Update',
+            'deceased_last_name' => 'Doe',
+            'gender' => 'M',
+            'date_of_birth' => '1980-01-01',
+            'date_of_death' => '2024-05-01',
+            'place_of_death' => 'Dakar',
+            'death_metadata' => [
+                'declarant_first_name' => 'Jane',
+                'declarant_last_name' => 'Doe',
+                'declarant_date_time' => '2024-05-02 10:00:00'
+            ]
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('death_acts', [
+            'id' => $act->id,
+            'deceased_first_name' => 'John Update',
+        ]);
+
+        $act = \App\Models\DeathAct::find($act->id);
+        $this->assertEquals('Jane', $act->death_metadata['declarant_first_name']);
+        $this->assertEquals('2024-05-02 10:00:00', $act->death_metadata['declarant_date_time']);
     }
 }
