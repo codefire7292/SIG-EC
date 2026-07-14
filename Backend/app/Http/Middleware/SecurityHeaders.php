@@ -39,7 +39,7 @@ class SecurityHeaders
         // ── 5. Désactive les fonctionnalités inutiles du navigateur ───────────
         $response->headers->set(
             'Permissions-Policy',
-            'camera=(), microphone=(), geolocation=(), payment=(), usb=()'
+            'camera=(self), microphone=(), geolocation=(), payment=(), usb=()'
         );
 
         // ── 6. Content Security Policy ────────────────────────────────────────
