@@ -2,6 +2,7 @@
 import { Head, useForm } from '@inertiajs/vue3'
 import GuestLayout from '@/Layouts/GuestLayout.vue'
 import { ref } from 'vue'
+import { QrcodeStream } from 'vue-qrcode-reader'
 import {
     ShieldCheckIcon,
     MagnifyingGlassIcon,
@@ -13,7 +14,8 @@ import {
     ArrowRightIcon,
     QrCodeIcon,
     LockClosedIcon,
-    BuildingOffice2Icon
+    BuildingOffice2Icon,
+    XMarkIcon
 } from '@heroicons/vue/24/outline'
 
 const form = useForm({
@@ -21,6 +23,47 @@ const form = useForm({
 })
 
 const isFocused = ref(false)
+
+
+const isScanning = ref(false)
+const scanError = ref('')
+
+const onDetect = (detectedCodes) => {
+    if (detectedCodes && detectedCodes.length > 0) {
+        const result = detectedCodes[0].rawValue;
+        isScanning.value = false;
+        
+        if (result.startsWith('http://') || result.startsWith('https://')) {
+            window.location.href = result;
+        } else {
+            form.reference = result;
+            submit();
+        }
+    }
+}
+
+const onInit = async (promise) => {
+    try {
+        await promise;
+        scanError.value = '';
+    } catch (error) {
+        if (error.name === 'NotAllowedError') {
+            scanError.value = "Erreur: Autorisation de l'appareil photo refusée.";
+        } else if (error.name === 'NotFoundError') {
+            scanError.value = "Erreur: Aucun appareil photo trouvé.";
+        } else if (error.name === 'NotSupportedError') {
+            scanError.value = "Erreur: Connexion non sécurisée (HTTPS requis).";
+        } else if (error.name === 'NotReadableError') {
+            scanError.value = "Erreur: L'appareil photo est peut-être déjà utilisé.";
+        } else if (error.name === 'OverconstrainedError') {
+            scanError.value = "Erreur: Caméra non compatible.";
+        } else if (error.name === 'StreamApiNotSupportedError') {
+            scanError.value = "Erreur: Navigateur non supporté.";
+        } else {
+            scanError.value = `Erreur de caméra (${error.name})`;
+        }
+    }
+}
 
 const submit = () => {
     form.post(route('certificates.search'))
@@ -53,6 +96,7 @@ const actTypes = [
     },
     {
         icon: BuildingOffice2Icon,
+    XMarkIcon,
         label: 'Certificats Civils',
         color: 'from-blue-500 to-indigo-600',
         bg: 'bg-blue-50',
@@ -150,6 +194,9 @@ const trusts = [
                                     @blur="isFocused = false"
                                     required
                                 />
+                                <button type="button" @click="isScanning = true" class="flex items-center px-4 sm:px-6 text-gray-400 hover:text-[#1E690F] transition-colors border-l border-gray-100 bg-gray-50/50" title="Scanner le QR Code">
+                                    <QrCodeIcon class="h-6 w-6 sm:h-7 sm:w-7" />
+                                </button>
                                 <button
                                     type="submit"
                                     :disabled="form.processing"
@@ -241,5 +288,49 @@ const trusts = [
                 </div>
             </div>
         </section>
+
+        <!-- Scanner Modal -->
+        <Teleport to="body">
+            <div v-if="isScanning" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm">
+                <div class="bg-white rounded-3xl overflow-hidden w-full max-w-md shadow-2xl relative">
+                    <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+                        <h3 class="font-black text-gray-900 flex items-center gap-2 text-sm uppercase tracking-widest">
+                            <QrCodeIcon class="h-5 w-5 text-[#1E690F]" />
+                            Scanner le document
+                        </h3>
+                        <button @click="isScanning = false" class="p-2 text-gray-500 hover:text-red-500 rounded-full hover:bg-gray-200 transition-colors">
+                            <XMarkIcon class="h-5 w-5" />
+                        </button>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div v-if="scanError" class="mb-4 p-3 bg-red-50 text-red-700 rounded-xl text-sm font-bold flex items-center gap-2">
+                            <ExclamationTriangleIcon class="h-5 w-5" />
+                            {{ scanError }}
+                        </div>
+                        
+                        <div class="aspect-square bg-black rounded-2xl overflow-hidden relative shadow-inner">
+                            <qrcode-stream 
+                                v-if="isScanning" 
+                                @detect="onDetect" 
+                                @camera-on="onInit"
+                                class="w-full h-full object-cover"
+                            ></qrcode-stream>
+                            
+                            <!-- Scanner Target Overlay -->
+                            <div class="absolute inset-0 pointer-events-none border-[2px] border-[#F0C31E]/50 rounded-2xl m-8 sm:m-12 transition-all duration-1000 animate-pulse">
+                                <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-[#F0C31E] -mt-[2px] -ml-[2px] rounded-tl-xl"></div>
+                                <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-[#F0C31E] -mt-[2px] -mr-[2px] rounded-tr-xl"></div>
+                                <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-[#F0C31E] -mb-[2px] -ml-[2px] rounded-bl-xl"></div>
+                                <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-[#F0C31E] -mb-[2px] -mr-[2px] rounded-br-xl"></div>
+                            </div>
+                        </div>
+                        <p class="text-center text-[10px] font-black text-gray-400 mt-4 uppercase tracking-widest">
+                            Pointez votre caméra vers le QR Code figurant sur l'acte ou le certificat
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </Teleport>
     </GuestLayout>
 </template>
