@@ -180,27 +180,29 @@ const trusts = [
                                  :class="isFocused ? 'bg-gradient-to-r from-[#F0C31E] to-yellow-300 opacity-60 blur-sm' : 'opacity-0'">
                             </div>
 
-                            <div class="relative flex bg-white rounded-2xl shadow-2xl overflow-hidden">
-                                <div class="flex items-center pl-6 text-gray-400">
-                                    <MagnifyingGlassIcon class="h-6 w-6" :class="isFocused ? 'text-[#1E690F]' : ''" style="transition: color 0.2s" />
+                            <div class="relative flex flex-col sm:flex-row bg-white rounded-2xl shadow-2xl overflow-hidden">
+                                <div class="flex flex-1 items-center">
+                                    <div class="flex items-center pl-4 sm:pl-6 text-gray-400">
+                                        <MagnifyingGlassIcon class="h-5 w-5 sm:h-6 sm:w-6" :class="isFocused ? 'text-[#1E690F]' : ''" style="transition: color 0.2s" />
+                                    </div>
+                                    <input
+                                        v-model="form.reference"
+                                        type="text"
+                                        placeholder="Ex : ENAM-N-2026-0001"
+                                        class="flex-1 min-w-0 px-3 py-4 sm:px-5 sm:py-5 text-gray-900 font-bold text-base sm:text-lg bg-transparent border-0 focus:ring-0 placeholder:font-normal placeholder:text-gray-400 uppercase"
+                                        style="outline: none;"
+                                        @focus="isFocused = true"
+                                        @blur="isFocused = false"
+                                        required
+                                    />
+                                    <button type="button" @click="isScanning = true" class="flex items-center justify-center px-4 sm:px-6 py-4 sm:py-5 text-gray-400 hover:text-[#1E690F] transition-colors border-l border-gray-100 bg-gray-50/50" title="Scanner le QR Code">
+                                        <QrCodeIcon class="h-6 w-6 sm:h-7 sm:w-7" />
+                                    </button>
                                 </div>
-                                <input
-                                    v-model="form.reference"
-                                    type="text"
-                                    placeholder="Ex : ENAM-N-2026-0001"
-                                    class="flex-1 px-5 py-5 text-gray-900 font-bold text-lg bg-transparent border-0 focus:ring-0 placeholder:font-normal placeholder:text-gray-400 uppercase"
-                                    style="outline: none;"
-                                    @focus="isFocused = true"
-                                    @blur="isFocused = false"
-                                    required
-                                />
-                                <button type="button" @click="isScanning = true" class="flex items-center px-4 sm:px-6 text-gray-400 hover:text-[#1E690F] transition-colors border-l border-gray-100 bg-gray-50/50" title="Scanner le QR Code">
-                                    <QrCodeIcon class="h-6 w-6 sm:h-7 sm:w-7" />
-                                </button>
                                 <button
                                     type="submit"
                                     :disabled="form.processing"
-                                    class="flex items-center gap-2 px-8 py-5 font-black text-[#0d4a08] text-sm transition-all duration-200 active:scale-95 disabled:opacity-60 shrink-0"
+                                    class="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-4 sm:px-8 sm:py-5 font-black text-[#0d4a08] text-sm transition-all duration-200 active:scale-95 disabled:opacity-60 shrink-0"
                                     style="background: linear-gradient(135deg, #F0C31E 0%, #e6b800 100%);"
                                 >
                                     <span v-if="form.processing">...</span>
