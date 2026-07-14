@@ -39,11 +39,11 @@ class SecurityHeaders
         // ── 5. Désactive les fonctionnalités inutiles du navigateur ───────────
         $response->headers->set(
             'Permissions-Policy',
-            'camera=(self), microphone=(), geolocation=(), payment=(), usb=()'
+            'microphone=(), geolocation=(), payment=(), usb=()'
         );
 
         // ── 6. Content Security Policy ────────────────────────────────────────
-        // Autorise : sources propres + Google Fonts (polices) + Vite HMR en dev uniquement
+        // Autorise : sources propres + Google Fonts (polices) + Vite HMR en dev uniquement + jsdelivr pour zxing-wasm
         $isLocal  = app()->environment('local');
         $appUrl   = rtrim(config('app.url', ''), '/');
 
@@ -59,11 +59,11 @@ class SecurityHeaders
             'Content-Security-Policy',
             implode('; ', [
                 "default-src 'self'",
-                "script-src 'self' 'unsafe-inline'{$viteWs}",   // unsafe-inline requis pour Inertia/Vite
+                "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://fastly.jsdelivr.net{$viteWs}",   // unsafe-inline requis pour Inertia/Vite, jsdelivr pour zxing, wasm-unsafe-eval pour WebAssembly
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
                 "font-src 'self' https://fonts.gstatic.com data:",
                 "img-src 'self' data: blob:",
-                "connect-src 'self'{$prodOrigin}{$viteWs}",
+                "connect-src 'self' https://fastly.jsdelivr.net{$prodOrigin}{$viteWs}",
                 "frame-ancestors 'self'",
                 "object-src 'none'",
                 "base-uri 'self'",
