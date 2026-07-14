@@ -91,7 +91,8 @@ const getRoleColor = (role) => {
                     <tr v-for="user in users.data" :key="user.id" class="group hover:bg-gray-50/50 transition-colors">
                         <td class="px-8 py-5">
                             <div class="flex items-center gap-3">
-                                <div class="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-black text-sm">
+                                <img v-if="user.profile_photo_url" :src="user.profile_photo_url" alt="" class="h-10 w-10 rounded-full object-cover shadow-sm border border-gray-100" />
+                                <div v-else class="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-black text-sm border border-blue-100">
                                     {{ user.name.substring(0, 2).toUpperCase() }}
                                 </div>
                                 <div>
