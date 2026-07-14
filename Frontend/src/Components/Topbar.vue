@@ -60,6 +60,7 @@ const markNotificationsAsRead = () => {
                 
                 <!-- Notifications -->
                 <div class="relative">
+                    <div v-if="isNotificationsOpen" @click="isNotificationsOpen = false" class="fixed inset-0 z-40"></div>
                     <button 
                         @click="isNotificationsOpen = !isNotificationsOpen"
                         class="p-2 rounded-full hover:bg-brand-50 transition-colors focus:outline-none relative"
@@ -107,6 +108,7 @@ const markNotificationsAsRead = () => {
 
                 <!-- Profil -->
                 <div class="relative">
+                    <div v-if="isProfileOpen" @click="isProfileOpen = false" class="fixed inset-0 z-40"></div>
                     <button 
                         @click="isProfileOpen = !isProfileOpen"
                         class="flex items-center gap-3 p-1 rounded-full hover:bg-brand-50 transition-colors focus:outline-none pr-3 border border-transparent hover:border-brand-100"
