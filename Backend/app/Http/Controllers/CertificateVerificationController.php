@@ -110,4 +110,30 @@ class CertificateVerificationController extends Controller
             'certificate' => $certificate,
         ]);
     }
+
+    /**
+     * Download the PDF extract of a civil act (Public/Internal).
+     */
+    public function downloadExtract(string $type, string $uuid, \App\Services\DocumentGenerationService $documentService)
+    {
+        $act = match ($type) {
+            'naissance' => BirthAct::with('registry')->where('uuid', $uuid)
+                ->whereIn('status', ['valide', 'signe'])
+                ->firstOrFail(),
+            'mariage'   => MarriageAct::with('registry')->where('uuid', $uuid)
+                ->whereIn('status', ['valide', 'signe'])
+                ->firstOrFail(),
+            'deces'     => DeathAct::with('registry')->where('uuid', $uuid)
+                ->whereIn('status', ['valide', 'signe'])
+                ->firstOrFail(),
+            default     => abort(404),
+        };
+
+        $pdfContent = $documentService->generateActExtractPdf($act, $type);
+
+        return response($pdfContent, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="extrait_' . $type . '_' . $act->reference_number . '.pdf"',
+        ]);
+    }
 }

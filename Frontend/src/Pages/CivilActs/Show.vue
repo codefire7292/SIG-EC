@@ -15,7 +15,8 @@ import {
     DocumentIcon,
     CheckCircleIcon,
     ArrowPathIcon,
-    ExclamationTriangleIcon
+    ExclamationTriangleIcon,
+    ArrowDownTrayIcon
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -760,6 +761,14 @@ const getStatusModalIcon = () => {
                                 Signer et Sceller
                             </button>
                         </template>
+                    </div>
+
+                    <!-- EXTRACT DOWNLOAD (For Validated/Signed Acts) -->
+                    <div v-if="['valide', 'signe'].includes(act.status)" class="space-y-3 mt-4">
+                        <a :href="`/verify/${type}/${act.uuid}/download`" target="_blank" class="w-full py-4 bg-[#1E690F] text-white hover:bg-[#154d0a] hover:scale-[1.02] active:scale-95 rounded-3xl transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-[#1E690F]/20">
+                            <ArrowDownTrayIcon class="h-4 w-4 shrink-0" />
+                            Télécharger l'Extrait PDF
+                        </a>
                     </div>
                 </div>
             </div>
