@@ -41,8 +41,8 @@ const markNotificationsAsRead = () => {
                 </button>
                 <!-- Logo mobile -->
                 <div class="flex items-center gap-2">
-                    <img src="/images/logo.png" alt="Mairie de Enampore" class="h-8 w-8 object-contain" />
-                    <div class="flex flex-col leading-none">
+                    <img src="/images/logo.png" alt="Mairie de Enampore" class="h-8 w-8 sm:h-10 sm:w-10 object-contain" />
+                    <div class="hidden sm:flex flex-col leading-none">
                         <span class="text-sm font-black tracking-tight" style="color: #1E690F;">Mairie de Enampore</span>
                         <span class="text-[8px] font-bold uppercase tracking-widest" style="color: #F0C31E;">État Civil</span>
                     </div>

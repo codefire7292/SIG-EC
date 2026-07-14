@@ -101,7 +101,7 @@ const formatType = (type) => {
                                     <input v-model="form.data.adresse" type="text" placeholder="Quartier, Rue, N° de porte..." class="mt-1 w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                                     <p v-if="form.errors['data.adresse']" class="text-red-500 text-xs mt-1 font-bold">{{ form.errors['data.adresse'] }}</p>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label class="text-xs font-bold text-gray-500 uppercase">Identité Témoin 1 <span class="text-red-500">*</span></label>
                                         <input v-model="form.data.temoin_1_identite" type="text" placeholder="Prénom, Nom, CNI" class="mt-1 w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />

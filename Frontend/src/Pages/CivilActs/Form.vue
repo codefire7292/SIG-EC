@@ -341,7 +341,7 @@ const submit = () => {
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div v-if="type === 'naissance'" class="space-y-6 col-span-full">
-                            <div class="grid grid-cols-2 gap-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms de l'enfant <span class="text-red-500">*</span></label>
                                     <input v-model="form.first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold transition-all" required />
@@ -351,7 +351,7 @@ const submit = () => {
                                     <input v-model="form.last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold transition-all" required />
                                 </div>
                             </div>
-                            <div class="grid grid-cols-3 gap-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Sexe <span class="text-red-500">*</span></label>
                                     <select v-model="form.gender" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold">
@@ -368,7 +368,7 @@ const submit = () => {
                                     <input v-model="form.time_of_birth" type="time" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de Naissance <span class="text-red-500">*</span></label>
                                     <input v-model="form.place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
@@ -388,7 +388,7 @@ const submit = () => {
                                         <div class="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
                                         Épou (Mari)
                                     </h4>
-                                    <div class="grid grid-cols-2 gap-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Prénoms <span class="text-red-500">*</span></label>
                                             <input v-model="form.husband_first_name" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
@@ -398,7 +398,7 @@ const submit = () => {
                                             <input v-model="form.husband_last_name" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                         </div>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Date de naissance <span class="text-red-500">*</span></label>
                                             <input v-model="form.spouses_metadata.husband_date_of_birth" type="date" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
@@ -412,7 +412,7 @@ const submit = () => {
                                         <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Profession <span class="text-red-500">*</span></label>
                                         <input v-model="form.spouses_metadata.husband_profession" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                     </div>
-                                    <div class="grid grid-cols-2 gap-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Domicile <span class="text-red-500">*</span></label>
                                             <input v-model="form.spouses_metadata.husband_domicile" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
@@ -434,7 +434,7 @@ const submit = () => {
                                         <div class="w-1.5 h-1.5 bg-pink-600 rounded-full"></div>
                                         Épouse (Femme)
                                     </h4>
-                                    <div class="grid grid-cols-2 gap-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Prénoms <span class="text-red-500">*</span></label>
                                             <input v-model="form.wife_first_name" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
@@ -444,7 +444,7 @@ const submit = () => {
                                             <input v-model="form.wife_last_name" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                         </div>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Date de naissance <span class="text-red-500">*</span></label>
                                             <input v-model="form.spouses_metadata.wife_date_of_birth" type="date" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
@@ -458,7 +458,7 @@ const submit = () => {
                                         <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Profession <span class="text-red-500">*</span></label>
                                         <input v-model="form.spouses_metadata.wife_profession" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                     </div>
-                                    <div class="grid grid-cols-2 gap-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Domicile <span class="text-red-500">*</span></label>
                                             <input v-model="form.spouses_metadata.wife_domicile" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
@@ -693,7 +693,7 @@ const submit = () => {
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span class="text-red-500">*</span></label>
                                 <input v-model="form.parents_metadata.father_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                             </div>
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance <span class="text-red-500">*</span></label>
                                     <input v-model="form.parents_metadata.father_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
@@ -722,7 +722,7 @@ const submit = () => {
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span class="text-red-500">*</span></label>
                                 <input v-model="form.parents_metadata.mother_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                             </div>
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance <span class="text-red-500">*</span></label>
                                     <input v-model="form.parents_metadata.mother_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
@@ -753,7 +753,7 @@ const submit = () => {
                                 <div class="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
                                 Père du défunt
                             </h4>
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénom du Père <span class="text-red-500">*</span></label>
                                     <input v-model="form.death_metadata.father_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
@@ -763,7 +763,7 @@ const submit = () => {
                                     <input v-model="form.death_metadata.father_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance <span class="text-red-500">*</span></label>
                                     <input v-model="form.death_metadata.father_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
@@ -785,7 +785,7 @@ const submit = () => {
                                 <div class="w-1.5 h-1.5 bg-pink-500 rounded-full"></div>
                                 Mère du défunt
                             </h4>
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénom de la Mère <span class="text-red-500">*</span></label>
                                     <input v-model="form.death_metadata.mother_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
@@ -795,7 +795,7 @@ const submit = () => {
                                     <input v-model="form.death_metadata.mother_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance <span class="text-red-500">*</span></label>
                                     <input v-model="form.death_metadata.mother_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
@@ -827,11 +827,11 @@ const submit = () => {
                             <!-- Père de l'époux -->
                             <div class="space-y-3">
                                 <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Père <span class="text-red-500">*</span></span>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input v-model="form.spouses_metadata.husband_father_first_name" placeholder="Prénoms *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                     <input v-model="form.spouses_metadata.husband_father_last_name" placeholder="Nom *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input v-model="form.spouses_metadata.husband_father_date_of_birth" type="date" placeholder="Date de naissance *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                     <input v-model="form.spouses_metadata.husband_father_profession" placeholder="Profession *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                 </div>
@@ -841,11 +841,11 @@ const submit = () => {
                             <!-- Mère de l'époux -->
                             <div class="space-y-3 pt-4 border-t border-blue-100/50">
                                 <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Mère <span class="text-red-500">*</span></span>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input v-model="form.spouses_metadata.husband_mother_first_name" placeholder="Prénoms *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                     <input v-model="form.spouses_metadata.husband_mother_last_name" placeholder="Nom *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input v-model="form.spouses_metadata.husband_mother_date_of_birth" type="date" placeholder="Date de naissance *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                     <input v-model="form.spouses_metadata.husband_mother_profession" placeholder="Profession *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                 </div>
@@ -859,11 +859,11 @@ const submit = () => {
                             <!-- Père de l'épouse -->
                             <div class="space-y-3">
                                 <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Père <span class="text-red-500">*</span></span>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input v-model="form.spouses_metadata.wife_father_first_name" placeholder="Prénoms *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                     <input v-model="form.spouses_metadata.wife_father_last_name" placeholder="Nom *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input v-model="form.spouses_metadata.wife_father_date_of_birth" type="date" placeholder="Date de naissance *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                     <input v-model="form.spouses_metadata.wife_father_profession" placeholder="Profession *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                 </div>
@@ -873,11 +873,11 @@ const submit = () => {
                             <!-- Mère de l'épouse -->
                             <div class="space-y-3 pt-4 border-t border-pink-100/50">
                                 <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Mère <span class="text-red-500">*</span></span>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input v-model="form.spouses_metadata.wife_mother_first_name" placeholder="Prénoms *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                     <input v-model="form.spouses_metadata.wife_mother_last_name" placeholder="Nom *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input v-model="form.spouses_metadata.wife_mother_date_of_birth" type="date" placeholder="Date de naissance *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                     <input v-model="form.spouses_metadata.wife_mother_profession" placeholder="Profession *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                 </div>
@@ -910,7 +910,7 @@ const submit = () => {
                         </p>
                     </div>
                     <div v-if="hasDeclarant" class="space-y-6">
-                        <div class="grid grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms du Déclarant</label>
                                 <input v-model="form.parents_metadata.declarant_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
@@ -920,7 +920,7 @@ const submit = () => {
                                 <input v-model="form.parents_metadata.declarant_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession</label>
                                 <input v-model="form.parents_metadata.declarant_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
@@ -934,7 +934,7 @@ const submit = () => {
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Adresse du Déclarant</label>
                             <input v-model="form.parents_metadata.declarant_address" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
                         </div>
-                        <div class="grid grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de Déclaration</label>
                                 <input v-model="form.parents_metadata.declarant_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
@@ -999,7 +999,7 @@ const submit = () => {
                         <UserIcon class="h-4 w-4" />
                         Déclarant du Décès
                     </h3>
-                    <div class="grid grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms du Déclarant <span class="text-red-500">*</span></label>
                             <input v-model="form.death_metadata.declarant_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
@@ -1009,7 +1009,7 @@ const submit = () => {
                             <input v-model="form.death_metadata.declarant_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span class="text-red-500">*</span></label>
                             <input v-model="form.death_metadata.declarant_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
@@ -1019,7 +1019,7 @@ const submit = () => {
                             <input v-model="form.death_metadata.declarant_id_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Adresse du Déclarant <span class="text-red-500">*</span></label>
                             <input v-model="form.death_metadata.declarant_address" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
@@ -1115,7 +1115,7 @@ const submit = () => {
                                 <div class="w-1.5 h-1.5 bg-[#1E690F] rounded-full"></div>
                                 Témoin {{ index + 1 }}
                             </h4>
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénom</label>
                                     <input v-model="witness.first_name" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
@@ -1125,7 +1125,7 @@ const submit = () => {
                                     <input v-model="witness.last_name" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession</label>
                                     <input v-model="witness.profession" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />

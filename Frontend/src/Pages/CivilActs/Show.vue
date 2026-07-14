@@ -171,7 +171,7 @@ const getStatusModalIcon = () => {
                         <div class="p-8 space-y-8">
                             <!-- Naissance Context -->
                             <div v-if="type === 'naissance'" class="space-y-6">
-                                <div class="grid grid-cols-2 gap-8">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div>
                                         <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Enfant</h4>
                                         <div class="text-xl font-black text-gray-900">{{ act.first_name }} {{ act.last_name }}</div>
@@ -234,7 +234,7 @@ const getStatusModalIcon = () => {
                                             Tiers déclarant
                                         </span>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-4 text-xs">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                                         <div><span class="text-gray-400">Nom :</span> <span class="font-bold text-gray-900">{{ effectiveDeclarant.name }}</span></div>
                                         <div v-if="effectiveDeclarant.profession"><span class="text-gray-400">Profession :</span> <span class="font-bold text-gray-900">{{ effectiveDeclarant.profession }}</span></div>
                                         <div v-if="effectiveDeclarant.address"><span class="text-gray-400">Adresse :</span> <span class="font-bold text-gray-900">{{ effectiveDeclarant.address }}</span></div>
@@ -273,7 +273,7 @@ const getStatusModalIcon = () => {
                                         </div>
                                         <div class="space-y-2">
                                             <div class="text-xl font-black text-gray-900">{{ act.husband_first_name }} {{ act.husband_last_name }}</div>
-                                            <div class="grid grid-cols-2 gap-4 text-xs">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                                                 <div>
                                                     <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Né le</span>
                                                     <span class="text-gray-800 font-black">{{ formatDate(act.spouses_metadata?.husband_date_of_birth) || 'Non renseigné' }}</span>
@@ -287,7 +287,7 @@ const getStatusModalIcon = () => {
                                                 <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Profession</span>
                                                 <span class="text-gray-800 font-black">{{ act.spouses_metadata?.husband_profession || 'Non renseigné' }}</span>
                                             </div>
-                                            <div class="grid grid-cols-2 gap-4 text-xs pt-1">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-1">
                                                 <div>
                                                     <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Domicile</span>
                                                     <span class="text-gray-800 font-bold">{{ act.spouses_metadata?.husband_domicile || 'Non renseigné' }}</span>
@@ -312,7 +312,7 @@ const getStatusModalIcon = () => {
                                         </div>
                                         <div class="space-y-2">
                                             <div class="text-xl font-black text-gray-900">{{ act.wife_first_name }} {{ act.wife_last_name }}</div>
-                                            <div class="grid grid-cols-2 gap-4 text-xs">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                                                 <div>
                                                     <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Née le</span>
                                                     <span class="text-gray-800 font-black">{{ formatDate(act.spouses_metadata?.wife_date_of_birth) || 'Non renseignée' }}</span>
@@ -326,7 +326,7 @@ const getStatusModalIcon = () => {
                                                 <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Profession</span>
                                                 <span class="text-gray-800 font-black">{{ act.spouses_metadata?.wife_profession || 'Non renseignée' }}</span>
                                             </div>
-                                            <div class="grid grid-cols-2 gap-4 text-xs pt-1">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-1">
                                                 <div>
                                                     <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Domicile</span>
                                                     <span class="text-gray-800 font-bold">{{ act.spouses_metadata?.wife_domicile || 'Non renseignée' }}</span>
@@ -468,7 +468,7 @@ const getStatusModalIcon = () => {
                                                 <span class="text-gray-900 font-black text-base block">{{ act.deceased_first_name }} {{ act.deceased_last_name }}</span>
                                                 <span class="text-xs font-bold text-red-600">{{ act.gender === 'M' ? 'Masculin' : 'Féminin' }}</span>
                                             </div>
-                                            <div class="grid grid-cols-2 gap-4">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Né(e) le</span>
                                                     <span class="text-gray-850 font-bold">{{ formatDate(act.date_of_birth) }}<span v-if="act.death_metadata?.time_of_birth" class="text-gray-500 font-medium ml-1">à {{ act.death_metadata.time_of_birth }}</span></span>
@@ -478,7 +478,7 @@ const getStatusModalIcon = () => {
                                                     <span class="text-gray-850 font-bold italic">{{ act.death_metadata?.place_of_birth || '-' }}</span>
                                                 </div>
                                             </div>
-                                            <div class="grid grid-cols-2 gap-4">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Profession</span>
                                                     <span class="text-gray-850 font-bold">{{ act.death_metadata?.profession || '-' }}</span>
@@ -488,7 +488,7 @@ const getStatusModalIcon = () => {
                                                     <span class="text-gray-850 font-bold">{{ act.death_metadata?.domicile || '-' }}</span>
                                                 </div>
                                             </div>
-                                            <div class="grid grid-cols-2 gap-4 pt-1 border-t border-red-100/50">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1 border-t border-red-100/50">
                                                 <div>
                                                     <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Situation Matrimoniale</span>
                                                     <span class="text-gray-850 font-bold">{{ act.death_metadata?.marital_status || '-' }}</span>
@@ -626,7 +626,7 @@ const getStatusModalIcon = () => {
                                             </a>
                                         </div>
                                         <p class="text-sm font-black text-gray-900">{{ witness.first_name }} {{ witness.last_name }}</p>
-                                        <div class="grid grid-cols-2 gap-2 text-xs text-gray-500 font-medium">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-500 font-medium">
                                             <div>CNI : {{ witness.id_number || 'Non renseigné' }}</div>
                                             <div>Profession : {{ witness.profession || 'Non renseignée' }}</div>
                                         </div>
