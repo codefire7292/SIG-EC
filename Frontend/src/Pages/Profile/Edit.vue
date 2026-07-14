@@ -80,13 +80,17 @@ function updatePhotoPreview() {
             const dataUrl = canvas.toDataURL('image/jpeg', 0.8)
             photoPreview.value = dataUrl
 
-            // Convertir le dataUrl compressé en fichier File pour l'envoi
-            fetch(dataUrl)
-                .then(res => res.blob())
-                .then(blob => {
-                    const file = new File([blob], "profile.jpg", { type: "image/jpeg" })
-                    form.profile_photo = file
-                })
+            // Convertir le dataUrl compressé en fichier File sans fetch pour éviter les erreurs CSP
+            const byteString = atob(dataUrl.split(',')[1])
+            const mimeString = dataUrl.split(',')[0].split(':')[1].split(';')[0]
+            const ab = new ArrayBuffer(byteString.length)
+            const ia = new Uint8Array(ab)
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i)
+            }
+            const blob = new Blob([ab], { type: mimeString })
+            const file = new File([blob], "profile.jpg", { type: "image/jpeg" })
+            form.profile_photo = file
         }
         img.src = e.target.result
     }
