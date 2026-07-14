@@ -76,7 +76,7 @@ const isUrl = (url) => page.url.startsWith(url)
         style="background: linear-gradient(180deg, #0A2903 0%, #1E690F 70%, #2D5A1E 100%);"
     >
         <!-- Logo & Identité Mairie -->
-        <div class="flex-shrink-0 flex flex-col items-center justify-center pt-6 pb-5 px-4 border-b border-white/10">
+        <Link :href="route('dashboard')" class="flex-shrink-0 flex flex-col items-center justify-center pt-6 pb-5 px-4 border-b border-white/10 hover:opacity-90 transition-opacity">
             <div class="h-16 w-16 rounded-full bg-white flex items-center justify-center shadow-lg border-2 mb-3" style="border-color: #F0C31E;">
                 <img 
                     src="/images/logo.png" 
@@ -86,7 +86,7 @@ const isUrl = (url) => page.url.startsWith(url)
             </div>
             <span class="text-white font-black text-sm tracking-widest uppercase leading-none">Mairie de Enampore</span>
             <span class="text-[9px] font-bold uppercase tracking-[0.35em] mt-1" style="color: #F0C31E;">État Civil Numérique</span>
-        </div>
+        </Link>
 
         <!-- Navigation -->
         <nav class="flex-1 mt-4 px-3 space-y-6 overflow-y-auto pb-24 scrollbar-hide">

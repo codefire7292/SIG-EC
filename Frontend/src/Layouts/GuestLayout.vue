@@ -8,7 +8,7 @@ import { Link } from '@inertiajs/vue3'
         <header class="fixed top-0 left-0 right-0 z-[60] bg-white/95 backdrop-blur-md shadow-sm py-2 px-4" style="border-bottom: 2px solid #1E690F;">
             <div class="max-w-7xl mx-auto flex items-center justify-between">
                 <!-- Logo + Nom -->
-                <Link :href="'/'" class="flex items-center gap-3 group">
+                <Link :href="$page.props.auth.user ? route('dashboard') : '/'" class="flex items-center gap-3 group">
                     <div class="h-12 w-12 rounded-full bg-white flex items-center justify-center border-2 shadow-sm group-hover:scale-105 transition-transform duration-200" style="border-color: #F0C31E;">
                         <img 
                             src="/images/logo.png" 
