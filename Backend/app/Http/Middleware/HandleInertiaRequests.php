@@ -44,6 +44,7 @@ class HandleInertiaRequests extends Middleware
                     'role' => $request->user()->getRoleNames()->first(),
                     'permissions' => $request->user()->getAllPermissions()->pluck('name'),
                     'unreadNotifications' => $request->user()->unreadNotifications,
+                    'profile_photo_url' => $request->user()->profile_photo_url,
                 ] : null,
             ],
             'flash' => [
