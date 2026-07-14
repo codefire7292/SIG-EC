@@ -142,21 +142,6 @@ function updatePhotoPreview() {
                 </form>
             </div>
 
-            <!-- Danger Zone -->
-            <div class="mt-12 p-8 bg-red-50 rounded-[2.5rem] border border-red-100 flex items-center justify-between gap-6">
-                <div class="flex items-center gap-4">
-                    <div class="h-12 w-12 bg-white rounded-2xl flex items-center justify-center text-red-600 shadow-sm">
-                        <ExclamationTriangleIcon class="h-6 w-6" />
-                    </div>
-                    <div>
-                        <h3 class="font-black text-red-900 tracking-tight">Zone Critique</h3>
-                        <p class="text-sm text-red-600 font-medium">Une fois supprimé, votre compte ne pourra plus être récupéré.</p>
-                    </div>
-                </div>
-                <button class="px-6 py-3 bg-white text-red-600 border border-red-100 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-black hover:text-white transition-all">
-                    Supprimer mon compte
-                </button>
-            </div>
         </div>
     </AuthenticatedLayout>
 </template>
