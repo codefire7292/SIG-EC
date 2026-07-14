@@ -42,10 +42,53 @@ function selectNewPhoto() {
 function updatePhotoPreview() {
     const photo = photoInput.value.files[0]
     if (!photo) return
-    form.profile_photo = photo
+
+    if (!photo.type.startsWith('image/')) {
+        form.errors.profile_photo = "Veuillez sélectionner une image valide."
+        return
+    }
+
+    form.errors.profile_photo = null
     const reader = new FileReader()
     reader.onload = (e) => {
-        photoPreview.value = e.target.result
+        const img = new Image()
+        img.onload = () => {
+            const canvas = document.createElement('canvas')
+            const MAX_WIDTH = 500
+            const MAX_HEIGHT = 500
+            let width = img.width
+            let height = img.height
+
+            if (width > height) {
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width
+                    width = MAX_WIDTH
+                }
+            } else {
+                if (height > MAX_HEIGHT) {
+                    width *= MAX_HEIGHT / height
+                    height = MAX_HEIGHT
+                }
+            }
+
+            canvas.width = width
+            canvas.height = height
+            const ctx = canvas.getContext('2d')
+            ctx.drawImage(img, 0, 0, width, height)
+            
+            // Compresser l'image en JPEG à 80% de qualité
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8)
+            photoPreview.value = dataUrl
+
+            // Convertir le dataUrl compressé en fichier File pour l'envoi
+            fetch(dataUrl)
+                .then(res => res.blob())
+                .then(blob => {
+                    const file = new File([blob], "profile.jpg", { type: "image/jpeg" })
+                    form.profile_photo = file
+                })
+        }
+        img.src = e.target.result
     }
     reader.readAsDataURL(photo)
 }
