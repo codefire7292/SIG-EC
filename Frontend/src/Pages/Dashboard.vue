@@ -131,18 +131,18 @@ const barOptions = {
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 class="font-black text-xl text-brand-800 tracking-tight flex items-center gap-2">
-                        <img src="/images/logo.png" alt="Mairie de Enampore" class="h-7 w-7 object-contain" />
-                        Console de Gestion — Mairie de Enampore
+                    <h2 class="font-black text-lg sm:text-xl text-brand-800 tracking-tight flex items-center gap-2">
+                        <img src="/images/logo.png" alt="Mairie de Enampore" class="h-6 w-6 sm:h-7 sm:w-7 object-contain hidden sm:block" />
+                        <span class="leading-tight">Console de Gestion — Mairie de Enampore</span>
                     </h2>
-                    <p class="text-xs text-gray-400 font-medium mt-0.5">Système Intégré de Gestion de l'État Civil — Commune de Enampore</p>
+                    <p class="text-[10px] sm:text-xs text-gray-400 font-medium mt-1">Système Intégré de Gestion de l'État Civil — Commune de Enampore</p>
                 </div>
                 <Link 
                     v-if="$page.props.auth.user.permissions?.includes('create-drafts')"
                     :href="route('civil-certificates.create')"
-                    class="flex items-center gap-2 px-4 py-2.5 text-white text-sm font-black rounded-xl shadow-brand hover:shadow-brand-lg transition-all duration-200"
+                    class="flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 text-white text-sm font-black rounded-xl shadow-brand hover:shadow-brand-lg transition-all duration-200 w-full sm:w-auto"
                     style="background: linear-gradient(135deg, #1E690F 0%, #3D9426 100%);"
                 >
                     <PlusCircleIcon class="h-5 w-5" />
