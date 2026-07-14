@@ -5,13 +5,26 @@ import {
     Bars3Icon, 
     UserCircleIcon,
     ChevronDownIcon,
-    ArrowRightOnRectangleIcon
+    ArrowRightOnRectangleIcon,
+    BellIcon
 } from '@heroicons/vue/24/outline'
+import { BellIcon as BellIconSolid } from '@heroicons/vue/24/solid'
 
 const emit = defineEmits(['toggleSidebar'])
 const page = usePage()
 
 const isProfileOpen = ref(false)
+const isNotificationsOpen = ref(false)
+
+const markNotificationsAsRead = () => {
+    isNotificationsOpen.value = false;
+    if (page.props.auth.user.unreadNotifications.length > 0) {
+        import('@inertiajs/vue3').then(({ router }) => {
+            router.post(route('notifications.mark-as-read'), {}, { preserveScroll: true });
+        });
+    }
+}
+
 </script>
 
 <template>
@@ -44,6 +57,55 @@ const isProfileOpen = ref(false)
 
             <!-- Profil à droite -->
             <div class="flex-1 flex justify-end items-center gap-4">
+                
+                <!-- Notifications -->
+                <div class="relative">
+                    <button 
+                        @click="isNotificationsOpen = !isNotificationsOpen"
+                        class="p-2 rounded-full hover:bg-brand-50 transition-colors focus:outline-none relative"
+                    >
+                        <BellIcon class="h-6 w-6 text-gray-600 hover:text-brand-700" />
+                        <span v-if="page.props.auth.user.unreadNotifications?.length > 0" class="absolute top-1.5 right-2 h-2.5 w-2.5 bg-red-500 rounded-full ring-2 ring-white"></span>
+                    </button>
+
+                    <Transition
+                        enter-active-class="transition duration-150 ease-out"
+                        enter-from-class="transform scale-95 opacity-0"
+                        enter-to-class="transform scale-100 opacity-100"
+                        leave-active-class="transition duration-100 ease-in"
+                        leave-from-class="transform scale-100 opacity-100"
+                        leave-to-class="transform scale-95 opacity-0"
+                    >
+                        <div 
+                            v-if="isNotificationsOpen" 
+                            class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-lg py-2 z-50 overflow-hidden border"
+                            style="border-color: #D9EDD0;"
+                        >
+                            <div class="px-4 py-3 border-b border-gray-50 flex items-center justify-between">
+                                <h3 class="text-sm font-black text-gray-900">Notifications</h3>
+                                <button v-if="page.props.auth.user.unreadNotifications?.length > 0" @click="markNotificationsAsRead" class="text-[10px] font-bold text-brand-600 uppercase tracking-widest hover:underline">
+                                    Tout marquer lu
+                                </button>
+                            </div>
+                            <div class="max-h-64 overflow-y-auto">
+                                <template v-if="page.props.auth.user.unreadNotifications?.length > 0">
+                                    <div v-for="notification in page.props.auth.user.unreadNotifications" :key="notification.id" class="px-4 py-3 hover:bg-gray-50 border-b border-gray-50/50">
+                                        <Link :href="notification.data.url" @click="markNotificationsAsRead" class="block">
+                                            <p class="text-xs font-bold text-gray-900 mb-0.5">{{ notification.data.title }}</p>
+                                            <p class="text-[10px] text-gray-600 leading-tight">{{ notification.data.message }}</p>
+                                        </Link>
+                                    </div>
+                                </template>
+                                <div v-else class="px-4 py-6 text-center">
+                                    <BellIcon class="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                                    <p class="text-xs text-gray-500">Aucune notification</p>
+                                </div>
+                            </div>
+                        </div>
+                    </Transition>
+                </div>
+
+                <!-- Profil -->
                 <div class="relative">
                     <button 
                         @click="isProfileOpen = !isProfileOpen"

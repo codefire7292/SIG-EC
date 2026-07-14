@@ -209,6 +209,7 @@ class CivilActController extends Controller
             }
         }
 
+        $data['created_by'] = $request->user()->id;
         $act = $model->create($data);
 
         return redirect()->route("acts.{$type}.show", $act->id)
@@ -584,6 +585,15 @@ class CivilActController extends Controller
 
         // Use direct DB update or unrestricted query to bypass Fillable protection securely
         $model::where('id', $act->id)->update($updateData);
+
+        // Notifier l'agent émetteur si renvoyé à la correction
+        if ($newStatus === 'a_corriger' && $act->creator) {
+            $act->creator->notify(new \App\Notifications\ActReturnedForCorrection(
+                $type,
+                $act->id,
+                $act->reference_number
+            ));
+        }
 
         return back()->with('success', 'Statut de l\'acte mis à jour avec succès : ' . strtoupper($newStatus));
     }

@@ -87,6 +87,12 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/dashboard', [CivilCertificateController::class, 'dashboard'])
         ->name('dashboard');
 
+    // Notifications
+    Route::post('/notifications/mark-as-read', function (Illuminate\Http\Request $request) {
+        $request->user()->unreadNotifications->markAsRead();
+        return back();
+    })->name('notifications.mark-as-read');
+
     // Profile Management
     Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])
         ->name('profile.edit');

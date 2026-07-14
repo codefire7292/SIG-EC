@@ -41,6 +41,7 @@ class BirthAct extends Model
         'doc_cni_declarant_path',
         'doc_autres_path',
         'doc_jugement_path',
+        'created_by',
         // NOTE: status, validated_by, validated_at, locked_at, is_locked, parent_id, version_number,
         // rectification_reason, is_current are managed by the system only — never from user HTTP input.
     ];
@@ -70,6 +71,11 @@ class BirthAct extends Model
     public function validator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'validated_by');
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function parent(): BelongsTo

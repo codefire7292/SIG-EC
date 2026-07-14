@@ -43,6 +43,7 @@ class MarriageAct extends Model
         'doc_jugement_path',
         'doc_autres_path',
         'spouses_metadata',
+        'created_by',
         // NOTE: status, validated_by, validated_at, locked_at etc. managed by the system only.
     ];
 
@@ -71,6 +72,11 @@ class MarriageAct extends Model
     public function validator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'validated_by');
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function attachments(): MorphMany

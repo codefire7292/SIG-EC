@@ -41,6 +41,7 @@ class DeathAct extends Model
         'death_metadata',
         'witnesses_metadata',
         'officer_comments',
+        'created_by',
     ];
 
     protected $casts = [
@@ -70,6 +71,11 @@ class DeathAct extends Model
     public function validator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'validated_by');
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function parent(): BelongsTo
