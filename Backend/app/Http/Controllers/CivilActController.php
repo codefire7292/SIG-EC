@@ -387,11 +387,37 @@ class CivilActController extends Controller
                 'mother_name'                             => 'required|string',
                 'parents_metadata'                        => 'required|array',
                 'parents_metadata.father_profession'      => 'required|string',
-                'parents_metadata.father_date_of_birth'   => 'required|date',
+                'parents_metadata.father_date_of_birth'   => [
+                    'required',
+                    'date',
+                    function ($attribute, $value, $fail) {
+                        $childDob = request()->input('date_of_birth');
+                        if ($childDob) {
+                            $childDate = \Carbon\Carbon::parse($childDob);
+                            $parentDate = \Carbon\Carbon::parse($value);
+                            if ($parentDate->diffInYears($childDate, false) < 10) {
+                                $fail("L'âge du père doit être supérieur d'au moins 10 ans à celui de l'enfant.");
+                            }
+                        }
+                    }
+                ],
                 'parents_metadata.father_place_of_birth'  => 'required|string',
                 'parents_metadata.father_domicile'        => 'required|string',
                 'parents_metadata.mother_profession'      => 'required|string',
-                'parents_metadata.mother_date_of_birth'   => 'required|date',
+                'parents_metadata.mother_date_of_birth'   => [
+                    'required',
+                    'date',
+                    function ($attribute, $value, $fail) {
+                        $childDob = request()->input('date_of_birth');
+                        if ($childDob) {
+                            $childDate = \Carbon\Carbon::parse($childDob);
+                            $parentDate = \Carbon\Carbon::parse($value);
+                            if ($parentDate->diffInYears($childDate, false) < 10) {
+                                $fail("L'âge de la mère doit être supérieur d'au moins 10 ans à celui de l'enfant.");
+                            }
+                        }
+                    }
+                ],
                 'parents_metadata.mother_place_of_birth'  => 'required|string',
                 'parents_metadata.mother_domicile'        => 'required|string',
                 // Section Déclarant
