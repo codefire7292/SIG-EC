@@ -66,7 +66,9 @@ const markNotificationsAsRead = () => {
                         class="p-2 rounded-full hover:bg-brand-50 transition-colors focus:outline-none relative"
                     >
                         <BellIcon class="h-6 w-6 text-gray-600 hover:text-brand-700" />
-                        <span v-if="page.props.auth.user.unreadNotifications?.length > 0" class="absolute top-1.5 right-2 h-2.5 w-2.5 bg-red-500 rounded-full ring-2 ring-white"></span>
+                        <span v-if="page.props.auth.user.unreadNotifications?.length > 0" class="absolute top-0 right-0 h-4 min-w-[16px] flex items-center justify-center px-1 text-[9px] font-bold text-white bg-red-500 rounded-full ring-2 ring-white">
+                            {{ page.props.auth.user.unreadNotifications.length > 9 ? '9+' : page.props.auth.user.unreadNotifications.length }}
+                        </span>
                     </button>
 
                     <Transition
