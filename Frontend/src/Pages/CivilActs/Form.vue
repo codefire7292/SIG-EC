@@ -56,8 +56,13 @@ const formatDateTimeLocal = (dateTimeStr) => {
     return clean;
 };
 
+const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+const isOldRegistryMode = ref(urlParams.get('old_registry') === '1');
+
 const form = useForm({
     // Common
+    is_old_registry: isOldRegistryMode.value,
+    reference_number: '',
     officer_comments: props.act?.officer_comments || '',
     certificate_file: null,
     certificate_path: props.act?.certificate_path || null,
@@ -338,6 +343,16 @@ const submit = () => {
                         <span v-if="type === 'mariage'">Informations des époux</span>
                         <span v-else>Informations d'Identification</span>
                     </h3>
+                    <div v-if="form.is_old_registry" class="mb-8 p-6 bg-amber-50 rounded-2xl border border-amber-200">
+                        <h4 class="text-xs font-black text-amber-900 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <DocumentTextIcon class="h-4 w-4" />
+                            Référence de l'Ancien Registre
+                        </h4>
+                        <div>
+                            <label class="block text-[10px] font-black text-amber-800 uppercase tracking-widest mb-1 pl-1">Numéro de Registre Existant <span class="text-red-500">*</span></label>
+                            <input v-model="form.reference_number" type="text" class="w-full md:w-1/2 px-4 py-3 rounded-xl border border-amber-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 font-bold transition-all" placeholder="Ex: N-1990-001" required />
+                        </div>
+                    </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div v-if="type === 'naissance'" class="space-y-6 col-span-full">
@@ -1171,7 +1186,7 @@ const submit = () => {
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- CNI Père -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Père (PDF, max. 500 Ko) <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Père (PDF, max. 500 Ko) <span v-if="!props.act && !form.is_old_registry" class="text-red-500">*</span><span v-if="!props.act && form.is_old_registry" class="text-amber-500 text-[9px] font-bold ml-1">(Optionnel)</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_pere || props.act?.doc_cni_pere_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_pere || props.act?.doc_cni_pere_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1187,7 +1202,7 @@ const submit = () => {
                         </div>
                         <!-- CNI Mère -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de la Mère (PDF, max. 500 Ko) <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de la Mère (PDF, max. 500 Ko) <span v-if="!props.act && !form.is_old_registry" class="text-red-500">*</span><span v-if="!props.act && form.is_old_registry" class="text-amber-500 text-[9px] font-bold ml-1">(Optionnel)</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_mere || props.act?.doc_cni_mere_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_mere || props.act?.doc_cni_mere_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1203,7 +1218,7 @@ const submit = () => {
                         </div>
                         <!-- Acte / Attestation de naissance -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte / Attestation de Naissance (PDF, max. 500 Ko) <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte / Attestation de Naissance (PDF, max. 500 Ko) <span v-if="!props.act && !form.is_old_registry" class="text-red-500">*</span><span v-if="!props.act && form.is_old_registry" class="text-amber-500 text-[9px] font-bold ml-1">(Optionnel)</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_acte_naissance || props.act?.doc_acte_naissance_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_acte_naissance || props.act?.doc_acte_naissance_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1219,7 +1234,7 @@ const submit = () => {
                         </div>
                         <!-- CNI Déclarant -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Déclarant (PDF, max. 500 Ko) <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Déclarant (PDF, max. 500 Ko) <span v-if="!props.act && !form.is_old_registry" class="text-red-500">*</span><span v-if="!props.act && form.is_old_registry" class="text-amber-500 text-[9px] font-bold ml-1">(Optionnel)</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_declarant || props.act?.doc_cni_declarant_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_declarant || props.act?.doc_cni_declarant_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1261,7 +1276,7 @@ const submit = () => {
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- CNI Époux -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Époux (PDF, max. 500 Ko) <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Époux (PDF, max. 500 Ko) <span v-if="!props.act && !form.is_old_registry" class="text-red-500">*</span><span v-if="!props.act && form.is_old_registry" class="text-amber-500 text-[9px] font-bold ml-1">(Optionnel)</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_husband || props.act?.doc_cni_husband_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_husband || props.act?.doc_cni_husband_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1278,7 +1293,7 @@ const submit = () => {
                         
                         <!-- CNI Épouse -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Épouse (PDF, max. 500 Ko) <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI de l'Épouse (PDF, max. 500 Ko) <span v-if="!props.act && !form.is_old_registry" class="text-red-500">*</span><span v-if="!props.act && form.is_old_registry" class="text-amber-500 text-[9px] font-bold ml-1">(Optionnel)</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_cni_wife || props.act?.doc_cni_wife_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_cni_wife || props.act?.doc_cni_wife_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1295,7 +1310,7 @@ const submit = () => {
 
                         <!-- Acte de Naissance Époux -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Époux (PDF, max. 500 Ko) <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Époux (PDF, max. 500 Ko) <span v-if="!props.act && !form.is_old_registry" class="text-red-500">*</span><span v-if="!props.act && form.is_old_registry" class="text-amber-500 text-[9px] font-bold ml-1">(Optionnel)</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_birth_husband || props.act?.doc_birth_husband_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_birth_husband || props.act?.doc_birth_husband_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1312,7 +1327,7 @@ const submit = () => {
 
                         <!-- Acte de Naissance Épouse -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Épouse (PDF, max. 500 Ko) <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Acte de Naissance de l'Épouse (PDF, max. 500 Ko) <span v-if="!props.act && !form.is_old_registry" class="text-red-500">*</span><span v-if="!props.act && form.is_old_registry" class="text-amber-500 text-[9px] font-bold ml-1">(Optionnel)</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_birth_wife || props.act?.doc_birth_wife_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_birth_wife || props.act?.doc_birth_wife_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1329,7 +1344,7 @@ const submit = () => {
 
                         <!-- Certificat de Domicile -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Domicile (PDF, max. 500 Ko) <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Domicile (PDF, max. 500 Ko) <span v-if="!props.act && !form.is_old_registry" class="text-red-500">*</span><span v-if="!props.act && form.is_old_registry" class="text-amber-500 text-[9px] font-bold ml-1">(Optionnel)</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_domicile || props.act?.doc_domicile_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_domicile || props.act?.doc_domicile_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1346,7 +1361,7 @@ const submit = () => {
 
                         <!-- Certificat Médical Prénuptial -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat Médical Prénuptial (PDF, max. 500 Ko) <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat Médical Prénuptial (PDF, max. 500 Ko) <span v-if="!props.act && !form.is_old_registry" class="text-red-500">*</span><span v-if="!props.act && form.is_old_registry" class="text-amber-500 text-[9px] font-bold ml-1">(Optionnel)</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_medical || props.act?.doc_medical_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_medical || props.act?.doc_medical_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1406,7 +1421,7 @@ const submit = () => {
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- Certificat de Décès -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Décès / Médical (PDF, max. 500 Ko) <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Certificat de Décès / Médical (PDF, max. 500 Ko) <span v-if="!props.act && !form.is_old_registry" class="text-red-500">*</span><span v-if="!props.act && form.is_old_registry" class="text-amber-500 text-[9px] font-bold ml-1">(Optionnel)</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_death_cert || props.act?.doc_death_cert_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_death_cert || props.act?.doc_death_cert_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1423,7 +1438,7 @@ const submit = () => {
 
                         <!-- Pièce d'identité du défunt -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Pièce d'identité du défunt (PDF, max. 500 Ko) <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Pièce d'identité du défunt (PDF, max. 500 Ko) <span v-if="!props.act && !form.is_old_registry" class="text-red-500">*</span><span v-if="!props.act && form.is_old_registry" class="text-amber-500 text-[9px] font-bold ml-1">(Optionnel)</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_deceased_id || props.act?.doc_deceased_id_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_deceased_id || props.act?.doc_deceased_id_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">
@@ -1440,7 +1455,7 @@ const submit = () => {
 
                         <!-- CNI du Déclarant -->
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Déclarant (PDF, max. 500 Ko) <span v-if="!props.act" class="text-red-500">*</span></label>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">CNI du Déclarant (PDF, max. 500 Ko) <span v-if="!props.act && !form.is_old_registry" class="text-red-500">*</span><span v-if="!props.act && form.is_old_registry" class="text-amber-500 text-[9px] font-bold ml-1">(Optionnel)</span></label>
                             <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_declarant_id || props.act?.doc_declarant_id_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
                                 <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_declarant_id || props.act?.doc_declarant_id_path ? 'text-[#1E690F]' : 'text-gray-400'" />
                                 <p class="text-xs text-gray-500 font-bold text-center px-2">

@@ -136,6 +136,13 @@ const cancelImport = () => {
                         Importer Excel
                     </button>
                     <Link
+                        :href="`/acts/${type}/create?old_registry=1`"
+                        class="inline-flex items-center justify-center px-6 py-3 bg-white border border-gray-200 rounded-xl font-black text-xs text-amber-600 uppercase tracking-widest hover:bg-amber-50 shadow-sm transition-all active:scale-95"
+                    >
+                        <DocumentTextIcon class="w-4 h-4 mr-2" />
+                        Saisir Ancien Registre
+                    </Link>
+                    <Link
                         :href="`/acts/${type}/create`"
                         class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 border border-transparent rounded-xl font-black text-xs text-white uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all active:scale-95"
                     >
