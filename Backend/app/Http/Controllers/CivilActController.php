@@ -97,6 +97,12 @@ class CivilActController extends Controller
 
         $type = $request->route('type');
         $rules = $this->getValidationRules($type);
+        
+        $isOldRegistry = $request->boolean('is_old_registry');
+        if ($isOldRegistry) {
+            $rules['reference_number'] = 'required|string|max:255';
+        }
+
         $validated = $request->validate($rules, [
             'file' => 'Le fichier doit être valide.',
             'mimes' => 'Le document doit être au format PDF.',
@@ -141,12 +147,17 @@ class CivilActController extends Controller
         if ($lastAct && preg_match('/-(\d+)$/', $lastAct->reference_number, $matches)) {
             $increment = intval($matches[1]) + 1;
         }
-        
-        $referenceNumber = $registry->reference_prefix . '-' . str_pad($increment, 4, '0', STR_PAD_LEFT);
+        if ($isOldRegistry && !empty($validated['reference_number'])) {
+            $referenceNumber = $validated['reference_number'];
+        } else {
+            $referenceNumber = $registry->reference_prefix . '-' . str_pad($increment, 4, '0', STR_PAD_LEFT);
+        }
 
-        // TECHNICAL RULE: Filter out dot-notation keys
-        $data = array_filter($validated, fn($key) => !str_contains($key, '.'), ARRAY_FILTER_USE_KEY);
+        // TECHNICAL RULE: Filter out dot-notation keys and transient flags
+        $data = array_filter($validated, fn($key) => !str_contains($key, '.') && $key !== 'is_old_registry' && $key !== 'reference_number', ARRAY_FILTER_USE_KEY);
         
+        $data = $this->formatTextData($data);
+
         $data['registry_id'] = $registry->id;
         $data['reference_number'] = $referenceNumber;
 
@@ -235,6 +246,8 @@ class CivilActController extends Controller
 
         // TECHNICAL RULE: Filter out dot-notation keys
         $data = array_filter($validated, fn($key) => !str_contains($key, '.'), ARRAY_FILTER_USE_KEY);
+
+        $data = $this->formatTextData($data);
 
         // Calculate year based on validated dates
         $year = $act->registry ? $act->registry->year : now()->year;
@@ -347,6 +360,9 @@ class CivilActController extends Controller
 
     protected function getValidationRules(string $type, $id = null): array
     {
+        $isOldRegistry = request()->boolean('is_old_registry');
+        $docRule = ($id || $isOldRegistry) ? 'nullable' : 'required';
+
         $common = [
             'officer_comments' => 'nullable|string',
             'certificate_file' => 'nullable|file|mimes:pdf|max:500',
@@ -399,12 +415,12 @@ class CivilActController extends Controller
                 'parents_metadata.witnesses.*.address'     => 'nullable|string',
                 'parents_metadata.witnesses.*.id_number'   => 'nullable|string',
                 // Pièces justificatives PDF
-                'doc_cni_pere'                            => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:500',
-                'doc_cni_mere'                            => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:500',
-                'doc_acte_naissance'                      => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:500',
-                'doc_cni_declarant'                       => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:500',
+                'doc_cni_pere'                            => $docRule . '|file|mimes:pdf|max:500',
+                'doc_cni_mere'                            => $docRule . '|file|mimes:pdf|max:500',
+                'doc_acte_naissance'                      => $docRule . '|file|mimes:pdf|max:500',
+                'doc_cni_declarant'                       => $docRule . '|file|mimes:pdf|max:500',
                 'doc_autres'                              => 'nullable|file|mimes:pdf|max:500',
-                'doc_jugement'                            => ($id ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:500',
+                'doc_jugement'                            => ($id || $isOldRegistry ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:500',
             ]);
         }
 
@@ -467,14 +483,14 @@ class CivilActController extends Controller
                 'witnesses_metadata.*.id_number'               => 'nullable|string',
                 'witnesses_metadata.*.cni_file'                => 'nullable|file|mimes:pdf|max:500',
                 // Documents PDF separate
-                'doc_cni_husband'                              => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:500',
-                'doc_cni_wife'                                 => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:500',
-                'doc_birth_husband'                            => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:500',
-                'doc_birth_wife'                               => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:500',
-                'doc_domicile'                                 => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:500',
-                'doc_medical'                                  => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:500',
+                'doc_cni_husband'                              => $docRule . '|file|mimes:pdf|max:500',
+                'doc_cni_wife'                                 => $docRule . '|file|mimes:pdf|max:500',
+                'doc_birth_husband'                            => $docRule . '|file|mimes:pdf|max:500',
+                'doc_birth_wife'                               => $docRule . '|file|mimes:pdf|max:500',
+                'doc_domicile'                                 => $docRule . '|file|mimes:pdf|max:500',
+                'doc_medical'                                  => $docRule . '|file|mimes:pdf|max:500',
                 'doc_parental_auth'                            => 'nullable|file|mimes:pdf|max:500',
-                'doc_jugement'                                 => ($id ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:500',
+                'doc_jugement'                                 => ($id || $isOldRegistry ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:500',
                 'doc_autres'                                   => 'nullable|file|mimes:pdf|max:500',
             ]);
         }
@@ -531,10 +547,10 @@ class CivilActController extends Controller
                 'witnesses_metadata.*.id_number'            => 'nullable|string',
                 'witnesses_metadata.*.cni_file'             => 'nullable|file|mimes:pdf|max:500',
                 // Documents PDF separate
-                'doc_death_cert'                            => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:500',
-                'doc_deceased_id'                           => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:500',
-                'doc_declarant_id'                          => ($id ? 'nullable' : 'required') . '|file|mimes:pdf|max:500',
-                'doc_jugement'                              => ($id ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:500',
+                'doc_death_cert'                            => $docRule . '|file|mimes:pdf|max:500',
+                'doc_deceased_id'                           => $docRule . '|file|mimes:pdf|max:500',
+                'doc_declarant_id'                          => $docRule . '|file|mimes:pdf|max:500',
+                'doc_jugement'                              => ($id || $isOldRegistry ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:500',
                 'doc_autres'                                => 'nullable|file|mimes:pdf|max:500',
             ]);
         }
@@ -596,5 +612,27 @@ class CivilActController extends Controller
         }
 
         return back()->with('success', 'Statut de l\'acte mis à jour avec succès : ' . strtoupper($newStatus));
+    }
+
+    private function formatTextData(array $data): array
+    {
+        $excludeKeys = ['reference_number', 'officer_comments', 'certificate_path', 'judgment_number', 'gender', 'marriage_option', 'matrimonial_regime', 'marital_status', 'judgment_court', 'cause_of_death'];
+
+        foreach ($data as $key => $value) {
+            if (is_string($value)) {
+                $isName = str_ends_with($key, 'last_name') || str_contains($key, 'last_name') || $key === 'nom';
+                
+                if ($isName) {
+                    $data[$key] = mb_strtoupper($value, 'UTF-8');
+                } else {
+                    if (!in_array($key, $excludeKeys) && !preg_match('/_date|_time|_id|doc_|^is_/', $key)) {
+                        $data[$key] = mb_convert_case(mb_strtolower($value, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+                    }
+                }
+            } elseif (is_array($value)) {
+                $data[$key] = $this->formatTextData($value);
+            }
+        }
+        return $data;
     }
 }
