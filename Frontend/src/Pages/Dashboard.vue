@@ -251,6 +251,37 @@ const barOptions = {
                     </div>
                 </div>
 
+                <!-- Section Administration & Suivi des Actes -->
+                <div class="mb-8">
+                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Indicateurs de Performance et Administration</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <!-- Registres Ouverts -->
+                        <div class="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Registres Ouverts</p>
+                            <h4 class="text-3xl font-black text-brand-800 tracking-tighter mt-1">{{ stats.registries_open }}</h4>
+                            <p class="text-[9px] text-green-600 font-bold mt-2 uppercase tracking-tight flex items-center gap-1"><CheckBadgeIcon class="h-3 w-3"/> {{ stats.acts_signe }} actes signés</p>
+                        </div>
+                        <!-- Registres Fermés -->
+                        <div class="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Registres Clos</p>
+                            <h4 class="text-3xl font-black text-gray-600 tracking-tighter mt-1">{{ stats.registries_closed }}</h4>
+                            <p class="text-[9px] text-amber-600 font-bold mt-2 uppercase tracking-tight flex items-center gap-1"><ClockIcon class="h-3 w-3"/> {{ stats.acts_a_corriger }} à corriger</p>
+                        </div>
+                        <!-- Centres -->
+                        <div class="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Centres Actifs</p>
+                            <h4 class="text-3xl font-black text-[#1E690F] tracking-tighter mt-1">{{ stats.centers_count }}</h4>
+                            <p class="text-[9px] text-brand-500 font-bold mt-2 uppercase tracking-tight flex items-center gap-1"><DocumentDuplicateIcon class="h-3 w-3"/> {{ stats.acts_valide }} à signer</p>
+                        </div>
+                        <!-- Utilisateurs -->
+                        <div class="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Utilisateurs</p>
+                            <h4 class="text-3xl font-black text-brand-800 tracking-tighter mt-1">{{ stats.users_count }}</h4>
+                            <p class="text-[9px] text-red-500 font-bold mt-2 uppercase tracking-tight flex items-center gap-1"><DocumentTextIcon class="h-3 w-3"/> {{ stats.acts_draft }} brouillons</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Section Graphiques & Activités -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     
@@ -271,14 +302,34 @@ const barOptions = {
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div class="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 text-center hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow">
-                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Registres Ouverts</p>
-                                <h4 class="text-4xl font-black text-gray-900 tracking-tighter">{{ stats.registries_open }}</h4>
-                            </div>
-                            <div class="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 text-center hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow">
-                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Utilisateurs</p>
-                                <h4 class="text-4xl font-black text-gray-900 tracking-tighter">{{ stats.users_count }}</h4>
+                        <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
+                            <h3 class="text-sm font-black text-gray-900 tracking-tight flex items-center gap-2 mb-6">
+                                <ChartPieIcon class="h-5 w-5 text-gray-400" />
+                                Répartition des Types de Certificats
+                            </h3>
+
+                            <div class="space-y-5">
+                                <div 
+                                    v-for="(count, type, index) in stats.by_type" 
+                                    :key="type" 
+                                    class="space-y-1.5"
+                                >
+                                    <div class="flex justify-between items-center text-xs font-bold">
+                                        <span class="text-gray-600 uppercase tracking-wider text-[10px]">{{ formatType(type) }}</span>
+                                        <span class="text-brand-800 font-black">{{ count }}</span>
+                                    </div>
+                                    <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                        <div 
+                                            class="h-full rounded-full transition-all duration-1000"
+                                            :class="typeColors[index % typeColors.length]"
+                                            :style="{ width: (stats.total > 0 ? (count / stats.total * 100) : 0) + '%' }"
+                                        ></div>
+                                    </div>
+                                </div>
+                                
+                                <div v-if="Object.keys(stats.by_type).length === 0" class="text-center py-6">
+                                    <p class="text-xs text-gray-400 font-medium">Pas de données de répartition.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
