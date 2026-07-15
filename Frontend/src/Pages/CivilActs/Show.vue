@@ -43,6 +43,12 @@ const formatDate = (date) => {
     });
 };
 
+const formatTime = (timeStr) => {
+    if (!timeStr) return '';
+    const parts = timeStr.split(':');
+    return parts.length >= 2 ? `${parts[0]}h${parts[1]}` : timeStr;
+};
+
 import { router, usePage } from '@inertiajs/vue3';
 
 // Pour les actes de naissance : si aucun déclarant tiers n'est renseigné,
@@ -179,7 +185,7 @@ const getStatusModalIcon = () => {
                                     </div>
                                     <div>
                                         <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Naissance</h4>
-                                        <div class="text-sm font-black text-gray-900">{{ formatDate(act.date_of_birth) }}<span v-if="act.time_of_birth" class="text-gray-500 font-medium ml-2">à {{ act.time_of_birth }}</span></div>
+                                        <div class="text-sm font-black text-gray-900">{{ formatDate(act.date_of_birth) }}<span v-if="act.time_of_birth" class="text-gray-500 font-medium ml-2">à {{ formatTime(act.time_of_birth) }}</span></div>
                                         <div class="text-xs font-bold text-gray-500 italic">{{ act.place_of_birth }}</div>
                                         <div v-if="act.health_facility" class="text-xs font-bold text-green-700 mt-1">Formation : {{ act.health_facility }}</div>
                                     </div>
@@ -439,7 +445,7 @@ const getStatusModalIcon = () => {
                                         <div class="space-y-3 text-xs">
                                             <div>
                                                 <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Date du Décès</span>
-                                                <span class="text-gray-900 font-black text-sm">{{ formatDate(act.date_of_death) }}<span v-if="act.time_of_death" class="text-gray-500 font-medium ml-2">à {{ act.time_of_death }}</span></span>
+                                                <span class="text-gray-900 font-black text-sm">{{ formatDate(act.date_of_death) }}<span v-if="act.time_of_death" class="text-gray-500 font-medium ml-2">à {{ formatTime(act.time_of_death) }}</span></span>
                                             </div>
                                             <div>
                                                 <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Lieu du Décès</span>
@@ -471,7 +477,7 @@ const getStatusModalIcon = () => {
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Né(e) le</span>
-                                                    <span class="text-gray-850 font-bold">{{ formatDate(act.date_of_birth) }}<span v-if="act.death_metadata?.time_of_birth" class="text-gray-500 font-medium ml-1">à {{ act.death_metadata.time_of_birth }}</span></span>
+                                                    <span class="text-gray-850 font-bold">{{ formatDate(act.date_of_birth) }}<span v-if="act.death_metadata?.time_of_birth" class="text-gray-500 font-medium ml-1">à {{ formatTime(act.death_metadata.time_of_birth) }}</span></span>
                                                 </div>
                                                 <div>
                                                     <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">À</span>

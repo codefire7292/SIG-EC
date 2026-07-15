@@ -26,6 +26,12 @@ const formatGender = (g) => g === 'M' ? 'Masculin' : g === 'F' ? 'Féminin' : nu
 const formatOption = (o) => ({ monogamie: 'Monogamie', polygamie: 'Polygamie', polyandrie: 'Polyandrie' }[o] ?? o)
 const formatRegime = (r) => ({ communaute_reduite: 'Communauté réduite aux acquêts', separation_biens: 'Séparation de biens' }[r] ?? r)
 
+const formatTime = (timeStr) => {
+    if (!timeStr) return '';
+    const parts = timeStr.split(':');
+    return parts.length >= 2 ? `${parts[0]}h${parts[1]}` : timeStr;
+};
+
 const docs = computed(() => {
     const a = props.act
     const map = {
@@ -124,7 +130,7 @@ const spousesMeta = computed(() => props.act?.spouses_metadata ?? null)
                                 </div>
                                 <div v-if="act.time_of_birth" class="p-5 bg-gray-50 rounded-2xl border border-gray-100">
                                     <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Heure de naissance</p>
-                                    <p class="font-bold text-gray-800">{{ act.time_of_birth }}</p>
+                                    <p class="font-bold text-gray-800">{{ formatTime(act.time_of_birth) }}</p>
                                 </div>
                                 <div v-if="act.place_of_birth" class="p-5 bg-gray-50 rounded-2xl border border-gray-100">
                                     <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Lieu de naissance</p>
@@ -235,7 +241,7 @@ const spousesMeta = computed(() => props.act?.spouses_metadata ?? null)
                                 </div>
                                 <div v-if="act.time_of_death" class="p-5 bg-gray-50 rounded-2xl border border-gray-100">
                                     <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Heure de décès</p>
-                                    <p class="font-bold text-gray-800">{{ act.time_of_death }}</p>
+                                    <p class="font-bold text-gray-800">{{ formatTime(act.time_of_death) }}</p>
                                 </div>
                                 <div v-if="act.place_of_death" class="p-5 bg-gray-50 rounded-2xl border border-gray-100">
                                     <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Lieu de décès</p>
