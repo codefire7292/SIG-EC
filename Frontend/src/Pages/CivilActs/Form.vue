@@ -313,9 +313,21 @@ const handleFileChange = (event, fieldOrObject, objectField = null) => {
     const maxSize = 500 * 1024; // 500KB
     const fieldName = objectField ? objectField : fieldOrObject;
 
-    if (file.size > maxSize) {
-        form.errors[fieldName] = `Le fichier "${file.name}" dépasse la limite autorisée de 500 Ko.`;
+    // Check if the file is a PDF
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    if (!isPdf) {
+        const errorMsg = `Le fichier "${file.name}" n'est pas un document PDF valide. Seuls les fichiers au format PDF sont autorisés.`;
+        form.errors[fieldName] = errorMsg;
         event.target.value = '';
+        alert(errorMsg);
+        return;
+    }
+
+    if (file.size > maxSize) {
+        const errorMsg = `Le fichier "${file.name}" dépasse la limite autorisée de 500 Ko (taille actuelle : ${(file.size / 1024).toFixed(1)} Ko).`;
+        form.errors[fieldName] = errorMsg;
+        event.target.value = '';
+        alert(errorMsg);
         return;
     }
 
