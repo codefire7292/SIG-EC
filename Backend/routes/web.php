@@ -132,6 +132,9 @@ Route::middleware(['auth'])->group(function (): void {
     // ⚙️ Administration Suite
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('users', \App\Http\Controllers\UserController::class)->middleware('permission:manage-users');
+        Route::post('users/{user}/toggle-status', [\App\Http\Controllers\UserController::class, 'toggleStatus'])
+            ->name('users.toggle-status')
+            ->middleware('permission:manage-users');
         Route::resource('centers', \App\Http\Controllers\CenterController::class)->middleware('permission:manage-centers');
         Route::resource('registries', \App\Http\Controllers\RegistryController::class)->middleware('permission:manage-registries');
         Route::post('registries/{registry}/close', [\App\Http\Controllers\RegistryController::class, 'close'])

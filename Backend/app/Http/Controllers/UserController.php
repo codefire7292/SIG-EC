@@ -20,6 +20,7 @@ class UserController extends Controller
         $users->getCollection()->transform(function ($user) {
             $user->edit_url = route('admin.users.edit', $user->id);
             $user->delete_url = route('admin.users.destroy', $user->id);
+            $user->toggle_status_url = route('admin.users.toggle-status', $user->id);
             return $user;
         });
 
@@ -122,5 +123,20 @@ class UserController extends Controller
 
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'Utilisateur supprimé avec succès.');
+    }
+
+    public function toggleStatus(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Vous ne pouvez pas modifier le statut de votre propre compte.');
+        }
+
+        $user->update(['is_active' => !$user->is_active]);
+
+        $msg = $user->is_active
+            ? "Le compte de {$user->name} a été réactivé."
+            : "Le compte de {$user->name} a été suspendu.";
+
+        return redirect()->route('admin.users.index')->with('success', $msg);
     }
 }
