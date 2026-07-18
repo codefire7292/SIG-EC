@@ -66,9 +66,15 @@ class CivilActController extends Controller
         }
 
         $type = $request->route('type');
+        $registries = \App\Models\Registry::where('type', $type)
+            ->orderBy('year', 'desc')
+            ->orderBy('number', 'asc')
+            ->get();
+
         return Inertia::render('CivilActs/Form', [
             'type' => $type,
-            'is_edit' => false
+            'is_edit' => false,
+            'registries' => $registries
         ]);
     }
 
@@ -81,11 +87,17 @@ class CivilActController extends Controller
         $type = $request->route('type');
         $model = $this->getModel($type);
         $act = $model->findOrFail($id);
+        
+        $registries = \App\Models\Registry::where('type', $type)
+            ->orderBy('year', 'desc')
+            ->orderBy('number', 'asc')
+            ->get();
 
         return Inertia::render('CivilActs/Form', [
             'act' => $act,
             'type' => $type,
-            'is_edit' => true
+            'is_edit' => true,
+            'registries' => $registries
         ]);
     }
 

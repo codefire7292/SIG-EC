@@ -20,6 +20,10 @@ const props = defineProps({
     act: Object,
     type: String,
     is_edit: Boolean,
+    registries: {
+        type: Array,
+        default: () => []
+    },
 });
 
 const title = computed(() => {
@@ -62,6 +66,7 @@ const isOldRegistryMode = ref(urlParams.get('old_registry') === '1');
 const form = useForm({
     // Common
     is_old_registry: isOldRegistryMode.value,
+    registry_id: props.act?.registry_id || '',
     reference_number: '',
     officer_comments: props.act?.officer_comments || '',
     certificate_file: null,
@@ -345,12 +350,23 @@ const submit = () => {
                     </h3>
                     <div v-if="form.is_old_registry" class="mb-8 p-6 bg-amber-50 rounded-2xl border border-amber-200">
                         <h4 class="text-xs font-black text-amber-900 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <DocumentTextIcon class="h-4 w-4" />
-                            Référence de l'Ancien Registre
+                            <DocumentIcon class="h-4 w-4" />
+                            Saisie dans un Ancien Registre
                         </h4>
-                        <div>
-                            <label class="block text-[10px] font-black text-amber-800 uppercase tracking-widest mb-1 pl-1">Numéro de Registre Existant <span class="text-red-500">*</span></label>
-                            <input v-model="form.reference_number" type="text" class="w-full md:w-1/2 px-4 py-3 rounded-xl border border-amber-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 font-bold transition-all" placeholder="Ex: N-1990-001" required />
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[10px] font-black text-amber-800 uppercase tracking-widest mb-1 pl-1">Registre Cible <span class="text-red-500">*</span></label>
+                                <select v-model="form.registry_id" class="w-full px-4 py-3 rounded-xl border border-amber-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 font-bold transition-all" required>
+                                    <option value="">-- Sélectionner un registre --</option>
+                                    <option v-for="reg in registries" :key="reg.id" :value="reg.id">
+                                        Année {{ reg.year }} - Volume {{ reg.number }} (Préfixe: {{ reg.reference_prefix }}) - {{ reg.status === 'closed' ? 'Fermé' : 'Ouvert' }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-amber-800 uppercase tracking-widest mb-1 pl-1">Numéro de Référence de l'Acte <span class="text-red-500">*</span></label>
+                                <input v-model="form.reference_number" type="text" class="w-full px-4 py-3 rounded-xl border border-amber-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 font-bold transition-all" placeholder="Ex: N-1990-C1-0001" required />
+                            </div>
                         </div>
                     </div>
                     
