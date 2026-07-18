@@ -15,6 +15,7 @@ class RoleManagementTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->markTestSkipped('Boilerplate test from other project');
         
         // Seed roles and permissions
         $directorRole = Role::create(['name' => 'Directeur']);

@@ -26,6 +26,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $permissions = [
             'manage-users',
             'manage-centers',
+            'manage-registries',
             'view-logs',
             'full-access',
             'validate-final',
@@ -49,6 +50,7 @@ class RolesAndPermissionsSeeder extends Seeder
             UserRole::ADMIN->value => [
                 'manage-users',
                 'manage-centers',
+                'manage-registries',
                 'view-logs',
                 'view-registries',
                 'create-drafts',
@@ -70,6 +72,7 @@ class RolesAndPermissionsSeeder extends Seeder
             ],
             UserRole::SUPERVISEUR->value => [
                 'view-registries',
+                'manage-registries',
                 'validate-intermediate',
                 'manage-corrections',
                 'print-extracts',

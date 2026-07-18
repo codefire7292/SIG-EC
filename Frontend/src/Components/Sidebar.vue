@@ -59,7 +59,7 @@ const navigation = computed(() => {
             items: [
                 { name: 'Utilisateurs', href: '/admin/users', icon: UsersIcon, show: userPermissions.includes('manage-users') },
                 { name: 'Centres & Localités', href: '/admin/centers', icon: MapIcon, show: userPermissions.includes('manage-centers') },
-                { name: 'Registres', href: '/admin/registries', icon: DocumentMagnifyingGlassIcon, show: userPermissions.includes('manage-centers') },
+                { name: 'Registres', href: '/admin/registries', icon: DocumentMagnifyingGlassIcon, show: userPermissions.includes('manage-registries') },
                 { name: 'Paramètres', href: '/admin/settings', icon: Cog6ToothIcon, show: userPermissions.includes('manage-centers') },
             ]
         }

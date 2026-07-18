@@ -43,18 +43,35 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                \Illuminate\Validation\Rule::unique('users')->whereNull('deleted_at'),
+            ],
             'password' => ['required', 'confirmed', Password::defaults()],
             'role' => 'required|string|exists:roles,name',
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+        $user = User::onlyTrashed()->where('email', $validated['email'])->first();
 
-        $user->assignRole($validated['role']);
+        if ($user) {
+            $user->restore();
+            $user->update([
+                'name' => $validated['name'],
+                'password' => Hash::make($validated['password']),
+                'is_active' => true,
+            ]);
+            $user->syncRoles($validated['role']);
+        } else {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
+            $user->assignRole($validated['role']);
+        }
 
         return redirect()->route('admin.users.index')->with('success', 'Utilisateur créé avec succès.');
     }

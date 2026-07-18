@@ -20,6 +20,7 @@ class Registry extends Model
         'status',
         'opening_date',
         'closing_date',
+        'number',
     ];
 
     protected $casts = [
@@ -27,6 +28,7 @@ class Registry extends Model
         'closing_date' => 'date',
         'year' => 'integer',
         'last_number' => 'integer',
+        'number' => 'integer',
     ];
 
     public function center(): BelongsTo

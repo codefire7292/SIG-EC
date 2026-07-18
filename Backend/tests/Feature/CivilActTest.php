@@ -17,12 +17,14 @@ class CivilActTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $center = \App\Models\CivilRegistrationCenter::create([
+        $center = new \App\Models\CivilRegistrationCenter([
             'name' => 'Centre Test',
             'code' => 'TEST01',
             'commune' => 'Dakar',
             'region' => 'Dakar'
         ]);
+        $center->id = 1;
+        $center->save();
         $this->registry = Registry::create([
             'civil_registration_center_id' => $center->id,
             'name' => 'Registre Test', 

@@ -33,14 +33,20 @@ class RegistryController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'number' => $request->input('number') ?: 1,
+        ]);
+
         $validated = $request->validate([
             'civil_registration_center_id' => 'required|exists:civil_registration_centers,id',
+            'number' => 'nullable|integer|min:1',
             'type' => [
                 'required',
                 'in:naissance,mariage,deces,divers',
                 Rule::unique('registries')->where(function ($query) use ($request) {
                     return $query->where('civil_registration_center_id', $request->civil_registration_center_id)
-                                 ->where('year', $request->year);
+                                 ->where('year', $request->year)
+                                 ->where('number', $request->number);
                 })
             ],
             'year' => 'required|integer|min:1900|max:'.(now()->year + 1),
@@ -48,7 +54,7 @@ class RegistryController extends Controller
             'status' => 'required|in:open,closed',
             'opening_date' => 'nullable|date',
         ], [
-            'type.unique' => 'Un registre de ce type existe déjà pour ce centre et cette année.',
+            'type.unique' => 'Un registre de ce type avec ce numéro de volume existe déjà pour ce centre et cette année.',
             'reference_prefix.unique' => 'Ce préfixe de référence est déjà utilisé par un autre registre.'
         ]);
 

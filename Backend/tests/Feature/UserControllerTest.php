@@ -74,4 +74,43 @@ class UserControllerTest extends TestCase
         $response->assertRedirect(route('admin.users.index'));
         $this->assertTrue($otherUser->fresh()->hasRole('Super Admin'));
     }
+
+    public function test_recreating_soft_deleted_user_restores_and_updates_it()
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('Super Admin');
+        $admin->givePermissionTo('manage-users');
+
+        $softDeletedUser = User::factory()->create([
+            'name' => 'Old Name',
+            'email' => 'deleted@example.com',
+            'password' => bcrypt('old-password'),
+        ]);
+        $softDeletedUser->assignRole('Agent');
+        $softDeletedUser->delete();
+
+        $this->assertSoftDeleted('users', [
+            'id' => $softDeletedUser->id,
+        ]);
+
+        $response = $this->actingAs($admin)->post(route('admin.users.store'), [
+            'name' => 'New Name',
+            'email' => 'deleted@example.com',
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+            'role' => 'Super Admin',
+        ]);
+
+        $response->assertRedirect(route('admin.users.index'));
+
+        $this->assertDatabaseHas('users', [
+            'id' => $softDeletedUser->id,
+            'name' => 'New Name',
+            'email' => 'deleted@example.com',
+            'deleted_at' => null,
+        ]);
+
+        $this->assertTrue($softDeletedUser->fresh()->hasRole('Super Admin'));
+        $this->assertFalse($softDeletedUser->fresh()->hasRole('Agent'));
+    }
 }

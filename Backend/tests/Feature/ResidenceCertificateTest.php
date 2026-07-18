@@ -20,6 +20,15 @@ class ResidenceCertificateTest extends TestCase
         \Spatie\Permission\Models\Permission::create(['name' => 'create-drafts', 'guard_name' => 'web']);
         $this->user = User::factory()->create();
         $this->user->givePermissionTo('create-drafts');
+
+        $center = new \App\Models\CivilRegistrationCenter([
+            'name' => 'Centre Test',
+            'code' => 'TEST01',
+            'commune' => 'Dakar',
+            'region' => 'Dakar'
+        ]);
+        $center->id = 1;
+        $center->save();
     }
 
     public function test_can_create_residence_certificate_with_cni()

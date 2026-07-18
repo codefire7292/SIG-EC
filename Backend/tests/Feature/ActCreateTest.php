@@ -8,16 +8,16 @@ use App\Models\User;
 
 class ActCreateTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_create_route()
     {
-        $user = User::first();
-        if (!$user) {
-            $user = User::factory()->create();
-        }
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->givePermissionTo('create-drafts');
 
         $response = $this->actingAs($user)->get('/acts/naissance/create');
         
-        $response->dump();
         $response->assertStatus(200);
     }
 }

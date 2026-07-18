@@ -17,17 +17,19 @@ const form = useForm({
     civil_registration_center_id: '',
     type: 'naissance',
     year: new Date().getFullYear(),
+    number: 1,
     reference_prefix: '',
     status: 'open',
     opening_date: new Date().toISOString().split('T')[0],
 });
 
 // Auto-generate prefix
-watch([() => form.type, () => form.civil_registration_center_id, () => form.year], () => {
+watch([() => form.type, () => form.civil_registration_center_id, () => form.year, () => form.number], () => {
     const center = props.centers.find(c => c.id === form.civil_registration_center_id);
     if (center && form.type && form.year) {
         const typeInitial = form.type.charAt(0).toUpperCase();
-        form.reference_prefix = `${typeInitial}-${form.year}-${center.code}`;
+        const numSuffix = form.number > 1 ? `-${form.number}` : '';
+        form.reference_prefix = `${typeInitial}-${form.year}-${center.code}${numSuffix}`;
     }
 }, { immediate: true });
 
@@ -100,6 +102,19 @@ const submit = () => {
                             class="w-full px-5 py-4 bg-white border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-gray-700 transition-all"
                             required
                         />
+                    </div>
+
+                    <!-- Registry Number / Volume -->
+                    <div>
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Numéro de volume / Discriminant</label>
+                        <input 
+                            type="number"
+                            min="1"
+                            v-model="form.number"
+                            class="w-full px-5 py-4 bg-white border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-gray-700 transition-all"
+                            required
+                        />
+                        <div v-if="form.errors.number" class="text-xs text-red-500 mt-1 ml-1 font-bold">{{ form.errors.number }}</div>
                     </div>
 
                     <!-- Reference Prefix -->

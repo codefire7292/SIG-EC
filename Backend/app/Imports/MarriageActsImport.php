@@ -13,14 +13,26 @@ class MarriageActsImport implements ToModel, WithHeadingRow, WithValidation, Ski
 {
     use SkipsFailures;
 
+    private int $currentCount = -1;
+
     public function __construct(private int $registryId) {}
 
     public function model(array $row)
     {
+        if ($this->currentCount === -1) {
+            $this->currentCount = MarriageAct::where('registry_id', $this->registryId)->count();
+        }
+
         // Skip if reference already exists
         if (MarriageAct::where('reference_number', $row['reference_number'])->exists()) {
             return null;
         }
+
+        if ($this->currentCount >= 100) {
+            throw new \Exception("La limite de 100 actes par registre est dépassée.");
+        }
+
+        $this->currentCount++;
 
         return new MarriageAct([
             'registry_id'        => $this->registryId,

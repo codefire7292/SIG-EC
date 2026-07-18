@@ -123,30 +123,83 @@ class CivilActController extends Controller
             $year = date('Y', strtotime($validated['date_of_death']));
         }
 
-        $registry = \App\Models\Registry::firstOrCreate(
-            [
-                'civil_registration_center_id' => $centerId,
-                'type' => $type,
-                'year' => $year,
-            ],
-            [
-                'status' => 'open',
-                'opening_date' => now(),
-                'reference_prefix' => strtoupper(substr($type, 0, 1)) . '-' . $year . '-C1',
-            ]
-        );
+        $model = $this->getModel($type);
+        $registryId = $request->input('registry_id');
+        $registry = null;
+        if ($registryId) {
+            $registry = \App\Models\Registry::find($registryId);
+        }
+
+        if (!$registry) {
+            // Find the first open registry for this year, type, and center that has < 100 acts
+            $registries = \App\Models\Registry::where('civil_registration_center_id', $centerId)
+                ->where('type', $type)
+                ->where('year', $year)
+                ->where('status', 'open')
+                ->orderBy('number', 'asc')
+                ->get();
+
+            foreach ($registries as $r) {
+                $count = $model->where('registry_id', $r->id)->count();
+                if ($count < 100) {
+                    $registry = $r;
+                    break;
+                }
+            }
+
+            // If no open registry with space is found, create a new one (incrementing the number)
+            if (!$registry) {
+                // If the latest registry of this year is closed, we cannot create/open a new one automatically
+                $latestRegistry = \App\Models\Registry::where('civil_registration_center_id', $centerId)
+                    ->where('type', $type)
+                    ->where('year', $year)
+                    ->orderBy('number', 'desc')
+                    ->first();
+
+                if ($latestRegistry && $latestRegistry->status === 'closed') {
+                    return back()->withErrors(['registry_id' => 'Le registre pour cette année est fermé.']);
+                }
+
+                $nextNumber = \App\Models\Registry::where('civil_registration_center_id', $centerId)
+                    ->where('type', $type)
+                    ->where('year', $year)
+                    ->max('number') + 1;
+                if ($nextNumber === 0 || !$nextNumber) {
+                    $nextNumber = 1;
+                }
+
+                $registry = \App\Models\Registry::create([
+                    'civil_registration_center_id' => $centerId,
+                    'type' => $type,
+                    'year' => $year,
+                    'number' => $nextNumber,
+                    'status' => 'open',
+                    'opening_date' => now(),
+                    'reference_prefix' => strtoupper(substr($type, 0, 1)) . '-' . $year . '-C1-' . $nextNumber,
+                ]);
+            }
+        }
 
         if ($registry->status !== 'open') {
             return back()->withErrors(['registry_id' => 'Le registre pour cette année est fermé.']);
         }
 
-        $model = $this->getModel($type);
+        $actCount = $model->where('registry_id', $registry->id)->count();
+        if ($actCount >= 100) {
+            return back()->withErrors(['registry_id' => 'Ce registre a atteint sa limite maximale de 100 actes.']);
+        }
+
         $lastAct = $model->where('registry_id', $registry->id)->latest('id')->first();
         
         $increment = 1;
         if ($lastAct && preg_match('/-(\d+)$/', $lastAct->reference_number, $matches)) {
             $increment = intval($matches[1]) + 1;
         }
+
+        if ($increment > 100 && !($isOldRegistry && !empty($validated['reference_number']))) {
+            return back()->withErrors(['registry_id' => 'Ce registre a atteint sa limite maximale de 100 actes.']);
+        }
+
         if ($isOldRegistry && !empty($validated['reference_number'])) {
             $referenceNumber = $validated['reference_number'];
         } else {
@@ -267,18 +320,52 @@ class CivilActController extends Controller
                 return back()->with('error', "Le centre d'état civil spécifié (ID {$centerId}) n'existe pas. Veuillez le créer dans l'administration.");
             }
 
-            $newRegistry = \App\Models\Registry::firstOrCreate(
-                [
+            $targetRegistries = \App\Models\Registry::where('civil_registration_center_id', $centerId)
+                ->where('type', $type)
+                ->where('year', $year)
+                ->where('status', 'open')
+                ->orderBy('number', 'asc')
+                ->get();
+
+            $newRegistry = null;
+            foreach ($targetRegistries as $r) {
+                $count = $model->where('registry_id', $r->id)->count();
+                if ($count < 100) {
+                    $newRegistry = $r;
+                    break;
+                }
+            }
+
+            if (!$newRegistry) {
+                // If the latest registry of this year is closed, we cannot create/open a new one automatically
+                $latestRegistry = \App\Models\Registry::where('civil_registration_center_id', $centerId)
+                    ->where('type', $type)
+                    ->where('year', $year)
+                    ->orderBy('number', 'desc')
+                    ->first();
+
+                if ($latestRegistry && $latestRegistry->status === 'closed') {
+                    return back()->with('error', 'Le registre cible pour cette année est fermé.');
+                }
+
+                $nextNumber = \App\Models\Registry::where('civil_registration_center_id', $centerId)
+                    ->where('type', $type)
+                    ->where('year', $year)
+                    ->max('number') + 1;
+                if ($nextNumber === 0 || !$nextNumber) {
+                    $nextNumber = 1;
+                }
+
+                $newRegistry = \App\Models\Registry::create([
                     'civil_registration_center_id' => $centerId,
                     'type' => $type,
                     'year' => $year,
-                ],
-                [
+                    'number' => $nextNumber,
                     'status' => 'open',
                     'opening_date' => now(),
-                    'reference_prefix' => strtoupper(substr($type, 0, 1)) . '-' . $year . '-C1',
-                ]
-            );
+                    'reference_prefix' => strtoupper(substr($type, 0, 1)) . '-' . $year . '-C1-' . $nextNumber,
+                ]);
+            }
 
             // Generate new reference number for the new registry
             $lastAct = $model->where('registry_id', $newRegistry->id)->latest('id')->first();
@@ -287,6 +374,11 @@ class CivilActController extends Controller
                 $increment = intval($matches[1]) + 1;
             }
             
+            $newRegistryActCount = $model->where('registry_id', $newRegistry->id)->count();
+            if ($newRegistryActCount >= 100 || $increment > 100) {
+                return back()->with('error', "Le registre cible a atteint sa limite maximale de 100 actes.");
+            }
+
             $referenceNumber = $newRegistry->reference_prefix . '-' . str_pad($increment, 4, '0', STR_PAD_LEFT);
 
             $data['registry_id'] = $newRegistry->id;

@@ -66,6 +66,20 @@ class CivilActImportController extends Controller
             $registryId = $registry->id;
         }
 
+        $actModel = match ($type) {
+            'naissance' => \App\Models\BirthAct::class,
+            'mariage'   => \App\Models\MarriageAct::class,
+            'deces'     => \App\Models\DeathAct::class,
+            default     => null,
+        };
+
+        if ($actModel) {
+            $currentCount = $actModel::where('registry_id', $registryId)->count();
+            if ($currentCount >= 100) {
+                return back()->with('error', "Le registre est plein. Il a déjà atteint sa limite maximale de 100 actes.");
+            }
+        }
+
         $importClass = match ($type) {
             'naissance' => new BirthActsImport($registryId),
             'mariage'   => new MarriageActsImport($registryId),

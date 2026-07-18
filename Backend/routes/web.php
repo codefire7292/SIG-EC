@@ -133,13 +133,13 @@ Route::middleware(['auth'])->group(function (): void {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('users', \App\Http\Controllers\UserController::class)->middleware('permission:manage-users');
         Route::resource('centers', \App\Http\Controllers\CenterController::class)->middleware('permission:manage-centers');
-        Route::resource('registries', \App\Http\Controllers\RegistryController::class)->middleware('permission:manage-centers');
+        Route::resource('registries', \App\Http\Controllers\RegistryController::class)->middleware('permission:manage-registries');
         Route::post('registries/{registry}/close', [\App\Http\Controllers\RegistryController::class, 'close'])
             ->name('registries.close')
-            ->middleware('permission:manage-centers');
+            ->middleware('permission:manage-registries');
         Route::post('registries/{registry}/reopen', [\App\Http\Controllers\RegistryController::class, 'reopen'])
             ->name('registries.reopen')
-            ->middleware('permission:manage-centers');
+            ->middleware('permission:manage-registries');
         
         Route::middleware('permission:manage-centers')->group(function() {
             Route::get('settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('settings.index');

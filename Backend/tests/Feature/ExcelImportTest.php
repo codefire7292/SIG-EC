@@ -19,7 +19,9 @@ class ExcelImportTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
         $this->user = User::factory()->create();
+        $this->user->givePermissionTo('create-drafts');
     }
 
     public function test_can_upload_birth_registry_excel()
@@ -68,7 +70,7 @@ class ExcelImportTest extends TestCase
             'status' => 'open',
         ]);
 
-        $import = new BirthActsImport();
+        $import = new BirthActsImport($registry->id);
         $act = $import->model($data[0]);
         $act->registry_id = $registry->id;
         $act->save();
