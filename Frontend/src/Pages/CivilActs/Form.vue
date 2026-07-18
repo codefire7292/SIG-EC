@@ -257,6 +257,17 @@ const fullReferenceNumber = computed(() => {
     return `${prefix}-${padded}`;
 });
 
+// Plage de numéros selon le volume (Volume 1 = 1-50, Volume 2 = 51-100, ...)
+const volumeRange = computed(() => {
+    if (!selectedRegistry.value) return [];
+    const vol = selectedRegistry.value.number || 1;
+    const start = (vol - 1) * 50 + 1;
+    const end = vol * 50;
+    const range = [];
+    for (let i = start; i <= end; i++) range.push(i);
+    return range;
+});
+
 watch(fullReferenceNumber, (val) => {
     form.reference_number = val;
 });
@@ -418,7 +429,7 @@ const submit = () => {
                                 <label class="block text-[10px] font-black text-amber-800 uppercase tracking-widest mb-1 pl-1">Numéro de Référence de l'Acte <span class="text-red-500">*</span></label>
                                 <select v-model="actNumber" :disabled="!form.registry_id" class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-white" :class="form.errors.reference_number ? 'border-red-400 focus:ring-red-400' : 'border-amber-300 focus:ring-amber-500 focus:border-amber-500'" required>
                                     <option value="">-- N° dans le registre --</option>
-                                    <option v-for="n in 50" :key="n" :value="n">{{ n }}</option>
+                                    <option v-for="n in volumeRange" :key="n" :value="n">{{ n }}</option>
                                 </select>
                                 <p v-if="fullReferenceNumber && !form.errors.reference_number" class="mt-2 pl-1 text-[10px] font-black text-amber-700 uppercase tracking-widest">
                                     Référence générée : <span class="text-amber-900">{{ fullReferenceNumber }}</span>
