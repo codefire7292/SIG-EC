@@ -12,8 +12,7 @@ import {
 } from '@heroicons/vue/24/outline';
 
 const currentUserId = usePage().props.auth.user.id;
-const currentUserRoles = usePage().props.auth.user.roles?.map(r => r.name) || [];
-const isAdmin = currentUserRoles.includes('Administrateur technique');
+const isAdmin = usePage().props.auth.user.role === 'Administrateur technique';
 
 const props = defineProps({
     users: Object,
