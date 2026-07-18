@@ -359,7 +359,7 @@ const submit = () => {
                                 <select v-model="form.registry_id" class="w-full px-4 py-3 rounded-xl border border-amber-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 font-bold transition-all" required>
                                     <option value="">-- Sélectionner un registre --</option>
                                     <option v-for="reg in registries" :key="reg.id" :value="reg.id">
-                                        Année {{ reg.year }} - Volume {{ reg.number }} (Préfixe: {{ reg.reference_prefix }}) - {{ reg.status === 'closed' ? 'Fermé' : 'Ouvert' }}
+                                        Année {{ reg.year }} - Volume {{ reg.number }} (Préfixe: {{ reg.reference_prefix }})
                                     </option>
                                 </select>
                             </div>

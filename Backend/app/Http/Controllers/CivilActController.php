@@ -67,6 +67,7 @@ class CivilActController extends Controller
 
         $type = $request->route('type');
         $registries = \App\Models\Registry::where('type', $type)
+            ->where('status', 'open')
             ->orderBy('year', 'desc')
             ->orderBy('number', 'asc')
             ->get();
@@ -89,6 +90,7 @@ class CivilActController extends Controller
         $act = $model->findOrFail($id);
         
         $registries = \App\Models\Registry::where('type', $type)
+            ->where('status', 'open')
             ->orderBy('year', 'desc')
             ->orderBy('number', 'asc')
             ->get();
