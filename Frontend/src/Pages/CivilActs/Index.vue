@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { 
     PlusIcon, 
@@ -10,7 +10,8 @@ import {
     BuildingLibraryIcon,
     ShieldCheckIcon,
     ArrowUpTrayIcon,
-    ArrowDownTrayIcon
+    ArrowDownTrayIcon,
+    DocumentTextIcon
 } from '@heroicons/vue/24/outline';
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
@@ -18,6 +19,11 @@ import { router } from '@inertiajs/vue3';
 const props = defineProps({
     acts: Object,
     type: String,
+});
+
+const canImportExcel = computed(() => {
+    const role = usePage().props.auth.user?.role;
+    return role === 'Administrateur technique' || role === 'Superviseur / Chef de centre';
 });
 
 const title = computed(() => {
@@ -121,6 +127,7 @@ const cancelImport = () => {
                         @change="handleFileUpload"
                     />
                     <a
+                        v-if="canImportExcel"
                         :href="`/acts/${type}/template`"
                         class="inline-flex items-center justify-center px-6 py-3 bg-white border border-gray-200 rounded-xl font-black text-xs text-green-700 uppercase tracking-widest hover:bg-green-50 shadow-sm transition-all active:scale-95"
                         download
@@ -129,6 +136,7 @@ const cancelImport = () => {
                         Modèle Excel
                     </a>
                     <button
+                        v-if="canImportExcel"
                         @click="$refs.fileInput.click()"
                         class="inline-flex items-center justify-center px-6 py-3 bg-white border border-gray-200 rounded-xl font-black text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 shadow-sm transition-all active:scale-95"
                     >

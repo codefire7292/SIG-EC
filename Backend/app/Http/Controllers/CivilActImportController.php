@@ -16,7 +16,12 @@ class CivilActImportController extends Controller
 {
     public function downloadTemplate(string $type)
     {
-        if (!auth()->user()->hasPermissionTo('create-drafts')) {
+        $forbiddenRoles = [
+            \App\Enums\UserRole::AGENT->value,
+            \App\Enums\UserRole::OFFICIER->value,
+            \App\Enums\UserRole::MAIRE->value,
+        ];
+        if (auth()->user()->hasAnyRole($forbiddenRoles) || !auth()->user()->hasPermissionTo('create-drafts')) {
             abort(403, "Vous n'avez pas la permission de télécharger le template d'importation.");
         }
 
@@ -37,7 +42,12 @@ class CivilActImportController extends Controller
 
     public function import(Request $request, string $type)
     {
-        if (!$request->user()->hasPermissionTo('create-drafts')) {
+        $forbiddenRoles = [
+            \App\Enums\UserRole::AGENT->value,
+            \App\Enums\UserRole::OFFICIER->value,
+            \App\Enums\UserRole::MAIRE->value,
+        ];
+        if ($request->user()->hasAnyRole($forbiddenRoles) || !$request->user()->hasPermissionTo('create-drafts')) {
             abort(403, "Vous n'avez pas la permission d'importer des actes.");
         }
 

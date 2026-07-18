@@ -1,6 +1,6 @@
 <script setup>
-import { Head, Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { 
     PlusIcon, 
@@ -9,12 +9,17 @@ import {
     BuildingLibraryIcon,
     CheckCircleIcon,
     XCircleIcon,
-    LockClosedIcon
+    LockClosedIcon,
+    PencilIcon,
+    TrashIcon
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     registries: Object,
 });
+
+const isSuperviseur = computed(() => usePage().props.auth.user?.role === 'Superviseur');
+const isAdmin = computed(() => usePage().props.auth.user?.role === 'Administrateur technique');
 
 const showConfirmModal = ref(false);
 const modalType = ref(''); // 'close' or 'reopen'
@@ -34,6 +39,12 @@ const reopenRegistry = (registry) => {
     showConfirmModal.value = true;
 };
 
+const deleteRegistry = (registry) => {
+    activeRegistry.value = registry;
+    modalType.value = 'delete';
+    showConfirmModal.value = true;
+};
+
 const executeAction = () => {
     showConfirmModal.value = false;
     if (!activeRegistry.value) return;
@@ -46,6 +57,12 @@ const executeAction = () => {
         });
     } else if (modalType.value === 'reopen') {
         router.post(`/admin/registries/${activeRegistry.value.id}/reopen`, {}, {
+            onFinish: () => {
+                activeRegistry.value = null;
+            }
+        });
+    } else if (modalType.value === 'delete') {
+        router.delete(`/admin/registries/${activeRegistry.value.id}`, {
             onFinish: () => {
                 activeRegistry.value = null;
             }
@@ -134,28 +151,54 @@ const getStatusColor = (status) => {
                     </div>
                 </div>
 
-                <div class="flex items-center justify-end gap-2 pt-4 border-t border-gray-50">
-                    <button 
-                        v-if="registry.status === 'open'"
-                        @click="closeRegistry(registry)" 
-                        class="w-full py-2 bg-gray-50 text-gray-500 hover:bg-red-50 hover:text-red-700 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
+                <!-- Admin Edit/Delete Actions -->
+                <div v-if="isAdmin" class="flex items-center gap-2 mb-4 pt-4 border-t border-gray-50">
+                    <Link 
+                        :href="`/admin/registries/${registry.id}/edit`"
+                        class="flex-1 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
                     >
-                        <LockClosedIcon class="h-4 w-4" />
-                        Clôturer le registre
+                        <PencilIcon class="h-4 w-4" />
+                        Modifier
+                    </Link>
+                    <button 
+                        @click="deleteRegistry(registry)"
+                        class="flex-1 py-2 bg-red-50 text-red-700 hover:bg-red-100 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
+                    >
+                        <TrashIcon class="h-4 w-4" />
+                        Supprimer
                     </button>
-                    <div v-else class="w-full flex flex-col gap-2">
-                        <div class="w-full py-2 bg-gray-50 text-gray-300 rounded-xl text-[10px] font-black uppercase tracking-widest text-center italic">
-                            Clôturé le {{ new Date(registry.closing_date).toLocaleDateString('fr-FR') }}
-                        </div>
-                        <button
-                            v-if="registry.year === currentYear"
-                            @click="reopenRegistry(registry)"
-                            class="w-full py-2 bg-orange-50 text-orange-600 hover:bg-orange-100 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-4 border-t border-gray-50">
+                    <template v-if="!isSuperviseur">
+                        <button 
+                            v-if="registry.status === 'open'"
+                            @click="closeRegistry(registry)" 
+                            class="w-full py-2 bg-gray-50 text-gray-500 hover:bg-red-50 hover:text-red-700 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
                         >
-                            <BookOpenIcon class="h-4 w-4" />
-                            Réouvrir le registre
+                            <LockClosedIcon class="h-4 w-4" />
+                            Clôturer le registre
                         </button>
-                    </div>
+                        <div v-else class="w-full flex flex-col gap-2">
+                            <div class="w-full py-2 bg-gray-50 text-gray-300 rounded-xl text-[10px] font-black uppercase tracking-widest text-center italic">
+                                Clôturé le {{ new Date(registry.closing_date).toLocaleDateString('fr-FR') }}
+                            </div>
+                            <button
+                                v-if="registry.year === currentYear"
+                                @click="reopenRegistry(registry)"
+                                class="w-full py-2 bg-orange-50 text-orange-600 hover:bg-orange-100 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
+                            >
+                                <BookOpenIcon class="h-4 w-4" />
+                                Réouvrir le registre
+                            </button>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div class="w-full py-2 bg-gray-50 text-gray-400 rounded-xl text-[10px] font-black uppercase tracking-widest text-center italic">
+                            <span v-if="registry.status === 'open'">Registre Actif</span>
+                            <span v-else>Clôturé le {{ new Date(registry.closing_date).toLocaleDateString('fr-FR') }}</span>
+                        </div>
+                    </template>
                 </div>
             </div>
 
@@ -184,19 +227,22 @@ const getStatusColor = (status) => {
                 <div class="p-8 flex items-start gap-6">
                   <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-2xl"
                     :class="{
-                      'bg-red-50 text-red-600': modalType === 'close',
+                      'bg-red-50 text-red-600': modalType === 'close' || modalType === 'delete',
                       'bg-orange-50 text-orange-600': modalType === 'reopen'
                     }"
                   >
-                    <component :is="modalType === 'close' ? LockClosedIcon : BookOpenIcon" class="h-6 w-6" />
+                    <component :is="modalType === 'close' ? LockClosedIcon : (modalType === 'delete' ? TrashIcon : BookOpenIcon)" class="h-6 w-6" />
                   </div>
                   <div class="flex-1 min-w-0">
                     <h3 class="text-lg font-black text-gray-900 leading-tight">
-                      {{ modalType === 'close' ? 'Clôture du registre' : 'Réouverture du registre' }}
+                      {{ modalType === 'close' ? 'Clôture du registre' : (modalType === 'delete' ? 'Suppression du registre' : 'Réouverture du registre') }}
                     </h3>
                     <p class="mt-2 text-sm text-gray-500 font-medium">
                       <span v-if="modalType === 'close'">
                         Voulez-vous vraiment clôturer le registre des <strong class="capitalize">{{ activeRegistry?.type }}s</strong> pour l'année <strong>{{ activeRegistry?.year }}</strong> ? Plus aucun nouvel acte ne pourra y être ajouté après cette opération.
+                      </span>
+                      <span v-else-if="modalType === 'delete'">
+                        Voulez-vous vraiment supprimer définitivement le registre des <strong class="capitalize">{{ activeRegistry?.type }}s</strong> pour l'année <strong>{{ activeRegistry?.year }}</strong> ? Cette action est irréversible et ne peut être effectuée que si le registre ne contient aucun acte.
                       </span>
                       <span v-else>
                         Voulez-vous vraiment réouvrir le registre des <strong class="capitalize">{{ activeRegistry?.type }}s</strong> pour l'année <strong>{{ activeRegistry?.year }}</strong> ? Les officiers pourront à nouveau y enregistrer des actes.
@@ -216,11 +262,11 @@ const getStatusColor = (status) => {
                         @click="executeAction"
                         class="px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 text-white"
                         :class="{
-                          'bg-red-600 hover:bg-red-700 shadow-xl shadow-red-100': modalType === 'close',
+                          'bg-red-600 hover:bg-red-700 shadow-xl shadow-red-100': modalType === 'close' || modalType === 'delete',
                           'bg-orange-600 hover:bg-orange-700 shadow-xl shadow-orange-100': modalType === 'reopen'
                         }"
                       >
-                        {{ modalType === 'close' ? 'Clôturer' : 'Réouvrir' }}
+                        {{ modalType === 'close' ? 'Clôturer' : (modalType === 'delete' ? 'Supprimer' : 'Réouvrir') }}
                       </button>
                     </div>
                   </div>

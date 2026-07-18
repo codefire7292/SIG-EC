@@ -11,20 +11,23 @@ import { computed, watch } from 'vue';
 const props = defineProps({
     centers: Array,
     types: Array,
+    registry: Object,
+    is_edit: Boolean,
 });
 
 const form = useForm({
-    civil_registration_center_id: '',
-    type: 'naissance',
-    year: new Date().getFullYear(),
-    number: 1,
-    reference_prefix: '',
-    status: 'open',
-    opening_date: new Date().toISOString().split('T')[0],
+    civil_registration_center_id: props.registry?.civil_registration_center_id || '',
+    type: props.registry?.type || 'naissance',
+    year: props.registry?.year || new Date().getFullYear(),
+    number: props.registry?.number || 1,
+    reference_prefix: props.registry?.reference_prefix || '',
+    status: props.registry?.status || 'open',
+    opening_date: props.registry?.opening_date ? new Date(props.registry.opening_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
 });
 
 // Auto-generate prefix
 watch([() => form.type, () => form.civil_registration_center_id, () => form.year, () => form.number], () => {
+    if (props.is_edit) return;
     const center = props.centers.find(c => c.id === form.civil_registration_center_id);
     if (center && form.type && form.year) {
         const typeInitial = form.type.charAt(0).toUpperCase();
@@ -34,12 +37,16 @@ watch([() => form.type, () => form.civil_registration_center_id, () => form.year
 }, { immediate: true });
 
 const submit = () => {
-    form.post(`/admin/registries`);
+    if (props.is_edit) {
+        form.put(`/admin/registries/${props.registry.id}`);
+    } else {
+        form.post(`/admin/registries`);
+    }
 };
 </script>
 
 <template>
-    <Head title="Ouvrir un Registre" />
+    <Head :title="is_edit ? 'Modifier le Registre' : 'Ouvrir un Registre'" />
 
     <AuthenticatedLayout>
         <template #header>
@@ -48,8 +55,8 @@ const submit = () => {
                     <ArrowLeftIcon class="h-5 w-5 text-gray-500" />
                 </Link>
                 <div>
-                    <h2 class="font-black text-2xl text-gray-900 tracking-tight">Ouvrir un nouveau registre</h2>
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Configuration initiale du volume</p>
+                    <h2 class="font-black text-2xl text-gray-900 tracking-tight">{{ is_edit ? 'Modifier le registre' : 'Ouvrir un nouveau registre' }}</h2>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ is_edit ? 'Modification des paramètres du volume' : 'Configuration initiale du volume' }}</p>
                 </div>
             </div>
         </template>
@@ -150,7 +157,7 @@ const submit = () => {
                         style="background-color: #1E690F;"
                     >
                         <CheckCircleIcon class="h-5 w-5 stroke-[2.5]" />
-                        Confirmer l'ouverture du registre
+                        {{ is_edit ? 'Enregistrer les modifications' : "Confirmer l'ouverture du registre" }}
                     </button>
                 </div>
             </form>

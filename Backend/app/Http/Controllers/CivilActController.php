@@ -224,6 +224,17 @@ class CivilActController extends Controller
 
         if ($isOldRegistry && !empty($validated['reference_number'])) {
             $referenceNumber = $validated['reference_number'];
+
+            // Vérifier que ce numéro de référence n'existe pas déjà dans ce registre
+            $alreadyExists = $model->where('registry_id', $registry->id)
+                ->where('reference_number', $referenceNumber)
+                ->exists();
+
+            if ($alreadyExists) {
+                return back()->withErrors([
+                    'reference_number' => "L'acte « {$referenceNumber} » existe déjà dans ce registre (Volume {$registry->number} — {$registry->year}). Veuillez choisir un autre numéro."
+                ]);
+            }
         } else {
             $referenceNumber = $registry->reference_prefix . '-' . str_pad($increment, 4, '0', STR_PAD_LEFT);
         }

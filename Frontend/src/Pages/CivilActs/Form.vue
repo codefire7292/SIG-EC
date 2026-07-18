@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useForm, Head, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { 
@@ -62,6 +62,7 @@ const formatDateTimeLocal = (dateTimeStr) => {
 
 const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
 const isOldRegistryMode = ref(urlParams.get('old_registry') === '1');
+
 
 const form = useForm({
     // Common
@@ -241,6 +242,30 @@ const form = useForm({
     },
 });
 
+// --- Ancien registre : numéro d'acte auto-calculé ---
+const actNumber = ref('');
+
+const selectedRegistry = computed(() => {
+    if (!form.registry_id) return null;
+    return props.registries.find(r => r.id === form.registry_id) || null;
+});
+
+const fullReferenceNumber = computed(() => {
+    if (!selectedRegistry.value || !actNumber.value) return '';
+    const prefix = selectedRegistry.value.reference_prefix;
+    const padded = String(actNumber.value).padStart(4, '0');
+    return `${prefix}-${padded}`;
+});
+
+watch(fullReferenceNumber, (val) => {
+    form.reference_number = val;
+});
+
+watch(() => form.registry_id, () => {
+    actNumber.value = '';
+    form.reference_number = '';
+});
+
 const addMarriageWitness = () => {
     if (!Array.isArray(form.witnesses_metadata)) {
         form.witnesses_metadata = [];
@@ -365,7 +390,17 @@ const submit = () => {
                             </div>
                             <div>
                                 <label class="block text-[10px] font-black text-amber-800 uppercase tracking-widest mb-1 pl-1">Numéro de Référence de l'Acte <span class="text-red-500">*</span></label>
-                                <input v-model="form.reference_number" type="text" class="w-full px-4 py-3 rounded-xl border border-amber-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 font-bold transition-all" placeholder="Ex: N-1990-C1-0001" required />
+                                <select v-model="actNumber" :disabled="!form.registry_id" class="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-white" :class="form.errors.reference_number ? 'border-red-400 focus:ring-red-400' : 'border-amber-300 focus:ring-amber-500 focus:border-amber-500'" required>
+                                    <option value="">-- N° dans le registre --</option>
+                                    <option v-for="n in 100" :key="n" :value="n">{{ n }}</option>
+                                </select>
+                                <p v-if="fullReferenceNumber && !form.errors.reference_number" class="mt-2 pl-1 text-[10px] font-black text-amber-700 uppercase tracking-widest">
+                                    Référence générée : <span class="text-amber-900">{{ fullReferenceNumber }}</span>
+                                </p>
+                                <p v-if="form.errors.reference_number" class="mt-2 pl-1 text-[10px] font-black text-red-600 flex items-center gap-1">
+                                    <svg class="h-3 w-3 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                                    {{ form.errors.reference_number }}
+                                </p>
                             </div>
                         </div>
                     </div>
