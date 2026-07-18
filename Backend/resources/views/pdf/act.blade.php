@@ -74,7 +74,8 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Times New Roman', Times, serif; font-size: 11px; color: #000; line-height: 1.4; }
 
-        .outer-border { border: 2px solid #000; width: 100%; }
+        .outer-border { border: 2px solid #000; width: 100%; height: 265mm; position: relative; }
+        .bottom-sections { position: absolute; bottom: 0; left: 0; width: 100%; }
 
         .header-table { width: 100%; border-collapse: collapse; }
         .header-table td { vertical-align: middle; padding: 8px 10px; }
@@ -292,6 +293,7 @@
 
     </div>
 
+    <div class="bottom-sections">
     {{-- ===== JUGEMENT (naissance uniquement) ===== --}}
     @if($type === 'naissance')
     <table class="jugement-table">
@@ -338,6 +340,7 @@
             </td>
         </tr>
     </table>
+    </div>
 
 </div>
 
