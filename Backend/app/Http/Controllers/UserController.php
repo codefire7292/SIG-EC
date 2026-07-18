@@ -14,7 +14,10 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with('roles')->paginate(15);
+        $superAdminEmail = 'youssouphbadji2013@gmail.com';
+        $users = User::with('roles')
+            ->where('email', '!=', $superAdminEmail)
+            ->paginate(15);
 
         // Pre-compute URLs server-side to avoid Ziggy stale manifest issues
         $users->getCollection()->transform(function ($user) {
