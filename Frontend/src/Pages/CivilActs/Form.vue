@@ -306,6 +306,16 @@ const removeWitness = (index) => {
     form.parents_metadata.witnesses.splice(index, 1);
 };
 
+const showErrorModal = ref(false);
+const modalErrorMessage = ref('');
+const modalErrorTitle = ref('');
+
+const closeErrorModal = () => {
+    showErrorModal.value = false;
+    modalErrorMessage.value = '';
+    modalErrorTitle.value = '';
+};
+
 const handleFileChange = (event, fieldOrObject, objectField = null) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -319,7 +329,9 @@ const handleFileChange = (event, fieldOrObject, objectField = null) => {
         const errorMsg = `Le fichier "${file.name}" n'est pas un document PDF valide. Seuls les fichiers au format PDF sont autorisés.`;
         form.errors[fieldName] = errorMsg;
         event.target.value = '';
-        alert(errorMsg);
+        modalErrorTitle.value = "Format de fichier invalide";
+        modalErrorMessage.value = errorMsg;
+        showErrorModal.value = true;
         return;
     }
 
@@ -327,7 +339,9 @@ const handleFileChange = (event, fieldOrObject, objectField = null) => {
         const errorMsg = `Le fichier "${file.name}" dépasse la limite autorisée de 500 Ko (taille actuelle : ${(file.size / 1024).toFixed(1)} Ko).`;
         form.errors[fieldName] = errorMsg;
         event.target.value = '';
-        alert(errorMsg);
+        modalErrorTitle.value = "Fichier trop volumineux";
+        modalErrorMessage.value = errorMsg;
+        showErrorModal.value = true;
         return;
     }
 
@@ -1609,5 +1623,54 @@ const submit = () => {
                 </div>
             </form>
         </div>
+
+        <!-- Custom Error Modal -->
+        <Teleport to="body">
+          <Transition
+            enter-active-class="transition duration-300 ease-out"
+            enter-from-class="opacity-0 scale-95"
+            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition duration-200 ease-in"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-95"
+          >
+            <div v-if="showErrorModal" class="fixed inset-0 z-50 overflow-y-auto bg-gray-950/70 backdrop-blur-md flex items-center justify-center p-4">
+              <div 
+                class="bg-white rounded-[32px] overflow-hidden shadow-2xl transform transition-all max-w-md w-full border border-red-100 p-8 relative"
+              >
+                <!-- Close Button -->
+                <button @click="closeErrorModal" type="button" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors">
+                  <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+
+                <div class="flex flex-col items-center text-center">
+                  <!-- Warning/Error Icon with pulse effect -->
+                  <div class="flex items-center justify-center h-16 w-16 rounded-full bg-red-50 text-red-600 mb-6 animate-pulse">
+                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  
+                  <h3 class="text-xl font-black text-gray-900 tracking-tight mb-3">
+                    {{ modalErrorTitle }}
+                  </h3>
+                  <p class="text-sm text-gray-500 font-bold leading-relaxed mb-8 px-2">
+                    {{ modalErrorMessage }}
+                  </p>
+
+                  <button
+                    type="button"
+                    @click="closeErrorModal"
+                    class="w-full py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-red-200 transition-all active:scale-[0.98] outline-none"
+                  >
+                    D'accord
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Transition>
+        </Teleport>
     </AuthenticatedLayout>
 </template>
