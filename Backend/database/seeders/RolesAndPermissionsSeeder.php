@@ -76,6 +76,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'validate-intermediate',
                 'manage-corrections',
                 'print-extracts',
+                'create-drafts',
+                'upload-docs',
             ],
             UserRole::AGENT->value => [
                 'create-drafts',

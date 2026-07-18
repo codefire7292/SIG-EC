@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\CivilRegistrationCenter;
 use App\Enums\UserRole;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Run the database seeds.
      */
     public function run(): void
     {
@@ -20,54 +21,26 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
         ]);
 
-        // 1. Admin
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@sig-ec.sn'],
+        // Create Default Center (ID = 1)
+        CivilRegistrationCenter::firstOrCreate(
+            ['id' => 1],
             [
-                'name' => 'Administrateur Système',
+                'name' => 'Centre Principal de Enampore',
+                'code' => 'C1',
+                'commune' => 'Enampore',
+                'region' => 'Ziguinchor',
+                'is_active' => true,
+            ]
+        );
+
+        // Create Super Admin User
+        $admin = User::firstOrCreate(
+            ['email' => 'youssouphbadji2013@gmail.com'],
+            [
+                'name' => 'Administrateur technique',
                 'password' => Hash::make('password'),
             ]
         );
         $admin->syncRoles([UserRole::ADMIN->value]);
-
-        // 2. Officier
-        $officier = User::firstOrCreate(
-            ['email' => 'officier@sig-ec.sn'],
-            [
-                'name' => 'Officier État Civil',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $officier->syncRoles([UserRole::OFFICIER->value]);
-
-        // 3. Superviseur
-        $superviseur = User::firstOrCreate(
-            ['email' => 'superviseur@sig-ec.sn'],
-            [
-                'name' => 'Superviseur de Centre',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $superviseur->syncRoles([UserRole::SUPERVISEUR->value]);
-
-        // 4. Agent
-        $agent = User::firstOrCreate(
-            ['email' => 'agent@sig-ec.sn'],
-            [
-                'name' => 'Agent de Saisie',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $agent->syncRoles([UserRole::AGENT->value]);
-
-        // 5. Maire
-        $maire = User::firstOrCreate(
-            ['email' => 'maire@sig-ec.sn'],
-            [
-                'name' => 'Maire',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $maire->syncRoles([UserRole::MAIRE->value]);
     }
 }
