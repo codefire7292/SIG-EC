@@ -72,10 +72,13 @@
     <style>
         @page { margin: 15mm 14mm 15mm 14mm; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; margin: 0; padding: 0; }
         body { font-family: 'Times New Roman', Times, serif; font-size: 11px; color: #000; line-height: 1.4; }
 
-        .outer-border { border: 2px solid #000; width: 100%; height: 265mm; position: relative; }
-        .bottom-sections { position: absolute; bottom: 0; left: 0; width: 100%; }
+        .outer-border-table { border: 1px solid #000; width: 100%; height: 100%; border-collapse: collapse; }
+        .outer-border-table > tbody > tr > td { padding: 0; }
+        .content-cell { vertical-align: top; }
+        .bottom-cell { vertical-align: bottom; height: 1%; }
 
         .header-table { width: 100%; border-collapse: collapse; }
         .header-table td { vertical-align: middle; padding: 8px 10px; }
@@ -128,7 +131,10 @@
 </head>
 <body>
 
-<div class="outer-border">
+<table class="outer-border-table">
+<tbody>
+<tr>
+<td class="content-cell">
 
     {{-- ===== HEADER (bicolonne) ===== --}}
     <table class="header-table">
@@ -293,7 +299,11 @@
 
     </div>
 
-    <div class="bottom-sections">
+</td>
+</tr>
+<tr>
+<td class="bottom-cell">
+
     {{-- ===== JUGEMENT (naissance uniquement) ===== --}}
     @if($type === 'naissance')
     <table class="jugement-table">
@@ -340,9 +350,11 @@
             </td>
         </tr>
     </table>
-    </div>
 
-</div>
+</td>
+</tr>
+</tbody>
+</table>
 
 </body>
 </html>
