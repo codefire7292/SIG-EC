@@ -748,8 +748,8 @@ const getStatusModalIcon = () => {
 
                     <!-- CONTROL PANEL FOR VALIDATION -->
                     <div v-if="act.status !== 'signe'" class="space-y-3 mt-4">
-                        <!-- Officier Actions -->
-                        <template v-if="hasRole(`Officier d'état-civil`) || hasRole('Administrateur technique')">
+                        <!-- Officier / Superviseur Actions -->
+                        <template v-if="hasRole(`Officier d'état-civil`) || hasRole('Superviseur') || hasRole('Administrateur technique')">
                             <button v-if="['brouillon', 'a_corriger'].includes(act.status)" @click="openStatusModal('valide')" class="w-full py-4 bg-green-50 text-green-600 hover:bg-green-100 rounded-3xl transition-all font-black text-xs uppercase flex items-center justify-center gap-2">
                                 Valider et Approuver
                             </button>

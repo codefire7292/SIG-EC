@@ -723,9 +723,9 @@ class CivilActController extends Controller
         // Let Administrator bypass role restrictions for system maintenance and Q&A.
         $isAdmin = $user->hasRole(\App\Enums\UserRole::ADMIN->value);
 
-        // Technical Rule: Valideur is Officier. Signer is Maire.
-        if (in_array($newStatus, ['valide', 'rejete', 'a_corriger']) && !$isAdmin && !$user->hasRole(\App\Enums\UserRole::OFFICIER->value)) {
-            abort(403, 'Seul un Officier d\'état-civil peut valider ou rejeter un acte.');
+        // Technical Rule: Valideur is Officier or Superviseur. Signer is Maire.
+        if (in_array($newStatus, ['valide', 'rejete', 'a_corriger']) && !$isAdmin && !$user->hasRole(\App\Enums\UserRole::OFFICIER->value) && !$user->hasRole(\App\Enums\UserRole::SUPERVISEUR->value)) {
+            abort(403, 'Seul un Officier d\'état-civil ou un Superviseur peut valider ou rejeter un acte.');
         }
 
         if ($newStatus === 'signe' && !$isAdmin && !$user->hasRole(\App\Enums\UserRole::MAIRE->value)) {
