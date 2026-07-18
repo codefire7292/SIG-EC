@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { 
@@ -10,6 +10,8 @@ import {
     NoSymbolIcon,
     CheckCircleIcon
 } from '@heroicons/vue/24/outline';
+
+const currentUserId = usePage().props.auth.user.id;
 
 const props = defineProps({
     users: Object,
@@ -150,8 +152,9 @@ const getRoleColor = (role) => {
                             <Link :href="user.edit_url" class="inline-flex p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Modifier">
                                 <PencilSquareIcon class="h-5 w-5" />
                             </Link>
-                            <!-- Suspend / Reactivate -->
+                            <!-- Suspend / Reactivate (hidden for current user) -->
                             <button
+                                v-if="user.id !== currentUserId"
                                 @click="toggleStatus(user)"
                                 class="inline-flex p-2 rounded-lg transition-all"
                                 :class="user.is_active
