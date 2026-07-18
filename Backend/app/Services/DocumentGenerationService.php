@@ -74,13 +74,20 @@ class DocumentGenerationService
             default => 'Acte',
         };
 
+        // Load center from registry
+        $center = null;
+        if ($act->registry && $act->registry->civil_registration_center_id) {
+            $center = \App\Models\CivilRegistrationCenter::find($act->registry->civil_registration_center_id);
+        }
+
         // 2. Prepare Data
         $data = [
-            'act' => $act,
-            'type' => $type,
-            'title' => $title,
-            'qrCode' => $qrCodeBase64,
-            'logo' => base64_encode(file_get_contents(public_path('images/logo.png'))),
+            'act'       => $act,
+            'type'      => $type,
+            'title'     => $title,
+            'center'    => $center,
+            'qrCode'    => $qrCodeBase64,
+            'logo'      => base64_encode(file_get_contents(public_path('images/logo.png'))),
             'timestamp' => now()->format('d/m/Y H:i:s'),
         ];
 

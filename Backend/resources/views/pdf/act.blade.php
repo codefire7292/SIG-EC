@@ -4,275 +4,566 @@
     <meta charset="utf-8">
     <title>Extrait d'Acte — {{ $act->reference_number }}</title>
     <style>
-        body { font-family: 'Helvetica', sans-serif; color: #333; line-height: 1.5; font-size: 12px; }
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #1e690f; padding-bottom: 10px; }
-        .logo { width: 60px; margin-bottom: 5px; }
-        .republic { font-weight: bold; font-size: 12px; text-transform: uppercase; margin-bottom: 2px; }
-        .document-title { font-size: 18px; font-weight: 800; color: #1e690f; text-transform: uppercase; margin: 10px 0; }
-        .section-title { font-weight: bold; font-size: 10px; color: #1e690f; text-transform: uppercase; margin-top: 15px; margin-bottom: 5px; border-bottom: 1px solid #edf2f7; padding-bottom: 3px; }
-        .grid { width: 100%; margin-bottom: 10px; border-collapse: collapse; }
-        .grid td { padding: 4px 0; vertical-align: top; }
-        .label { font-weight: bold; color: #4a5568; width: 35%; }
-        .value { font-weight: 600; color: #1a202c; }
-        .content-box { border: 1px solid #e2e8f0; padding: 15px; background-color: #f8fafc; border-radius: 8px; }
-        .footer { margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px; position: relative; }
-        .qr-code { position: absolute; right: 0; top: 15px; width: 90px; }
-        .signature-box { margin-top: 15px; width: 60%; }
-        .watermark { position: absolute; top: 35%; left: 15%; font-size: 55px; color: rgba(30, 105, 15, 0.04); transform: rotate(-45deg); z-index: -1; }
-        .meta { font-size: 9px; color: #a0aec0; margin-top: 15px; }
+        @page { margin: 15mm 14mm 15mm 14mm; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11px;
+            color: #000;
+            line-height: 1.4;
+        }
+
+        /* ======= OUTER BORDER ======= */
+        .outer-border {
+            border: 2px solid #000;
+            width: 100%;
+        }
+
+        /* ======= TOP HEADER: two-column ======= */
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .header-table td {
+            vertical-align: middle;
+            padding: 8px 10px;
+        }
+        .header-left {
+            width: 48%;
+            border-right: 1px solid #000;
+            text-align: center;
+        }
+        .header-right {
+            width: 52%;
+            text-align: center;
+        }
+        .header-left p {
+            font-size: 10px;
+            line-height: 1.7;
+        }
+        .header-logo {
+            width: 50px;
+            height: 50px;
+            margin: 5px auto;
+            display: block;
+        }
+        .commune-label {
+            font-size: 10px;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+        .republic-label {
+            font-size: 10px;
+            margin-bottom: 2px;
+        }
+        .republic-motto {
+            font-size: 9px;
+            margin-bottom: 2px;
+        }
+        .republic-divider {
+            font-size: 10px;
+            letter-spacing: 2px;
+            margin: 2px 0;
+        }
+        .etat-civil-title {
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin: 6px 0 4px;
+        }
+        .centre-label {
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        /* ======= SECTION: "EXTRAIT DU REGISTRE..." ======= */
+        .extrait-title-row {
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .extrait-title-row td {
+            padding: 6px 10px;
+        }
+        .extrait-title-cell {
+            border-right: 1px solid #000;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .extrait-ref-cell {
+            width: 22%;
+            text-align: center;
+            font-size: 10px;
+            line-height: 1.8;
+        }
+        .extrait-ref-label {
+            font-size: 8px;
+            color: #555;
+        }
+
+        /* ======= BODY CONTENT ======= */
+        .body-content {
+            padding: 10px 14px 6px;
+            border-top: none;
+        }
+        .narrative {
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        /* ======= FIELDS LAYOUT ======= */
+        .field-row {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6px;
+        }
+        .field-row td {
+            vertical-align: top;
+            padding: 2px 0;
+        }
+        .field-label {
+            font-size: 8px;
+            text-transform: uppercase;
+            color: #444;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-top: 1px;
+        }
+        .field-value {
+            font-size: 11.5px;
+            font-weight: normal;
+            display: block;
+        }
+        .field-value-bold {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* ======= DIVIDER LINE ======= */
+        .divider {
+            border: none;
+            border-top: 1px solid #000;
+            margin: 6px 0;
+        }
+
+        /* ======= JUGEMENT BOX ======= */
+        .jugement-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-top: 1px solid #000;
+        }
+        .jugement-table td {
+            vertical-align: top;
+            padding: 6px 8px;
+        }
+        .jugement-label-cell {
+            width: 30px;
+            border-right: 1px solid #000;
+            text-align: center;
+        }
+        .jugement-label-vertical {
+            font-size: 8px;
+            text-transform: uppercase;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        .jugement-content-cell {
+            font-size: 10.5px;
+            line-height: 2.0;
+            border-right: 1px solid #000;
+        }
+        .jugement-ref-cell {
+            width: 60px;
+            text-align: center;
+            font-size: 10px;
+            line-height: 2.2;
+        }
+        .jugement-ref-small {
+            font-size: 8px;
+            color: #555;
+        }
+
+        /* ======= MENTIONS MARGINALES ======= */
+        .mentions-box {
+            border-top: 1px solid #000;
+            padding: 6px 14px;
+            min-height: 40px;
+        }
+        .mentions-label {
+            font-size: 8px;
+            text-transform: uppercase;
+            color: #444;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .mentions-content {
+            font-size: 10px;
+            min-height: 24px;
+        }
+
+        /* ======= FOOTER: signature & QR ======= */
+        .footer-row {
+            border-top: 1px solid #000;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .footer-row td {
+            vertical-align: bottom;
+            padding: 8px 14px;
+        }
+        .footer-qr-cell {
+            width: 110px;
+            text-align: center;
+            border-right: 1px solid #ccc;
+        }
+        .footer-qr-label {
+            font-size: 8px;
+            margin-bottom: 3px;
+        }
+        .footer-signature-cell {
+            text-align: right;
+            font-size: 10px;
+            line-height: 1.7;
+        }
+
+        /* ======= DOTTED FILL LINE ======= */
+        .dotted-line {
+            display: inline-block;
+            width: 75%;
+            border-bottom: 1px dotted #555;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
-    <div class="watermark">SIG-EC RÉPUBLIQUE</div>
 
-    <div class="header">
-        <img src="data:image/png;base64,{{ $logo }}" class="logo">
-        <div class="republic">République du Sénégal</div>
-        <div class="republic">Mairie de Enampore</div>
-        <div class="republic">Direction de l'État Civil</div>
-        <div class="document-title">Extrait d'{{ $title }}</div>
-    </div>
+<div class="outer-border">
 
-    <div class="content-box">
-        <table class="grid">
+    {{-- ===== HEADER (bicolonne) ===== --}}
+    <table class="header-table">
+        <tr>
+            <td class="header-left">
+                <p>REGION DE <strong>{{ strtoupper($center?->region ?? 'ZIGUINCHOR') }}</strong></p>
+                <p>DEPARTEMENT DE <strong>{{ strtoupper($center?->region ?? 'ZIGUINCHOR') }}</strong></p>
+                <img src="data:image/png;base64,{{ $logo }}" class="header-logo" alt="Logo">
+                <p class="commune-label">COMMUNE DE <strong>{{ strtoupper($center?->commune ?? 'ENNAMPORE') }}</strong></p>
+            </td>
+            <td class="header-right">
+                <p class="republic-label">REPUBLIQUE DU SENEGAL</p>
+                <p class="republic-motto">Un-Peuple Un-But Une-Foi</p>
+                <p class="republic-divider">- - - - - - - - - - - -</p>
+                <p class="etat-civil-title">ETAT-CIVIL</p>
+                <p class="centre-label">
+                    CENTRE PRINCIPAL (1)<br>
+                    {{ strtoupper($center?->name ?? 'ENAMPORE CENTRE PRINCIPAL') }}
+                </p>
+            </td>
+        </tr>
+    </table>
+
+    {{-- ===== TITRE + RÉFÉRENCE ===== --}}
+    @if($type === 'naissance')
+    <table class="extrait-title-row">
+        <tr>
+            <td class="extrait-title-cell">
+                Extrait du Registre des Actes de Naissance
+            </td>
+            <td class="extrait-ref-cell">
+                @php
+                    $refYear = $act->date_of_birth ? $act->date_of_birth->format('Y') : ($act->registry?->year ?? now()->year);
+                    // Extract numeric part from reference number for display
+                    preg_match('/(\d+)$/', $act->reference_number, $matches);
+                    $refNum = isset($matches[1]) ? intval($matches[1]) : '';
+                @endphp
+                <strong>AN {{ $refYear }}</strong><br>
+                <strong>{{ $refYear }} - {{ $refNum }}</strong><br>
+                <span class="extrait-ref-label">N° dans le registre en chiffres</span>
+            </td>
+        </tr>
+    </table>
+    @elseif($type === 'mariage')
+    <table class="extrait-title-row">
+        <tr>
+            <td class="extrait-title-cell">
+                Extrait du Registre des Actes de Mariage
+            </td>
+            <td class="extrait-ref-cell">
+                @php
+                    $refYear = $act->marriage_date ? $act->marriage_date->format('Y') : ($act->registry?->year ?? now()->year);
+                    preg_match('/(\d+)$/', $act->reference_number, $matches);
+                    $refNum = isset($matches[1]) ? intval($matches[1]) : '';
+                @endphp
+                <strong>AN {{ $refYear }}</strong><br>
+                <strong>{{ $refYear }} - {{ $refNum }}</strong><br>
+                <span class="extrait-ref-label">N° dans le registre en chiffres</span>
+            </td>
+        </tr>
+    </table>
+    @elseif($type === 'deces')
+    <table class="extrait-title-row">
+        <tr>
+            <td class="extrait-title-cell">
+                Extrait du Registre des Actes de Décès
+            </td>
+            <td class="extrait-ref-cell">
+                @php
+                    $refYear = $act->date_of_death ? $act->date_of_death->format('Y') : ($act->registry?->year ?? now()->year);
+                    preg_match('/(\d+)$/', $act->reference_number, $matches);
+                    $refNum = isset($matches[1]) ? intval($matches[1]) : '';
+                @endphp
+                <strong>AN {{ $refYear }}</strong><br>
+                <strong>{{ $refYear }} - {{ $refNum }}</strong><br>
+                <span class="extrait-ref-label">N° dans le registre en chiffres</span>
+            </td>
+        </tr>
+    </table>
+    @endif
+
+    {{-- ===== BODY CONTENT ===== --}}
+    <div class="body-content">
+
+        @if($type === 'naissance')
+        {{-- Narration --}}
+        @php
+            use Carbon\Carbon;
+            $dob = $act->date_of_birth;
+            $yearWords = $dob ? $dob->format('Y') : '';
+            $dayWords  = $dob ? $dob->day : '';
+            $months    = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+            $monthWord = $dob ? $months[$dob->month - 1] : '';
+
+            function toFrWords(int $n): string {
+                $ones = ['','un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix',
+                         'onze','douze','treize','quatorze','quinze','seize','dix-sept','dix-huit','dix-neuf'];
+                $tens = ['','dix','vingt','trente','quarante','cinquante','soixante','soixante','quatre-vingts','quatre-vingt'];
+                if ($n === 0) return 'zéro';
+                if ($n < 0) return 'moins ' . toFrWords(-$n);
+                $str = '';
+                if ($n >= 1000) { $str .= toFrWords((int)($n/1000)) . ' mille '; $n %= 1000; }
+                if ($n >= 100) {
+                    $h = (int)($n/100);
+                    $str .= ($h > 1 ? toFrWords($h) . ' ' : '') . 'cent' . ($h > 1 && $n % 100 === 0 ? 's' : '') . ' ';
+                    $n %= 100;
+                }
+                if ($n >= 20) {
+                    $t = (int)($n/10);
+                    $u = $n % 10;
+                    if ($t === 7 || $t === 9) { $str .= $tens[$t] . '-' . $ones[10 + $u]; }
+                    else { $str .= $tens[$t] . ($u === 1 && $t !== 8 ? '-et-' : ($u ? '-' : '')) . ($u ? $ones[$u] : ''); }
+                } elseif ($n > 0) { $str .= $ones[$n]; }
+                return rtrim($str);
+            }
+
+            $yearFr = $dob ? ucfirst(toFrWords((int)$dob->format('Y'))) : '';
+            $dayFr  = $dob ? ($dob->day === 1 ? 'premier' : toFrWords($dob->day)) : '';
+
+            $timeDisplay = $act->time_of_birth
+                ? \Carbon\Carbon::createFromFormat('H:i:s', strlen($act->time_of_birth) === 5 ? $act->time_of_birth . ':00' : $act->time_of_birth)->format('H:i:s')
+                : null;
+        @endphp
+
+        <p class="narrative">
+            L'an {{ strtolower($yearFr) }}, le {{ $dayFr }} du mois de {{ $monthWord }}
+            @if($dob)({{ $dob->format('Y-m-d') }})@endif
+        </p>
+
+        {{-- Heure & Lieu --}}
+        <table class="field-row">
             <tr>
-                <td class="label">Numéro de Registre :</td>
-                <td class="value">{{ $act->reference_number }}</td>
+                <td style="width:50%">
+                    @if($timeDisplay)
+                    <span class="field-value">Heures : {{ $timeDisplay }}</span>
+                    @else
+                    <span class="field-value">Heures : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    @endif
+                    <span class="field-label">Heure de Naissance</span>
+                </td>
+                <td style="width:50%">
+                    <span class="field-value">Est né(e) à : {{ $act->place_of_birth ?? '' }}</span>
+                </td>
             </tr>
-            @if(isset($act->registry) && $act->registry)
-            <tr>
-                <td class="label">Registre :</td>
-                <td class="value">{{ $act->registry->name }} (Année {{ $act->registry->year }})</td>
-            </tr>
-            @endif
         </table>
 
-        <!-- NAISSANCE -->
-        @if($type === 'naissance')
-            <div class="section-title">Identité du nouveau-né</div>
-            <table class="grid">
-                <tr>
-                    <td class="label">Prénom(s) & Nom :</td>
-                    <td class="value" style="font-size: 14px; text-transform: uppercase;">{{ $act->first_name }} {{ $act->last_name }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Sexe :</td>
-                    <td class="value">{{ $act->gender === 'M' ? 'Masculin' : ($act->gender === 'F' ? 'Féminin' : 'N/A') }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Date de naissance :</td>
-                    <td class="value">{{ $act->date_of_birth ? $act->date_of_birth->format('d/m/Y') : 'N/A' }}</td>
-                </tr>
-                @if($act->time_of_birth)
-                <tr>
-                    <td class="label">Heure de naissance :</td>
-                    <td class="value">{{ $act->time_of_birth }}</td>
-                </tr>
-                @endif
-                <tr>
-                    <td class="label">Lieu de naissance :</td>
-                    <td class="value">{{ $act->place_of_birth ?? 'N/A' }}</td>
-                </tr>
-                @if($act->health_facility)
-                <tr>
-                    <td class="label">Formation sanitaire :</td>
-                    <td class="value">{{ $act->health_facility }}</td>
-                </tr>
-                @endif
-            </table>
+        {{-- Sexe --}}
+        <p class="narrative">de sexe : {{ $act->gender === 'M' ? 'Masculin' : ($act->gender === 'F' ? 'Féminin' : 'N/A') }}</p>
 
-            @if(is_array($act->parents_metadata))
-                <div class="section-title">Filiation</div>
-                <table class="grid">
-                    @if(isset($act->parents_metadata['father']))
-                    <tr>
-                        <td class="label">Père :</td>
-                        <td class="value">{{ $act->parents_metadata['father']['first_name'] ?? '' }} {{ $act->parents_metadata['father']['last_name'] ?? '' }}@if(isset($act->parents_metadata['father']['profession'])), {{ $act->parents_metadata['father']['profession'] }}@endif</td>
-                    </tr>
-                    @endif
-                    @if(isset($act->parents_metadata['mother']))
-                    <tr>
-                        <td class="label">Mère :</td>
-                        <td class="value">{{ $act->parents_metadata['mother']['first_name'] ?? '' }} {{ $act->parents_metadata['mother']['last_name'] ?? '' }}@if(isset($act->parents_metadata['mother']['profession'])), {{ $act->parents_metadata['mother']['profession'] }}@endif</td>
-                    </tr>
-                    @endif
-                </table>
-            @endif
+        {{-- Prénom & Nom --}}
+        <table class="field-row">
+            <tr>
+                <td style="width:50%">
+                    <span class="field-value field-value-bold">{{ $act->first_name }}</span>
+                    <span class="field-label">PRENOM(S)</span>
+                </td>
+                <td style="width:50%">
+                    <span class="field-value field-value-bold">{{ $act->last_name }}</span>
+                    <span class="field-label">NOM DE FAMILLE</span>
+                </td>
+            </tr>
+        </table>
 
-        <!-- MARIAGE -->
+        {{-- Père --}}
+        <table class="field-row">
+            <tr>
+                <td>
+                    <span class="field-value">de {{ $act->father_name ?? '' }}</span>
+                    <span class="field-label">PRENOM(S) DU PERE</span>
+                </td>
+            </tr>
+        </table>
+
+        {{-- Mère --}}
+        @php
+            $motherFirst = '';
+            $motherLast  = '';
+            if ($act->mother_name) {
+                $parts = explode(' ', $act->mother_name, 2);
+                $motherFirst = $parts[0] ?? '';
+                $motherLast  = $parts[1] ?? '';
+            }
+            if (is_array($act->parents_metadata)) {
+                $motherFirst = $motherFirst ?: ($act->parents_metadata['mother_first_name'] ?? '');
+                $motherLast  = $motherLast ?: ($act->parents_metadata['mother_last_name'] ?? '');
+            }
+        @endphp
+        <table class="field-row">
+            <tr>
+                <td style="width:50%">
+                    <span class="field-value">et de {{ $motherFirst }}</span>
+                    <span class="field-label">PRENOM(S) DE LA MERE</span>
+                </td>
+                <td style="width:50%">
+                    <span class="field-value">{{ strtoupper($motherLast) }}</span>
+                    <span class="field-label">NOM DE FAMILLE DE LA MERE</span>
+                </td>
+            </tr>
+        </table>
+
+        <p style="font-size:8.5px; color:#555; margin-top:2px;">Le pays de naissance pour les naissances à l'étranger (3)</p>
+
         @elseif($type === 'mariage')
-            <div class="section-title">Les Époux</div>
-            <table class="grid">
-                <tr>
-                    <td class="label">Époux :</td>
-                    <td class="value" style="font-size: 13px; text-transform: uppercase;">{{ $act->husband_first_name }} {{ $act->husband_last_name }}</td>
-                </tr>
-                @if(isset($act->spouses_metadata['husband']['date_of_birth']))
-                <tr>
-                    <td class="label">Date de naissance époux :</td>
-                    <td class="value">{{ \Carbon\Carbon::parse($act->spouses_metadata['husband']['date_of_birth'])->format('d/m/Y') }}</td>
-                </tr>
-                @endif
-                @if(isset($act->spouses_metadata['husband']['profession']))
-                <tr>
-                    <td class="label">Profession époux :</td>
-                    <td class="value">{{ $act->spouses_metadata['husband']['profession'] }}</td>
-                </tr>
-                @endif
-                <tr style="border-top: 1px dashed #edf2f7;">
-                    <td class="label">Épouse :</td>
-                    <td class="value" style="font-size: 13px; text-transform: uppercase;">{{ $act->wife_first_name }} {{ $act->wife_last_name }}</td>
-                </tr>
-                @if(isset($act->spouses_metadata['wife']['date_of_birth']))
-                <tr>
-                    <td class="label">Date de naissance épouse :</td>
-                    <td class="value">{{ \Carbon\Carbon::parse($act->spouses_metadata['wife']['date_of_birth'])->format('d/m/Y') }}</td>
-                </tr>
-                @endif
-                @if(isset($act->spouses_metadata['wife']['profession']))
-                <tr>
-                    <td class="label">Profession épouse :</td>
-                    <td class="value">{{ $act->spouses_metadata['wife']['profession'] }}</td>
-                </tr>
-                @endif
-            </table>
+        {{-- MARIAGE --}}
+        @php
+            $md = $act->marriage_date;
+            $months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+            $mMonth = $md ? $months[$md->month - 1] : '';
+        @endphp
+        <p class="narrative">
+            Le {{ $md ? $md->day : '' }} {{ $mMonth }} {{ $md ? $md->format('Y') : '' }} — Lieu : {{ $act->marriage_place ?? '' }}
+        </p>
+        <table class="field-row">
+            <tr>
+                <td style="width:50%">
+                    <span class="field-value field-value-bold">{{ $act->husband_first_name }}</span>
+                    <span class="field-label">PRENOM(S) DE L'ÉPOUX</span>
+                </td>
+                <td style="width:50%">
+                    <span class="field-value field-value-bold">{{ $act->husband_last_name }}</span>
+                    <span class="field-label">NOM DE L'ÉPOUX</span>
+                </td>
+            </tr>
+        </table>
+        <table class="field-row">
+            <tr>
+                <td style="width:50%">
+                    <span class="field-value field-value-bold">{{ $act->wife_first_name }}</span>
+                    <span class="field-label">PRENOM(S) DE L'ÉPOUSE</span>
+                </td>
+                <td style="width:50%">
+                    <span class="field-value field-value-bold">{{ $act->wife_last_name }}</span>
+                    <span class="field-label">NOM DE L'ÉPOUSE</span>
+                </td>
+            </tr>
+        </table>
 
-            <div class="section-title">Détails du mariage</div>
-            <table class="grid">
-                <tr>
-                    <td class="label">Date de célébration :</td>
-                    <td class="value">{{ $act->marriage_date ? $act->marriage_date->format('d/m/Y') : 'N/A' }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Lieu de célébration :</td>
-                    <td class="value">{{ $act->marriage_place ?? 'N/A' }}</td>
-                </tr>
-                @if($act->marriage_option)
-                <tr>
-                    <td class="label">Option matrimoniale :</td>
-                    <td class="value" style="text-transform: capitalize;">{{ $act->marriage_option }}</td>
-                </tr>
-                @endif
-                @if($act->matrimonial_regime)
-                <tr>
-                    <td class="label">Régime matrimonial :</td>
-                    <td class="value" style="text-transform: capitalize;">{{ str_replace('_', ' ', $act->matrimonial_regime) }}</td>
-                </tr>
-                @endif
-            </table>
-
-        <!-- DECÈS -->
         @elseif($type === 'deces')
-            <div class="section-title">Identité du défunt</div>
-            <table class="grid">
-                <tr>
-                    <td class="label">Prénom(s) & Nom :</td>
-                    <td class="value" style="font-size: 14px; text-transform: uppercase;">{{ $act->deceased_first_name }} {{ $act->deceased_last_name }}</td>
-                </tr>
-                <tr>
-                    <td class="label">Sexe :</td>
-                    <td class="value">{{ $act->gender === 'M' ? 'Masculin' : ($act->gender === 'F' ? 'Féminin' : 'N/A') }}</td>
-                </tr>
-                @if($act->date_of_birth)
-                <tr>
-                    <td class="label">Date de naissance :</td>
-                    <td class="value">{{ $act->date_of_birth ? $act->date_of_birth->format('d/m/Y') : 'N/A' }}</td>
-                </tr>
-                @endif
-                <tr>
-                    <td class="label">Date du décès :</td>
-                    <td class="value">{{ $act->date_of_death ? $act->date_of_death->format('d/m/Y') : 'N/A' }}</td>
-                </tr>
-                @if($act->time_of_death)
-                <tr>
-                    <td class="label">Heure du décès :</td>
-                    <td class="value">{{ $act->time_of_death }}</td>
-                </tr>
-                @endif
-                <tr>
-                    <td class="label">Lieu du décès :</td>
-                    <td class="value">{{ $act->place_of_death ?? 'N/A' }}</td>
-                </tr>
-            </table>
-
-            @if(is_array($act->death_metadata))
-                @if(isset($act->death_metadata['father']) || isset($act->death_metadata['mother']))
-                <div class="section-title">Filiation</div>
-                <table class="grid">
-                    @if(isset($act->death_metadata['father']))
-                    <tr>
-                        <td class="label">Père :</td>
-                        <td class="value">{{ $act->death_metadata['father']['first_name'] ?? '' }} {{ $act->death_metadata['father']['last_name'] ?? '' }}</td>
-                    </tr>
-                    @endif
-                    @if(isset($act->death_metadata['mother']))
-                    <tr>
-                        <td class="label">Mère :</td>
-                        <td class="value">{{ $act->death_metadata['mother']['first_name'] ?? '' }} {{ $act->death_metadata['mother']['last_name'] ?? '' }}</td>
-                    </tr>
-                    @endif
-                </table>
-                @endif
-
-                @if(isset($act->death_metadata['declarant']))
-                <div class="section-title">Déclarant</div>
-                <table class="grid">
-                    <tr>
-                        <td class="label">Prénom(s) & Nom :</td>
-                        <td class="value">{{ $act->death_metadata['declarant']['first_name'] ?? '' }} {{ $act->death_metadata['declarant']['last_name'] ?? '' }}</td>
-                    </tr>
-                    @if(isset($act->death_metadata['declarant']['relationship']))
-                    <tr>
-                        <td class="label">Degré de parenté :</td>
-                        <td class="value">{{ $act->death_metadata['declarant']['relationship'] }}</td>
-                    </tr>
-                    @endif
-                </table>
-                @endif
-            @endif
+        {{-- DECES --}}
+        @php
+            $dd = $act->date_of_death;
+            $months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+            $dMonth = $dd ? $months[$dd->month - 1] : '';
+        @endphp
+        <p class="narrative">
+            Le {{ $dd ? $dd->day : '' }} {{ $dMonth }} {{ $dd ? $dd->format('Y') : '' }}, est décédé(e) à : {{ $act->place_of_death ?? '' }}
+        </p>
+        @if($act->time_of_death)
+        <p class="narrative">à {{ \Carbon\Carbon::createFromFormat('H:i:s', strlen($act->time_of_death) === 5 ? $act->time_of_death . ':00' : $act->time_of_death)->format('H:i:s') }}</p>
+        @endif
+        <table class="field-row">
+            <tr>
+                <td style="width:50%">
+                    <span class="field-value field-value-bold">{{ $act->deceased_first_name }}</span>
+                    <span class="field-label">PRENOM(S)</span>
+                </td>
+                <td style="width:50%">
+                    <span class="field-value field-value-bold">{{ $act->deceased_last_name }}</span>
+                    <span class="field-label">NOM DE FAMILLE</span>
+                </td>
+            </tr>
+        </table>
+        <p class="narrative">de sexe : {{ $act->gender === 'M' ? 'Masculin' : ($act->gender === 'F' ? 'Féminin' : 'N/A') }}</p>
+        @if($act->date_of_birth)
+        <p class="narrative">né(e) le : {{ $act->date_of_birth->format('d/m/Y') }}</p>
+        @endif
         @endif
 
-        <!-- JUGEMENT (si applicable) -->
-        @if($act->is_judgment)
-            <div class="section-title">Jugement d'autorisation</div>
-            <table class="grid">
-                @if($act->judgment_number)
-                <tr>
-                    <td class="label">N° Jugement :</td>
-                    <td class="value">{{ $act->judgment_number }}</td>
-                </tr>
-                @endif
-                @if($act->judgment_date)
-                <tr>
-                    <td class="label">Date du jugement :</td>
-                    <td class="value">{{ \Carbon\Carbon::parse($act->judgment_date)->format('d/m/Y') }}</td>
-                </tr>
-                @endif
-                @if($act->judgment_court)
-                <tr>
-                    <td class="label">Tribunal :</td>
-                    <td class="value">{{ $act->judgment_court }}</td>
-                </tr>
-                @endif
-            </table>
-        @endif
     </div>
 
-    <div class="footer">
-        <div class="signature-box">
-            <div class="label">Fait à Enampore, le {{ $act->validated_at ? $act->validated_at->format('d/m/Y') : now()->format('d/m/Y') }}</div>
-            <div style="margin-top: 10px; font-weight: bold;">L'Officier de l'État Civil</div>
-            <div style="margin-top: 5px; font-style: italic; font-size: 11px;">(Signé Électroniquement)</div>
-        </div>
+    {{-- ===== JUGEMENT ===== --}}
+    @if($type === 'naissance')
+    <table class="jugement-table">
+        <tr>
+            <td class="jugement-label-cell" style="vertical-align:middle;">
+                <div class="jugement-label-vertical">
+                    JUGEMENT<br>d'Autorisation<br>d'Inscription<br>(ex supplétif)
+                </div>
+            </td>
+            <td class="jugement-content-cell">
+                <p>Délivré par le Juge du tribunal de {{ strtoupper($center?->region ?? 'ZIGUINCHOR') }}</p>
+                <p>le, <span class="dotted-line">{{ $act->is_judgment ? (\Carbon\Carbon::parse($act->judgment_date)->format('d/m/Y') ?? '') : '' }}</span></p>
+                <p>sous le numéro <span class="dotted-line">{{ $act->judgment_number ?? '' }}</span></p>
+                <p>Transcrit-le <span class="dotted-line"></span></p>
+                <p>Sur le régistre des Actes de Naissance de l'année</p>
+            </td>
+            <td class="jugement-ref-cell">
+                <span class="field-value-bold">AN</span><br>
+                <span class="field-value-bold">N°</span><br>
+                <span class="jugement-ref-small">N° du jugement en chiffres</span><br><br>
+                <span class="field-value-bold">AN</span>
+            </td>
+        </tr>
+    </table>
+    @endif
 
-        <div class="qr-code">
-            <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="90">
-            <div style="font-size: 8px; text-align: center; margin-top: 5px;">Scanner pour vérifier l'authenticité</div>
-        </div>
-
-        <div class="meta">
-            Document officiel généré par SIG-EC le {{ $timestamp }} | ID Unique: {{ $act->uuid }}
-        </div>
+    {{-- ===== MENTIONS MARGINALES ===== --}}
+    <div class="mentions-box">
+        <p class="mentions-label">Mentions Marginales</p>
+        <p class="mentions-content">{{ $act->officer_comments ?? '' }}</p>
     </div>
+
+    {{-- ===== FOOTER ===== --}}
+    <table class="footer-row">
+        <tr>
+            <td class="footer-qr-cell">
+                <p class="footer-qr-label">QRcode</p>
+                <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="80" alt="QR Code">
+            </td>
+            <td class="footer-signature-cell">
+                POUR EXTRAIT CERTIFIE CONFORME<br>
+                Fait à {{ $center?->commune ?? 'ENAMPORE' }} le, {{ \Carbon\Carbon::parse($act->validated_at ?? now())->locale('fr')->isoFormat('D MMMM YYYY') }}<br>
+                L'officier d'Etat-civil soussigné
+            </td>
+        </tr>
+    </table>
+
+</div>
+
 </body>
 </html>
