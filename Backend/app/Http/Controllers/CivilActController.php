@@ -145,7 +145,7 @@ class CivilActController extends Controller
         }
 
         if (!$registry) {
-            // Find the first open registry for this year, type, and center that has < 100 acts
+            // RULE: max 50 acts per volume, numbering continues across volumes within the same year
             $registries = \App\Models\Registry::where('civil_registration_center_id', $centerId)
                 ->where('type', $type)
                 ->where('year', $year)
@@ -155,15 +155,14 @@ class CivilActController extends Controller
 
             foreach ($registries as $r) {
                 $count = $model->where('registry_id', $r->id)->count();
-                if ($count < 100) {
+                if ($count < 50) {
                     $registry = $r;
                     break;
                 }
             }
 
-            // If no open registry with space is found, create a new one (incrementing the number)
+            // No open volume with space — create a new one
             if (!$registry) {
-                // If the latest registry of this year is closed, we cannot create/open a new one automatically
                 $latestRegistry = \App\Models\Registry::where('civil_registration_center_id', $centerId)
                     ->where('type', $type)
                     ->where('year', $year)
@@ -174,21 +173,18 @@ class CivilActController extends Controller
                     return back()->withErrors(['registry_id' => 'Le registre pour cette année est fermé.']);
                 }
 
-                $nextNumber = \App\Models\Registry::where('civil_registration_center_id', $centerId)
+                $nextNumber = (\App\Models\Registry::where('civil_registration_center_id', $centerId)
                     ->where('type', $type)
                     ->where('year', $year)
-                    ->max('number') + 1;
-                if ($nextNumber === 0 || !$nextNumber) {
-                    $nextNumber = 1;
-                }
+                    ->max('number') ?? 0) + 1;
 
                 $registry = \App\Models\Registry::create([
                     'civil_registration_center_id' => $centerId,
-                    'type' => $type,
-                    'year' => $year,
-                    'number' => $nextNumber,
-                    'status' => 'open',
-                    'opening_date' => now(),
+                    'type'             => $type,
+                    'year'             => $year,
+                    'number'           => $nextNumber,
+                    'status'           => 'open',
+                    'opening_date'     => now(),
                     'reference_prefix' => strtoupper(substr($type, 0, 1)) . '-' . $year . '-C1-' . $nextNumber,
                 ]);
             }
@@ -199,27 +195,21 @@ class CivilActController extends Controller
         }
 
         $actCount = $model->where('registry_id', $registry->id)->count();
-        if ($actCount >= 100) {
-            return back()->withErrors(['registry_id' => 'Ce registre a atteint sa limite maximale de 100 actes.']);
+        if ($actCount >= 50) {
+            return back()->withErrors(['registry_id' => 'Ce volume a atteint sa limite de 50 actes.']);
         }
 
-        $referenceNumbers = $model->where('registry_id', $registry->id)
-            ->pluck('reference_number')
-            ->toArray();
-        $maxIncrement = 0;
-        foreach ($referenceNumbers as $ref) {
-            $escapedPrefix = preg_quote($registry->reference_prefix, '/');
-            if (preg_match('/^' . $escapedPrefix . '-(\d+)$/', $ref, $matches)) {
-                $val = intval($matches[1]);
-                if ($val > $maxIncrement) {
-                    $maxIncrement = $val;
-                }
-            }
-        }
-        $increment = $maxIncrement + 1;
+        // RULE: sequential numbering across ALL volumes of the same year
+        // Count all acts for this year+type+center across every volume
+        $allRegistryIds = \App\Models\Registry::where('civil_registration_center_id', $centerId)
+            ->where('type', $type)
+            ->where('year', $year)
+            ->pluck('id');
+        $yearActCount = $model->whereIn('registry_id', $allRegistryIds)->count();
+        $increment = $yearActCount + 1;
 
-        if ($increment > 100 && !($isOldRegistry && !empty($validated['reference_number']))) {
-            return back()->withErrors(['registry_id' => 'Ce registre a atteint sa limite maximale de 100 actes.']);
+        if ($increment > 9999 && !($isOldRegistry && !empty($validated['reference_number']))) {
+            return back()->withErrors(['registry_id' => 'La limite annuelle d\'actes a été atteinte.']);
         }
 
         if ($isOldRegistry && !empty($validated['reference_number'])) {
@@ -363,14 +353,13 @@ class CivilActController extends Controller
             $newRegistry = null;
             foreach ($targetRegistries as $r) {
                 $count = $model->where('registry_id', $r->id)->count();
-                if ($count < 100) {
+                if ($count < 50) {
                     $newRegistry = $r;
                     break;
                 }
             }
 
             if (!$newRegistry) {
-                // If the latest registry of this year is closed, we cannot create/open a new one automatically
                 $latestRegistry = \App\Models\Registry::where('civil_registration_center_id', $centerId)
                     ->where('type', $type)
                     ->where('year', $year)
@@ -381,45 +370,34 @@ class CivilActController extends Controller
                     return back()->with('error', 'Le registre cible pour cette année est fermé.');
                 }
 
-                $nextNumber = \App\Models\Registry::where('civil_registration_center_id', $centerId)
+                $nextNumber = (\App\Models\Registry::where('civil_registration_center_id', $centerId)
                     ->where('type', $type)
                     ->where('year', $year)
-                    ->max('number') + 1;
-                if ($nextNumber === 0 || !$nextNumber) {
-                    $nextNumber = 1;
-                }
+                    ->max('number') ?? 0) + 1;
 
                 $newRegistry = \App\Models\Registry::create([
                     'civil_registration_center_id' => $centerId,
-                    'type' => $type,
-                    'year' => $year,
-                    'number' => $nextNumber,
-                    'status' => 'open',
-                    'opening_date' => now(),
+                    'type'             => $type,
+                    'year'             => $year,
+                    'number'           => $nextNumber,
+                    'status'           => 'open',
+                    'opening_date'     => now(),
                     'reference_prefix' => strtoupper(substr($type, 0, 1)) . '-' . $year . '-C1-' . $nextNumber,
                 ]);
             }
 
-            // Generate new reference number for the new registry
-            $referenceNumbers = $model->where('registry_id', $newRegistry->id)
-                ->pluck('reference_number')
-                ->toArray();
-            $maxIncrement = 0;
-            foreach ($referenceNumbers as $ref) {
-                $escapedPrefix = preg_quote($newRegistry->reference_prefix, '/');
-                if (preg_match('/^' . $escapedPrefix . '-(\d+)$/', $ref, $matches)) {
-                    $val = intval($matches[1]);
-                    if ($val > $maxIncrement) {
-                        $maxIncrement = $val;
-                    }
-                }
-            }
-            $increment = $maxIncrement + 1;
-            
             $newRegistryActCount = $model->where('registry_id', $newRegistry->id)->count();
-            if ($newRegistryActCount >= 100 || $increment > 100) {
-                return back()->with('error', "Le registre cible a atteint sa limite maximale de 100 actes.");
+            if ($newRegistryActCount >= 50) {
+                return back()->with('error', 'Le volume cible a atteint sa limite de 50 actes.');
             }
+
+            // Sequential numbering across all volumes of the target year
+            $allRegistryIds = \App\Models\Registry::where('civil_registration_center_id', $centerId)
+                ->where('type', $type)
+                ->where('year', $year)
+                ->pluck('id');
+            $yearActCount = $model->whereIn('registry_id', $allRegistryIds)->count();
+            $increment = $yearActCount + 1;
 
             $referenceNumber = $newRegistry->reference_prefix . '-' . str_pad($increment, 4, '0', STR_PAD_LEFT);
 
