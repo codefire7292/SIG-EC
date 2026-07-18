@@ -456,8 +456,11 @@ const submit = () => {
                                     <input v-model="form.date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Heure de Naissance <span class="text-red-500">*</span></label>
-                                    <input v-model="form.time_of_birth" type="time" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">
+                                        Heure de Naissance
+                                        <span v-if="!form.is_old_registry" class="text-red-500"> *</span>
+                                    </label>
+                                    <input v-model="form.time_of_birth" type="time" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry" />
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -466,8 +469,11 @@ const submit = () => {
                                     <input v-model="form.place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Formation Sanitaire (lieu d'accouchement) <span class="text-red-500">*</span></label>
-                                    <input v-model="form.health_facility" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Ex : Centre de Santé d'Enampore" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">
+                                        Formation Sanitaire (lieu d'accouchement)
+                                        <span v-if="!form.is_old_registry" class="text-red-500"> *</span>
+                                    </label>
+                                    <input v-model="form.health_facility" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Ex : Centre de Santé d'Enampore" :required="!form.is_old_registry" />
                                 </div>
                             </div>
                         </div>

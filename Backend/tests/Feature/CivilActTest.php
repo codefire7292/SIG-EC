@@ -418,5 +418,57 @@ class CivilActTest extends TestCase
         $this->assertNotNull($newAct);
         $this->assertEquals('N-2026-C1-0002', $newAct->reference_number);
     }
+
+    public function test_can_create_birth_act_without_time_and_health_facility_for_old_registry(): void
+    {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole(\App\Enums\UserRole::OFFICIER->value);
+        $this->actingAs($user);
+
+        $registry = \App\Models\Registry::create([
+            'civil_registration_center_id' => 1,
+            'type' => 'naissance',
+            'year' => 1990,
+            'number' => 1,
+            'status' => 'open',
+            'opening_date' => now(),
+            'reference_prefix' => 'N-1990-C1',
+        ]);
+
+        $data = [
+            'is_old_registry' => true,
+            'registry_id' => $registry->id,
+            'reference_number' => 'N-1990-C1-0005',
+            'first_name' => 'OldBaby',
+            'last_name' => 'Doe',
+            'date_of_birth' => '1990-01-01',
+            // time_of_birth and health_facility are omitted
+            'place_of_birth' => 'Dakar',
+            'act_registration_date' => '1990-01-02',
+            'gender' => 'M',
+            'father_name' => 'Father Doe',
+            'mother_name' => 'Mother Doe',
+            'parents_metadata' => [
+                'father_profession' => 'Ingénieur',
+                'father_date_of_birth' => '1960-01-01',
+                'father_place_of_birth' => 'Dakar',
+                'father_domicile' => 'Dakar Plateau',
+                'mother_profession' => 'Médecin',
+                'mother_date_of_birth' => '1965-02-02',
+                'mother_place_of_birth' => 'Dakar',
+                'mother_domicile' => 'Dakar Plateau',
+            ],
+        ];
+
+        $response = $this->post('/acts/naissance', $data);
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect();
+
+        $newAct = BirthAct::where('first_name', 'Oldbaby')->first();
+        $this->assertNotNull($newAct);
+        $this->assertNull($newAct->time_of_birth);
+        $this->assertNull($newAct->health_facility);
+    }
 }
 
