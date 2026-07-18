@@ -295,4 +295,47 @@ class CivilActTest extends TestCase
         $this->assertEquals('Jane', $act->death_metadata['declarant_first_name']);
         $this->assertEquals('2024-05-02 10:00:00', $act->death_metadata['declarant_date_time']);
     }
+
+    public function test_act_extract_download_requires_signed_status(): void
+    {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole(\App\Enums\UserRole::ADMIN->value);
+        $this->actingAs($user);
+
+        // 1. Create a BirthAct with status 'valide'
+        $actValide = BirthAct::forceCreate([
+            'registry_id' => $this->registry->id,
+            'reference_number' => '2024/NAI/999',
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'date_of_birth' => '2024-01-01',
+            'place_of_birth' => 'Dakar',
+            'gender' => 'M',
+            'status' => 'valide'
+        ]);
+        $actValide->refresh();
+
+        // 2. Create a BirthAct with status 'signe'
+        $actSigne = BirthAct::forceCreate([
+            'registry_id' => $this->registry->id,
+            'reference_number' => '2024/NAI/888',
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'date_of_birth' => '2024-01-01',
+            'place_of_birth' => 'Dakar',
+            'gender' => 'F',
+            'status' => 'signe'
+        ]);
+        $actSigne->refresh();
+
+        // 3. Try downloading 'valide' act (should fail/404)
+        $responseValide = $this->get("/verify/naissance/{$actValide->uuid}/download");
+        $responseValide->assertStatus(404);
+
+        // 4. Try downloading 'signe' act (should succeed/200)
+        $responseSigne = $this->get("/verify/naissance/{$actSigne->uuid}/download");
+        $responseSigne->assertStatus(200);
+    }
 }
+

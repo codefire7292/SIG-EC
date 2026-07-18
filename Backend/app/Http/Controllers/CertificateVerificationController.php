@@ -118,13 +118,13 @@ class CertificateVerificationController extends Controller
     {
         $act = match ($type) {
             'naissance' => BirthAct::with('registry')->where('uuid', $uuid)
-                ->whereIn('status', ['valide', 'signe'])
+                ->where('status', 'signe')
                 ->firstOrFail(),
             'mariage'   => MarriageAct::with('registry')->where('uuid', $uuid)
-                ->whereIn('status', ['valide', 'signe'])
+                ->where('status', 'signe')
                 ->firstOrFail(),
             'deces'     => DeathAct::with('registry')->where('uuid', $uuid)
-                ->whereIn('status', ['valide', 'signe'])
+                ->where('status', 'signe')
                 ->firstOrFail(),
             default     => abort(404),
         };

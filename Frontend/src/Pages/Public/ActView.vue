@@ -97,8 +97,8 @@ const spousesMeta = computed(() => props.act?.spouses_metadata ?? null)
                         <h1 class="text-3xl font-black tracking-tight mb-2">{{ config.label }}</h1>
                         <p class="text-white/70 font-bold tracking-widest text-xs uppercase">Réf : {{ act.reference_number }}</p>
                         
-                        <!-- Button to download extract -->
-                        <div class="mt-6">
+                        <!-- Button to download extract (Only for Signed/Sealed Acts) -->
+                        <div v-if="act.status === 'signe'" class="mt-6">
                             <a :href="route('acts.verify.download', { type: type, uuid: act.uuid })" target="_blank"
                                class="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-full font-black text-xs uppercase tracking-wider hover:bg-gray-100 hover:scale-105 active:scale-95 transition-all shadow-lg">
                                 <ArrowDownTrayIcon class="h-4 w-4 text-[#1E690F] shrink-0" />
