@@ -127,6 +127,10 @@ class UserController extends Controller
 
     public function toggleStatus(User $user)
     {
+        if (!auth()->user()->hasRole(\App\Enums\UserRole::ADMIN->value)) {
+            abort(403, "Seul l'Administrateur technique peut suspendre ou réactiver un compte.");
+        }
+
         if ($user->id === auth()->id()) {
             return back()->with('error', 'Vous ne pouvez pas modifier le statut de votre propre compte.');
         }

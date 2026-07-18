@@ -12,6 +12,8 @@ import {
 } from '@heroicons/vue/24/outline';
 
 const currentUserId = usePage().props.auth.user.id;
+const currentUserRoles = usePage().props.auth.user.roles?.map(r => r.name) || [];
+const isAdmin = currentUserRoles.includes('Administrateur technique');
 
 const props = defineProps({
     users: Object,
@@ -152,9 +154,9 @@ const getRoleColor = (role) => {
                             <Link :href="user.edit_url" class="inline-flex p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Modifier">
                                 <PencilSquareIcon class="h-5 w-5" />
                             </Link>
-                            <!-- Suspend / Reactivate (hidden for current user) -->
+                            <!-- Suspend / Reactivate (Admin only, hidden for current user) -->
                             <button
-                                v-if="user.id !== currentUserId"
+                                v-if="isAdmin && user.id !== currentUserId"
                                 @click="toggleStatus(user)"
                                 class="inline-flex p-2 rounded-lg transition-all"
                                 :class="user.is_active
