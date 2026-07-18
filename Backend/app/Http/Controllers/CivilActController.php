@@ -299,6 +299,15 @@ class CivilActController extends Controller
         $data['created_by'] = $request->user()->id;
         $act = $model->create($data);
 
+        // Auto-fermeture du volume s'il atteint 50 actes
+        $totalInVolume = $model->where('registry_id', $registry->id)->count();
+        if ($totalInVolume >= 50 && $registry->status === 'open') {
+            $registry->update([
+                'status'       => 'closed',
+                'closing_date' => now(),
+            ]);
+        }
+
         return redirect()->route("acts.{$type}.show", $act->id)
             ->with('success', 'Acte enregistré avec succès.');
     }
