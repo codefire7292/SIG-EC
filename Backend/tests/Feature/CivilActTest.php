@@ -337,5 +337,86 @@ class CivilActTest extends TestCase
         $responseSigne = $this->get("/verify/naissance/{$actSigne->uuid}/download");
         $responseSigne->assertStatus(200);
     }
+
+    public function test_reference_number_incrementation_ignores_non_sequential_references(): void
+    {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole(\App\Enums\UserRole::OFFICIER->value);
+        $this->actingAs($user);
+
+        // Create registry
+        $registry = \App\Models\Registry::create([
+            'civil_registration_center_id' => 1,
+            'type' => 'naissance',
+            'year' => 2026,
+            'number' => 1,
+            'status' => 'open',
+            'opening_date' => now(),
+            'reference_prefix' => 'N-2026-C1',
+        ]);
+
+        // Insert first act with standard reference N-2026-C1-0001
+        BirthAct::forceCreate([
+            'registry_id' => $registry->id,
+            'reference_number' => 'N-2026-C1-0001',
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'date_of_birth' => '2026-01-01',
+            'place_of_birth' => 'Dakar',
+            'gender' => 'M',
+            'status' => 'brouillon'
+        ]);
+
+        // Insert second act with non-sequential custom reference
+        BirthAct::forceCreate([
+            'registry_id' => $registry->id,
+            'reference_number' => '16TGFS67',
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'date_of_birth' => '2026-01-01',
+            'place_of_birth' => 'Dakar',
+            'gender' => 'F',
+            'status' => 'brouillon'
+        ]);
+
+        // Post request to store third act
+        $data = [
+            'registry_id' => $registry->id,
+            'first_name' => 'Baby',
+            'last_name' => 'Doe',
+            'date_of_birth' => '2026-01-01',
+            'time_of_birth' => '10:00',
+            'place_of_birth' => 'Dakar',
+            'health_facility' => 'Centre de Santé',
+            'act_registration_date' => '2026-01-02',
+            'gender' => 'M',
+            'father_name' => 'Father Doe',
+            'mother_name' => 'Mother Doe',
+            'parents_metadata' => [
+                'father_profession' => 'Ingénieur',
+                'father_date_of_birth' => '1990-01-01',
+                'father_place_of_birth' => 'Dakar',
+                'father_domicile' => 'Dakar Plateau',
+                'mother_profession' => 'Médecin',
+                'mother_date_of_birth' => '1992-02-02',
+                'mother_place_of_birth' => 'Dakar',
+                'mother_domicile' => 'Dakar Plateau',
+            ],
+            'doc_cni_pere' => \Illuminate\Http\UploadedFile::fake()->create('cni_pere.pdf', 100, 'application/pdf'),
+            'doc_cni_mere' => \Illuminate\Http\UploadedFile::fake()->create('cni_mere.pdf', 100, 'application/pdf'),
+            'doc_acte_naissance' => \Illuminate\Http\UploadedFile::fake()->create('acte_naissance.pdf', 100, 'application/pdf'),
+            'doc_cni_declarant' => \Illuminate\Http\UploadedFile::fake()->create('cni_declarant.pdf', 100, 'application/pdf'),
+        ];
+
+        $response = $this->post('/acts/naissance', $data);
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect();
+
+        // Verify that the generated reference number is N-2026-C1-0002 (since N-2026-C1-0001 was max and 16TGFS67 was ignored)
+        $newAct = BirthAct::where('first_name', 'Baby')->first();
+        $this->assertNotNull($newAct);
+        $this->assertEquals('N-2026-C1-0002', $newAct->reference_number);
+    }
 }
 

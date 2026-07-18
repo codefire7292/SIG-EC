@@ -189,12 +189,20 @@ class CivilActController extends Controller
             return back()->withErrors(['registry_id' => 'Ce registre a atteint sa limite maximale de 100 actes.']);
         }
 
-        $lastAct = $model->where('registry_id', $registry->id)->latest('id')->first();
-        
-        $increment = 1;
-        if ($lastAct && preg_match('/-(\d+)$/', $lastAct->reference_number, $matches)) {
-            $increment = intval($matches[1]) + 1;
+        $referenceNumbers = $model->where('registry_id', $registry->id)
+            ->pluck('reference_number')
+            ->toArray();
+        $maxIncrement = 0;
+        foreach ($referenceNumbers as $ref) {
+            $escapedPrefix = preg_quote($registry->reference_prefix, '/');
+            if (preg_match('/^' . $escapedPrefix . '-(\d+)$/', $ref, $matches)) {
+                $val = intval($matches[1]);
+                if ($val > $maxIncrement) {
+                    $maxIncrement = $val;
+                }
+            }
         }
+        $increment = $maxIncrement + 1;
 
         if ($increment > 100 && !($isOldRegistry && !empty($validated['reference_number']))) {
             return back()->withErrors(['registry_id' => 'Ce registre a atteint sa limite maximale de 100 actes.']);
@@ -368,11 +376,20 @@ class CivilActController extends Controller
             }
 
             // Generate new reference number for the new registry
-            $lastAct = $model->where('registry_id', $newRegistry->id)->latest('id')->first();
-            $increment = 1;
-            if ($lastAct && preg_match('/-(\d+)$/', $lastAct->reference_number, $matches)) {
-                $increment = intval($matches[1]) + 1;
+            $referenceNumbers = $model->where('registry_id', $newRegistry->id)
+                ->pluck('reference_number')
+                ->toArray();
+            $maxIncrement = 0;
+            foreach ($referenceNumbers as $ref) {
+                $escapedPrefix = preg_quote($newRegistry->reference_prefix, '/');
+                if (preg_match('/^' . $escapedPrefix . '-(\d+)$/', $ref, $matches)) {
+                    $val = intval($matches[1]);
+                    if ($val > $maxIncrement) {
+                        $maxIncrement = $val;
+                    }
+                }
             }
+            $increment = $maxIncrement + 1;
             
             $newRegistryActCount = $model->where('registry_id', $newRegistry->id)->count();
             if ($newRegistryActCount >= 100 || $increment > 100) {
