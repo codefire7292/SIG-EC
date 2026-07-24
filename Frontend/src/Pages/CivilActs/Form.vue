@@ -1055,7 +1055,6 @@ const submit = () => {
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Qualité du Déclarant <span class="text-red-500">*</span></label>
                                 <select v-model="form.parents_metadata.declarant_relationship" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="hasDeclarant">
                                     <option value="">-- Sélectionner --</option>
-                                    <option value="Mère">Mère</option>
                                     <option value="Médecin">Médecin</option>
                                     <option value="Sage-femme">Sage-femme</option>
                                     <option value="Personne ayant assisté à l'accouchement">Personne ayant assisté à l'accouchement</option>
