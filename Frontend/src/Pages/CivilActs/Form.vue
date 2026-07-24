@@ -39,6 +39,13 @@ const title = computed(() => {
 // Affichage conditionnel de la section Déclarant
 const hasDeclarant = ref(
     !!(props.act?.parents_metadata?.declarant_first_name || props.act?.parents_metadata?.declarant_last_name)
+    || !!(props.act?.parents_metadata?.is_foundling)
+);
+
+// Si "Enfant trouvé" est coché, le déclarant tiers devient obligatoire
+watch(
+    () => form.parents_metadata.is_foundling,
+    (val) => { if (val) hasDeclarant.value = true; }
 );
 
 const formatDate = (dateStr) => {
@@ -1025,9 +1032,10 @@ const submit = () => {
                             <UserIcon class="h-4 w-4" />
                             Déclarant
                         </h3>
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input id="hasDeclarant" v-model="hasDeclarant" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-[#1E690F] focus:ring-[#1E690F]" />
-                            <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Déclarant différent des parents</span>
+                        <label class="flex items-center gap-2 cursor-pointer select-none" :class="form.parents_metadata.is_foundling ? 'opacity-60 cursor-not-allowed' : ''">
+                            <input id="hasDeclarant" v-model="hasDeclarant" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-[#1E690F] focus:ring-[#1E690F]" :disabled="form.parents_metadata.is_foundling" />
+                            <span class="text-[10px] font-black uppercase tracking-widest" :class="form.parents_metadata.is_foundling ? 'text-amber-600' : 'text-gray-500'">Déclarant différent des parents</span>
+                            <span v-if="form.parents_metadata.is_foundling" class="text-[9px] text-amber-600 font-black">(Obligatoire)</span>
                         </label>
                     </div>
                     <!-- Notice par défaut quand pas de déclarant tiers -->
