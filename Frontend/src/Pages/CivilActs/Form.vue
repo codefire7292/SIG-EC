@@ -42,11 +42,6 @@ const hasDeclarant = ref(
     || !!(props.act?.parents_metadata?.is_foundling)
 );
 
-// Si "Enfant trouvé" est coché, le déclarant tiers devient obligatoire
-watch(
-    () => form.parents_metadata.is_foundling,
-    (val) => { if (val) hasDeclarant.value = true; }
-);
 
 const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -377,6 +372,12 @@ const handleFileChange = (event, fieldOrObject, objectField = null) => {
         form[fieldOrObject] = file;
     }
 };
+
+// Si "Enfant trouvé" est coché, le déclarant tiers devient obligatoire
+watch(
+    () => form.parents_metadata.is_foundling,
+    (val) => { if (val) hasDeclarant.value = true; }
+);
 
 const submit = () => {
     if (props.is_edit) {
