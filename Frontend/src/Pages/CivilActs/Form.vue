@@ -97,6 +97,8 @@ const form = useForm({
         mother_date_of_birth: formatDate(props.act?.parents_metadata?.mother_date_of_birth),
         mother_place_of_birth: props.act?.parents_metadata?.mother_place_of_birth || '',
         mother_domicile: props.act?.parents_metadata?.mother_domicile || '',
+        is_foundling: props.act?.parents_metadata?.is_foundling || false,
+        declarant_relationship: props.act?.parents_metadata?.declarant_relationship || '',
         declarant_first_name: props.act?.parents_metadata?.declarant_first_name || '',
         declarant_last_name: props.act?.parents_metadata?.declarant_last_name || '',
         declarant_profession: props.act?.parents_metadata?.declarant_profession || '',
@@ -181,6 +183,7 @@ const form = useForm({
     doc_cni_wife: null,
     doc_birth_husband: null,
     doc_birth_wife: null,
+    doc_consentement: null,
     doc_domicile: null,
     doc_medical: null,
     doc_parental_auth: null,
@@ -469,9 +472,9 @@ const submit = () => {
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">
                                         Heure de Naissance
-                                        <span v-if="!form.is_old_registry" class="text-red-500"> *</span>
+                                        <span v-if="!form.is_old_registry && !is_edit" class="text-red-500"> *</span>
                                     </label>
-                                    <input v-model="form.time_of_birth" type="time" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry" />
+                                    <input v-model="form.time_of_birth" type="time" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -482,9 +485,9 @@ const submit = () => {
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">
                                         Formation Sanitaire (lieu d'accouchement)
-                                        <span v-if="!form.is_old_registry" class="text-red-500"> *</span>
+                                        <span v-if="!form.is_old_registry && !is_edit" class="text-red-500"> *</span>
                                     </label>
-                                    <input v-model="form.health_facility" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Ex : Centre de Santé d'Enampore" :required="!form.is_old_registry" />
+                                    <input v-model="form.health_facility" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Ex : Centre de Santé d'Enampore" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                             </div>
                         </div>
@@ -787,7 +790,13 @@ const submit = () => {
                         <UserGroupIcon class="h-4 w-4" />
                         Filiation &amp; Détails Parents
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200/80">
+                        <div class="flex items-center gap-3">
+                            <input v-model="form.parents_metadata.is_foundling" type="checkbox" id="is_foundling" class="h-4.5 w-4.5 text-[#1E690F] focus:ring-[#1E690F] border-gray-300 rounded" />
+                            <label for="is_foundling" class="text-xs font-black text-gray-700 uppercase tracking-wider cursor-pointer">Parents non désignés (Enfant trouvé / Filiation inconnue)</label>
+                        </div>
+                    </div>
+                    <div v-if="!form.parents_metadata.is_foundling" class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <!-- Père -->
                         <div class="p-6 bg-blue-50/40 rounded-2xl border border-blue-100 space-y-4">
                             <h4 class="text-[10px] font-black text-blue-900 uppercase tracking-widest flex items-center gap-2">
@@ -846,6 +855,7 @@ const submit = () => {
                                 <input v-model="form.parents_metadata.mother_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                             </div>
                         </div>
+                    </div>
                     </div>
                 </div>
 
@@ -1019,10 +1029,23 @@ const submit = () => {
                         </p>
                     </div>
                     <div v-if="hasDeclarant" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms du Déclarant</label>
-                                <input v-model="form.parents_metadata.declarant_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Qualité du Déclarant <span class="text-red-500">*</span></label>
+                                <select v-model="form.parents_metadata.declarant_relationship" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="hasDeclarant">
+                                    <option value="">-- Sélectionner --</option>
+                                    <option value="Mère">Mère</option>
+                                    <option value="Médecin">Médecin</option>
+                                    <option value="Sage-femme">Sage-femme</option>
+                                    <option value="Personne ayant assisté à l'accouchement">Personne ayant assisté à l'accouchement</option>
+                                    <option value="Chef de village">Chef de village</option>
+                                    <option value="Délégué de quartier">Délégué de quartier</option>
+                                    <option value="Autre">Autre</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms du Déclarant <span class="text-red-500">*</span></label>
+                                <input v-model="form.parents_metadata.declarant_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="hasDeclarant" />
                             </div>
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom du Déclarant</label>
@@ -1433,6 +1456,23 @@ const submit = () => {
                             </label>
                             <div v-if="props.act?.doc_birth_wife_path && !form.doc_birth_wife" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
                                 <a :href="props.act.doc_birth_wife_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
+                            </div>
+                        </div>
+
+                        <!-- Consentement des Époux -->
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 pl-1">Consentement des Époux (PDF, max. 500 Ko) <span v-if="!props.act && !form.is_old_registry" class="text-red-500">*</span><span v-if="!props.act && form.is_old_registry" class="text-amber-500 text-[9px] font-bold ml-1">(Optionnel)</span></label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer hover:bg-gray-50/50 transition-all" :class="form.doc_consentement || props.act?.doc_consentement_path ? 'border-[#1E690F] bg-green-50' : 'border-gray-300 bg-white'">
+                                <DocumentIcon class="w-6 h-6 mb-1" :class="form.doc_consentement || props.act?.doc_consentement_path ? 'text-[#1E690F]' : 'text-gray-400'" />
+                                <p class="text-xs text-gray-500 font-bold text-center px-2">
+                                    <span v-if="form.doc_consentement">{{ form.doc_consentement.name }}</span>
+                                    <span v-else-if="props.act?.doc_consentement_path">Document existant (Modifier)</span>
+                                    <span v-else>Cliquer pour téléverser (PDF, max. 500 Ko)</span>
+                                </p>
+                                <input type="file" class="hidden" accept="application/pdf" @change="(e) => handleFileChange(e, 'doc_consentement')" />
+                            </label>
+                            <div v-if="props.act?.doc_consentement_path && !form.doc_consentement" class="text-[9px] text-[#1E690F] font-bold mt-1 text-center">
+                                <a :href="props.act.doc_consentement_path" target="_blank" class="hover:underline">Visualiser le document existant</a>
                             </div>
                         </div>
 

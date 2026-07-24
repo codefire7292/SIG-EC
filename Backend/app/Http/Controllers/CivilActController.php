@@ -259,6 +259,7 @@ class CivilActController extends Controller
                 'doc_cni_wife'       => 'doc_cni_wife_path',
                 'doc_birth_husband'  => 'doc_birth_husband_path',
                 'doc_birth_wife'     => 'doc_birth_wife_path',
+                'doc_consentement'   => 'doc_consentement_path',
                 'doc_domicile'       => 'doc_domicile_path',
                 'doc_medical'        => 'doc_medical_path',
                 'doc_parental_auth'  => 'doc_parental_auth_path',
@@ -436,6 +437,7 @@ class CivilActController extends Controller
                 'doc_cni_wife'       => 'doc_cni_wife_path',
                 'doc_birth_husband'  => 'doc_birth_husband_path',
                 'doc_birth_wife'     => 'doc_birth_wife_path',
+                'doc_consentement'   => 'doc_consentement_path',
                 'doc_domicile'       => 'doc_domicile_path',
                 'doc_medical'        => 'doc_medical_path',
                 'doc_parental_auth'  => 'doc_parental_auth_path',
@@ -491,27 +493,32 @@ class CivilActController extends Controller
         ];
 
         if ($type === 'naissance') {
+            $isFoundling = filter_var(request()->input('parents_metadata.is_foundling', false), FILTER_VALIDATE_BOOLEAN);
+            $parentRule = $isFoundling ? 'nullable' : 'required';
+
             return array_merge($common, [
                 'first_name'                              => 'required|string',
                 'last_name'                               => 'required|string',
                 'date_of_birth'                           => 'required|date',
-                'time_of_birth'                           => $isOldRegistry ? 'nullable|date_format:H:i' : 'required|date_format:H:i',
+                'time_of_birth'                           => ($isOldRegistry || $id) ? 'nullable|date_format:H:i' : 'required|date_format:H:i',
                 'place_of_birth'                          => 'required|string',
-                'health_facility'                         => $isOldRegistry ? 'nullable|string' : 'required|string',
+                'health_facility'                         => ($isOldRegistry || $id) ? 'nullable|string' : 'required|string',
                 'act_registration_date'                   => 'required|date',
                 'gender'                                  => 'required|in:M,F',
                 'is_judgment'                             => 'nullable|boolean',
                 'judgment_number'                         => 'nullable|required_if:is_judgment,true|string',
                 'judgment_date'                           => 'nullable|required_if:is_judgment,true|date',
                 'judgment_court'                          => 'nullable|required_if:is_judgment,true|string',
-                'father_name'                             => 'required|string',
-                'mother_name'                             => 'required|string',
+                'father_name'                             => $parentRule . '|string',
+                'mother_name'                             => $parentRule . '|string',
                 'parents_metadata'                        => 'required|array',
-                'parents_metadata.father_profession'      => 'required|string',
+                'parents_metadata.is_foundling'           => 'nullable|boolean',
+                'parents_metadata.father_profession'      => $parentRule . '|string',
                 'parents_metadata.father_date_of_birth'   => [
-                    'required',
+                    $parentRule,
                     'date',
-                    function ($attribute, $value, $fail) {
+                    function ($attribute, $value, $fail) use ($isFoundling) {
+                        if ($isFoundling || empty($value)) return;
                         $childDob = request()->input('date_of_birth');
                         if ($childDob) {
                             $childDate = \Carbon\Carbon::parse($childDob);
@@ -522,13 +529,14 @@ class CivilActController extends Controller
                         }
                     }
                 ],
-                'parents_metadata.father_place_of_birth'  => 'required|string',
-                'parents_metadata.father_domicile'        => 'required|string',
-                'parents_metadata.mother_profession'      => 'required|string',
+                'parents_metadata.father_place_of_birth'  => $parentRule . '|string',
+                'parents_metadata.father_domicile'        => $parentRule . '|string',
+                'parents_metadata.mother_profession'      => $parentRule . '|string',
                 'parents_metadata.mother_date_of_birth'   => [
-                    'required',
+                    $parentRule,
                     'date',
-                    function ($attribute, $value, $fail) {
+                    function ($attribute, $value, $fail) use ($isFoundling) {
+                        if ($isFoundling || empty($value)) return;
                         $childDob = request()->input('date_of_birth');
                         if ($childDob) {
                             $childDate = \Carbon\Carbon::parse($childDob);
@@ -539,9 +547,10 @@ class CivilActController extends Controller
                         }
                     }
                 ],
-                'parents_metadata.mother_place_of_birth'  => 'required|string',
-                'parents_metadata.mother_domicile'        => 'required|string',
+                'parents_metadata.mother_place_of_birth'  => $parentRule . '|string',
+                'parents_metadata.mother_domicile'        => $parentRule . '|string',
                 // Section Déclarant
+                'parents_metadata.declarant_relationship' => 'nullable|string',
                 'parents_metadata.declarant_first_name'   => 'nullable|string',
                 'parents_metadata.declarant_last_name'    => 'nullable|string',
                 'parents_metadata.declarant_profession'   => 'nullable|string',
@@ -634,6 +643,7 @@ class CivilActController extends Controller
                 'doc_cni_wife'                                 => $docRule . '|file|mimes:pdf|max:500',
                 'doc_birth_husband'                            => $docRule . '|file|mimes:pdf|max:500',
                 'doc_birth_wife'                               => $docRule . '|file|mimes:pdf|max:500',
+                'doc_consentement'                             => $docRule . '|file|mimes:pdf|max:500',
                 'doc_domicile'                                 => $docRule . '|file|mimes:pdf|max:500',
                 'doc_medical'                                  => $docRule . '|file|mimes:pdf|max:500',
                 'doc_parental_auth'                            => 'nullable|file|mimes:pdf|max:500',

@@ -219,7 +219,7 @@
         <table class="field-row">
             <tr>
                 <td>
-                    <span class="field-value">de {{ $act->father_name ?? '' }}</span>
+                    <span class="field-value">de {{ $act->father_name ?: 'non dénommé' }}</span>
                     <span class="field-label">PRENOM(S) DU PERE</span>
                 </td>
             </tr>
@@ -228,7 +228,7 @@
         <table class="field-row">
             <tr>
                 <td style="width:50%">
-                    <span class="field-value">et de {{ $motherFirst }}</span>
+                    <span class="field-value">et de {{ $motherFirst ?: 'non dénommée' }}</span>
                     <span class="field-label">PRENOM(S) DE LA MERE</span>
                 </td>
                 <td style="width:50%">
