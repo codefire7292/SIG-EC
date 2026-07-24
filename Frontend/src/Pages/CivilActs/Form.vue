@@ -856,7 +856,6 @@ const submit = () => {
                             </div>
                         </div>
                     </div>
-                    </div>
                 </div>
 
                 <!-- Section 2C: Parents du Défunt (Décès uniquement) -->
