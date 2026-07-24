@@ -98,6 +98,7 @@ const form = useForm({
         mother_place_of_birth: props.act?.parents_metadata?.mother_place_of_birth || '',
         mother_domicile: props.act?.parents_metadata?.mother_domicile || '',
         is_foundling: props.act?.parents_metadata?.is_foundling || false,
+        is_father_unrecognized: props.act?.parents_metadata?.is_father_unrecognized || false,
         declarant_relationship: props.act?.parents_metadata?.declarant_relationship || '',
         declarant_first_name: props.act?.parents_metadata?.declarant_first_name || '',
         declarant_last_name: props.act?.parents_metadata?.declarant_last_name || '',
@@ -799,10 +800,21 @@ const submit = () => {
                     <div v-if="!form.parents_metadata.is_foundling" class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <!-- Père -->
                         <div class="p-6 bg-blue-50/40 rounded-2xl border border-blue-100 space-y-4">
-                            <h4 class="text-[10px] font-black text-blue-900 uppercase tracking-widest flex items-center gap-2">
-                                <div class="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
-                                Père
-                            </h4>
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-[10px] font-black text-blue-900 uppercase tracking-widest flex items-center gap-2">
+                                    <div class="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
+                                    Père
+                                </h4>
+                                <label class="flex items-center gap-2 cursor-pointer select-none">
+                                    <input v-model="form.parents_metadata.is_father_unrecognized" type="checkbox" id="is_father_unrecognized" class="h-3.5 w-3.5 text-amber-600 focus:ring-amber-500 border-gray-300 rounded" />
+                                    <span class="text-[9px] font-black text-amber-700 uppercase tracking-widest">Père non reconnu</span>
+                                </label>
+                            </div>
+                            <div v-if="form.parents_metadata.is_father_unrecognized" class="flex items-start gap-2 p-3 bg-amber-50 rounded-xl border border-amber-200">
+                                <svg class="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <p class="text-[10px] text-amber-700 font-medium leading-relaxed">Le père ne reconnaît pas l'enfant. Conformément à l'art. 30, aucune mention ne sera faite à son sujet sur le registre.</p>
+                            </div>
+                            <template v-if="!form.parents_metadata.is_father_unrecognized">
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms &amp; Nom du Père <span class="text-red-500">*</span></label>
                                 <input v-model="form.father_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
@@ -825,6 +837,7 @@ const submit = () => {
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile <span class="text-red-500">*</span></label>
                                 <input v-model="form.parents_metadata.father_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                             </div>
+                            </template>
                         </div>
                         <!-- Mère -->
                         <div class="p-6 bg-pink-50/40 rounded-2xl border border-pink-100 space-y-4">

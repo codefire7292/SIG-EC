@@ -494,7 +494,11 @@ class CivilActController extends Controller
 
         if ($type === 'naissance') {
             $isFoundling = filter_var(request()->input('parents_metadata.is_foundling', false), FILTER_VALIDATE_BOOLEAN);
-            $parentRule = $isFoundling ? 'nullable' : 'required';
+            $isFatherUnrecognized = filter_var(request()->input('parents_metadata.is_father_unrecognized', false), FILTER_VALIDATE_BOOLEAN);
+            $fatherOptional = $isFoundling || $isFatherUnrecognized;
+            $motherOptional = $isFoundling;
+            $fatherRule = $fatherOptional ? 'nullable' : 'required';
+            $parentRule  = $motherOptional ? 'nullable' : 'required';
 
             return array_merge($common, [
                 'first_name'                              => 'required|string',
@@ -509,16 +513,17 @@ class CivilActController extends Controller
                 'judgment_number'                         => 'nullable|required_if:is_judgment,true|string',
                 'judgment_date'                           => 'nullable|required_if:is_judgment,true|date',
                 'judgment_court'                          => 'nullable|required_if:is_judgment,true|string',
-                'father_name'                             => $parentRule . '|string',
+                'father_name'                             => $fatherRule . '|string',
                 'mother_name'                             => $parentRule . '|string',
                 'parents_metadata'                        => 'required|array',
                 'parents_metadata.is_foundling'           => 'nullable|boolean',
-                'parents_metadata.father_profession'      => $parentRule . '|string',
+                'parents_metadata.is_father_unrecognized' => 'nullable|boolean',
+                'parents_metadata.father_profession'      => $fatherRule . '|string',
                 'parents_metadata.father_date_of_birth'   => [
-                    $parentRule,
+                    $fatherRule,
                     'date',
-                    function ($attribute, $value, $fail) use ($isFoundling) {
-                        if ($isFoundling || empty($value)) return;
+                    function ($attribute, $value, $fail) use ($fatherOptional) {
+                        if ($fatherOptional || empty($value)) return;
                         $childDob = request()->input('date_of_birth');
                         if ($childDob) {
                             $childDate = \Carbon\Carbon::parse($childDob);
@@ -529,8 +534,8 @@ class CivilActController extends Controller
                         }
                     }
                 ],
-                'parents_metadata.father_place_of_birth'  => $parentRule . '|string',
-                'parents_metadata.father_domicile'        => $parentRule . '|string',
+                'parents_metadata.father_place_of_birth'  => $fatherRule . '|string',
+                'parents_metadata.father_domicile'        => $fatherRule . '|string',
                 'parents_metadata.mother_profession'      => $parentRule . '|string',
                 'parents_metadata.mother_date_of_birth'   => [
                     $parentRule,

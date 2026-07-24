@@ -51,6 +51,8 @@
             $motherFirst = $motherFirst ?: ($act->parents_metadata['mother_first_name'] ?? '');
             $motherLast  = $motherLast ?: ($act->parents_metadata['mother_last_name'] ?? '');
         }
+        $isFatherUnrecognized = is_array($act->parents_metadata) && !empty($act->parents_metadata['is_father_unrecognized']);
+        $isFoundling          = is_array($act->parents_metadata) && !empty($act->parents_metadata['is_foundling']);
     } elseif ($type === 'mariage') {
         $refYear = $act->marriage_date ? $act->marriage_date->format('Y') : ($act->registry?->year ?? now()->year);
         $md      = $act->marriage_date;
@@ -219,7 +221,11 @@
         <table class="field-row">
             <tr>
                 <td>
+                    @if($isFatherUnrecognized)
+                    <span class="field-value" style="font-style:italic; color:#777;">Père non désigné</span>
+                    @else
                     <span class="field-value">de {{ $act->father_name ?: 'non dénommé' }}</span>
+                    @endif
                     <span class="field-label">PRENOM(S) DU PERE</span>
                 </td>
             </tr>
