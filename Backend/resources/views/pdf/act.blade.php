@@ -107,8 +107,8 @@
         .extrait-ref-cell { width: 22%; text-align: center; font-size: 10px; line-height: 1.8; }
         .extrait-ref-label { font-size: 8px; color: #555; }
 
-        .body-content { padding: 10px 14px 6px; }
-        .narrative { font-size: 11px; margin-bottom: 8px; }
+        .body-content { padding: 6px 14px 4px; }
+        .narrative { font-size: 11px; margin-bottom: 5px; }
 
         .field-row { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
         .field-row td { vertical-align: top; padding: 2px 0; }
@@ -172,7 +172,8 @@
             <td class="extrait-title-cell">
                 @if($type === 'naissance')
                     EXTRAIT DU REGISTRE DES ACTES DE NAISSANCE<br>
-                    <span style="font-size:10px; font-weight:normal;">Pour l'année <strong>{{ strtoupper($yearFr ?? '') }}</strong></span>
+                    <span style="font-size:10px; font-weight:normal;">Pour l'année <strong>{{ strtoupper($yearFr ?? '') }}</strong></span><br>
+                    <span style="font-size:10px;">NUMERO : <strong>{{ strtoupper(toFrWords($refNum)) }}</strong></span>
                 @elseif($type === 'mariage') EXTRAIT DU REGISTRE DES ACTES DE MARIAGE
                 @else EXTRAIT DU REGISTRE DES ACTES DE DÉCÈS
                 @endif
@@ -194,11 +195,6 @@
         <p class="narrative">
             L'an <strong>{{ strtoupper($yearFr) }}</strong>, le <strong>{{ $dayFr }}</strong> du mois de <strong>{{ strtoupper($monthWord) }}</strong>
             @if($dob)({{ $dob->format('d/m/Y') }})@endif
-        </p>
-
-        {{-- Numéro en lettres --}}
-        <p class="narrative">
-            NUMERO : <strong>{{ strtoupper(toFrWords($refNum)) }}</strong>
         </p>
 
         <table class="field-row">
