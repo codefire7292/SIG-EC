@@ -91,7 +91,7 @@
         .header-left { width: 48%; border-right: 1px solid #000; text-align: center; }
         .header-right { width: 52%; text-align: center; }
         .header-left p { font-size: 11px; line-height: 1.5; }
-        .header-logo { width: 70px; height: 70px; margin: 3px auto; display: block; }
+        .header-logo { width: 90px; height: 90px; margin: 3px auto; display: block; }
         .commune-label { font-size: 11px; font-weight: bold; margin-top: 2px; }
         .republic-label { font-size: 11px; margin-bottom: 1px; }
         .republic-motto { font-size: 10px; margin-bottom: 1px; }
