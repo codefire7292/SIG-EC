@@ -152,7 +152,7 @@
         .jugement-ref-cell { width: 95px; text-align: left; font-size: 14px; line-height: 1.8; vertical-align: bottom; }
         .jugement-ref-small { font-size: 10px; color: #555; white-space: nowrap; }
 
-        .mentions-box { border-top: 1px solid #000; padding: 5px 14px; min-height: 30px; }
+        .mentions-box { border-top: 1px solid #000; padding: 0 14px 5px; min-height: 30px; }
         .mentions-label { font-size: 12px; text-transform: uppercase; color: #444; letter-spacing: 0.5px; margin-bottom: 3px; }
         .mentions-content { font-size: 11px; min-height: 20px; }
 
