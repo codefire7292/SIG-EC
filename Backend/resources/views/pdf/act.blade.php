@@ -119,8 +119,8 @@
         .jugement-label-cell { width: 30px; border-right: 1px solid #000; text-align: center; vertical-align: middle; }
         .jugement-label-vertical { font-size: 8px; text-transform: uppercase; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 1px; white-space: nowrap; }
         .jugement-content-cell { font-size: 11px; line-height: 1.8; border-right: 1px solid #000; }
-        .jugement-ref-cell { width: 60px; text-align: center; font-size: 11px; line-height: 2.0; }
-        .jugement-ref-small { font-size: 9px; color: #555; }
+        .jugement-ref-cell { width: 95px; text-align: center; font-size: 11px; line-height: 2.0; }
+        .jugement-ref-small { font-size: 9px; color: #555; white-space: nowrap; }
 
         .mentions-box { border-top: 1px solid #000; padding: 5px 14px; min-height: 30px; }
         .mentions-label { font-size: 9px; text-transform: uppercase; color: #444; letter-spacing: 0.5px; margin-bottom: 3px; }
