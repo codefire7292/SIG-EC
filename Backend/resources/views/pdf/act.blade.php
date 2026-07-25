@@ -24,6 +24,18 @@
         }
     }
 
+    if (!function_exists('dateToFrWords')) {
+        function dateToFrWords($date): string {
+            if (!$date) return '';
+            $d = \Carbon\Carbon::parse($date);
+            $months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+            $dayFr = $d->day === 1 ? 'premier' : toFrWords($d->day);
+            $monthWord = $months[$d->month - 1];
+            $yearFr = toFrWords($d->year);
+            return trim("$dayFr $monthWord $yearFr");
+        }
+    }
+
     $months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 
     // ===== Ref year & number =====
@@ -49,13 +61,30 @@
         $motherFirst = '';
         $motherLast  = '';
         if ($act->mother_name) {
-            $parts       = explode(' ', $act->mother_name, 2);
-            $motherFirst = $parts[0] ?? '';
-            $motherLast  = $parts[1] ?? '';
+            $parts = explode(' ', trim($act->mother_name));
+            if (count($parts) > 1) {
+                $motherLast  = array_pop($parts);
+                $motherFirst = implode(' ', $parts);
+            } else {
+                $motherFirst = $parts[0] ?? '';
+                $motherLast  = '';
+            }
         }
         if (is_array($act->parents_metadata)) {
             $motherFirst = $motherFirst ?: ($act->parents_metadata['mother_first_name'] ?? '');
             $motherLast  = $motherLast ?: ($act->parents_metadata['mother_last_name'] ?? '');
+        }
+
+        // Father name split (exclude last name)
+        $fatherFirst = '';
+        if ($act->father_name) {
+            $parts = explode(' ', trim($act->father_name));
+            if (count($parts) > 1) {
+                array_pop($parts);
+                $fatherFirst = implode(' ', $parts);
+            } else {
+                $fatherFirst = $parts[0] ?? '';
+            }
         }
         $isFatherUnrecognized = is_array($act->parents_metadata) && !empty($act->parents_metadata['is_father_unrecognized']);
         $isFoundling          = is_array($act->parents_metadata) && !empty($act->parents_metadata['is_foundling']);
@@ -81,7 +110,7 @@
         @page { margin: 0; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { height: 100%; margin: 0; padding: 0; }
-        body { font-family: 'Times New Roman', Times, serif; font-size: 12px; color: #000; line-height: 1.5; margin: 13mm 12mm; }
+        body { font-family: 'Times New Roman', Times, serif; font-size: 12px; color: #000; line-height: 1.5; margin: 13mm 12mm 12.2mm 12mm; }
 
         .outer-border-table { border: 1px solid #000; width: 100%; border-collapse: collapse; }
         .outer-border-table > tbody > tr > td { padding: 0; vertical-align: top; }
@@ -101,26 +130,27 @@
 
         .extrait-title-row { border-top: 1px solid #000; border-bottom: 1px solid #000; width: 100%; border-collapse: collapse; }
         .extrait-title-row td { padding: 6px 12px; }
-        .extrait-title-cell { border-right: 1px solid #000; font-size: 13px; font-weight: bold; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
-        .extrait-ref-cell { width: 22%; text-align: center; font-size: 11px; line-height: 1.8; }
+        .extrait-title-cell { border-right: 1px solid #000; font-size: 20px; font-weight: bold; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        .extrait-ref-cell { width: 22%; text-align: left; padding-left: 8px; font-size: 11px; line-height: 1.8; vertical-align: bottom; padding-bottom: 0; }
         .extrait-ref-label { font-size: 9px; color: #555; }
 
         .body-content { padding: 6px 14px 4px; }
-        .narrative { font-size: 12px; margin-bottom: 5px; }
-
+        .narrative { font-size: 16px; margin-bottom: 5px; line-height: 1.5; }
+        
         .field-row { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
         .field-row td { vertical-align: top; padding: 1px 0; }
-        .field-label { font-size: 9px; text-transform: uppercase; color: #444; letter-spacing: 0.5px; display: block; margin-top: 1px; }
-        .field-value { font-size: 12px; display: block; }
-        .field-value-bold { font-size: 13px; font-weight: bold; }
+        .field-label { font-size: 12px; text-transform: uppercase; color: #444; letter-spacing: 0.5px; display: block; margin-top: 1px; }
+        .field-value { font-size: 16px; display: block; line-height: 1.4; }
+        .field-value-bold { font-size: 18px; font-weight: bold; line-height: 1.4; }
 
         .jugement-table { width: 100%; border-collapse: collapse; border-top: 1px solid #000; }
         .jugement-table td { vertical-align: top; padding: 4px 8px; }
-        .jugement-label-cell { width: 55px; border-right: 1px solid #000; text-align: center; vertical-align: middle; }
-        .jugement-label-vertical { font-size: 8px; text-transform: uppercase; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 1px; white-space: nowrap; }
-        .jugement-content-cell { font-size: 11px; line-height: 1.8; border-right: 1px solid #000; }
-        .jugement-ref-cell { width: 95px; text-align: center; font-size: 11px; line-height: 2.0; }
-        .jugement-ref-small { font-size: 9px; color: #555; white-space: nowrap; }
+         .jugement-label-cell { width: 55px; border-right: 1px solid #000; text-align: center; vertical-align: middle; }
+         .jugement-label-cell img { width: 54px !important; }
+         .jugement-label-vertical { font-size: 8px; text-transform: uppercase; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 1px; white-space: nowrap; }
+        .jugement-content-cell { font-size: 14px; line-height: 1.6; border-right: 1px solid #000; }
+        .jugement-ref-cell { width: 95px; text-align: left; font-size: 14px; line-height: 1.8; vertical-align: bottom; }
+        .jugement-ref-small { font-size: 10px; color: #555; white-space: nowrap; }
 
         .mentions-box { border-top: 1px solid #000; padding: 5px 14px; min-height: 30px; }
         .mentions-label { font-size: 9px; text-transform: uppercase; color: #444; letter-spacing: 0.5px; margin-bottom: 3px; }
@@ -131,9 +161,9 @@
         .footer-qr-cell { width: 120px; text-align: center; border-right: 1px solid #ccc; }
         .footer-qr-label { font-size: 9px; margin-bottom: 3px; }
         .footer-signature-cell { text-align: right; font-size: 11px; line-height: 1.7; }
-        .signature-content { display: inline-block; text-align: center; padding-right: 15px; }
+        .signature-content { display: inline-block; text-align: center; padding-right: 15px; position: relative; top: -60px; font-weight: normal; }
 
-        .dotted-line { display: inline-block; width: 75%; border-bottom: 1px dotted #555; vertical-align: middle; }
+        .dotted-line { display: inline-block; width: 75%; border-bottom: 1px dotted #555; vertical-align: baseline; }
     </style>
 </head>
 <body>
@@ -170,17 +200,22 @@
         <tr>
             <td class="extrait-title-cell">
                 @if($type === 'naissance')
-                    EXTRAIT DU REGISTRE DES ACTES DE NAISSANCE<br>
-                    <span style="font-size:10px; font-weight:normal;">Pour l'année <strong>{{ strtoupper($yearFr ?? '') }}</strong></span><br>
-                    <span style="font-size:10px;">NUMERO : <strong>{{ strtoupper(toFrWords($refNum)) }}</strong></span>
+                    <div style="margin-top: 15px;">EXTRAIT DU REGISTRE DES ACTES DE NAISSANCE</div>
+                    <div style="text-align: left; font-size: 14px; font-weight: normal; margin-top: 18px; white-space: normal; line-height: 1.4;">
+                        <div style="margin-bottom: 6px;">POUR L'ANNÉE <strong>{{ strtoupper($yearFr ?? '') }}</strong></div>
+                        <div>NUMERO : <strong>{{ strtoupper(toFrWords($refNum)) }}</strong></div>
+                        <div style="height: 15px;"></div>
+                    </div>
                 @elseif($type === 'mariage') EXTRAIT DU REGISTRE DES ACTES DE MARIAGE
                 @else EXTRAIT DU REGISTRE DES ACTES DE DÉCÈS
                 @endif
             </td>
             <td class="extrait-ref-cell">
-                <strong>AN {{ $refYear }}</strong><br>
-                <strong>{{ $refNum }}</strong><br>
-                <span class="extrait-ref-label">N° dans le registre en chiffres</span>
+                <div style="margin-bottom: 5px; font-size: 15px;"><strong>AN {{ $refYear }}</strong></div>
+                <div style="line-height: 1.1; font-size: 15px;">
+                    <strong>{{ $refNum }}</strong><br>
+                    <span class="extrait-ref-label">N° dans le registre en chiffres</span>
+                </div>
             </td>
         </tr>
     </table>
@@ -196,9 +231,9 @@
             @if($dob)({{ $dob->format('d/m/Y') }})@endif
         </p>
 
-        <table class="field-row">
+        <table class="field-row" style="margin-bottom: 20px;">
             <tr>
-                <td style="width:50%">
+                <td style="width:65%">
                     @if($timeDisplay)
                     <span class="field-value">Heures : <strong>{{ \Carbon\Carbon::parse('1970-01-01 ' . $timeDisplay)->format('H\hi') }}</strong></span>
                     @else
@@ -206,28 +241,28 @@
                     @endif
                     <span class="field-label">Heure de Naissance</span>
                 </td>
-                <td style="width:50%">
-                    <span class="field-value">Est né(e) à : <strong>{{ strtoupper($act->place_of_birth ?? '') }}</strong></span>
+                <td style="width:35%">
+                    <span class="field-value" style="white-space: nowrap;">Est né(e) à : <strong>{{ strtoupper($act->place_of_birth ?? '') }}</strong></span>
                 </td>
             </tr>
         </table>
 
-        <p class="narrative">de sexe : <strong>{{ $act->gender === 'M' ? 'MASCULIN' : ($act->gender === 'F' ? 'FÉMININ' : 'N/A') }}</strong></p>
+        <p class="narrative" style="margin-bottom: 20px;">de sexe : <strong>{{ $act->gender === 'M' ? 'MASCULIN' : ($act->gender === 'F' ? 'FÉMININ' : 'N/A') }}</strong></p>
 
-        <table class="field-row">
+        <table class="field-row" style="margin-bottom: 20px;">
             <tr>
-                <td style="width:50%">
+                <td style="width:65%">
                     <span class="field-value field-value-bold">{{ strtoupper($act->first_name) }}</span>
                     <span class="field-label">PRENOM(S)</span>
                 </td>
-                <td style="width:50%">
+                <td style="width:35%">
                     <span class="field-value field-value-bold">{{ strtoupper($act->last_name) }}</span>
                     <span class="field-label">NOM DE FAMILLE</span>
                 </td>
             </tr>
         </table>
 
-        <table class="field-row">
+        <table class="field-row" style="margin-bottom: 20px;">
             <tr>
                 <td>
                     @if($isFatherUnrecognized)
@@ -235,7 +270,7 @@
                     @elseif($isFoundling)
                     <span class="field-value" style="font-style:italic; color:#777;">non dénommé</span>
                     @else
-                    <span class="field-value">de <strong>{{ strtoupper($act->father_name ?? '') }}</strong></span>
+                    <span class="field-value">de <strong>{{ strtoupper($fatherFirst) }}</strong></span>
                     @endif
                     <span class="field-label">PRENOM(S) DU PERE</span>
                 </td>
@@ -244,7 +279,7 @@
 
         <table class="field-row">
             <tr>
-                <td style="width:50%">
+                <td style="width:65%">
                     @if($isFoundling)
                     <span class="field-value" style="font-style:italic; color:#777;">et de non dénommée</span>
                     @else
@@ -252,7 +287,7 @@
                     @endif
                     <span class="field-label">PRENOM(S) DE LA MERE</span>
                 </td>
-                <td style="width:50%">
+                <td style="width:35%">
                     @if(!$isFoundling)
                     <span class="field-value"><strong>{{ strtoupper($motherLast) }}</strong></span>
                     <span class="field-label">NOM DE FAMILLE DE LA MERE</span>
@@ -330,17 +365,33 @@
                 <img src="data:image/png;base64,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" alt="Jugement" style="width: 50px;">
             </td>
             <td class="jugement-content-cell">
-                <p>Délivré par le Juge du tribunal de {{ strtoupper($center?->region ?? 'ZIGUINCHOR') }}</p>
-                <p>le, <span class="dotted-line">{{ $act->is_judgment && $act->judgment_date ? \Carbon\Carbon::parse($act->judgment_date)->format('d/m/Y') : '' }}</span></p>
-                <p>sous le numéro <span class="dotted-line">{{ $act->judgment_number ?? '' }}</span></p>
-                <p>Transcrit-le <span class="dotted-line"></span></p>
-                <p>Sur le régistre des Actes de Naissance de l'année</p>
+                <p style="margin-bottom: 4px;">Délivré par le Juge du tribunal de {{ strtoupper($center?->region ?? 'ZIGUINCHOR') }}</p>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 4px;">
+                    <tr>
+                        <td style="width: 1%; white-space: nowrap; padding: 0 4px 0 0; vertical-align: bottom;">le,</td>
+                        <td style="border-bottom: 1px dotted #555; vertical-align: bottom; padding: 0;"><strong>{{ $act->is_judgment && $act->judgment_date ? dateToFrWords($act->judgment_date) : '' }}</strong></td>
+                    </tr>
+                </table>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 4px;">
+                    <tr>
+                        <td style="width: 1%; white-space: nowrap; padding: 0 4px 0 0; vertical-align: bottom;">sous le numéro</td>
+                        <td style="border-bottom: 1px dotted #555; vertical-align: bottom; padding: 0;"><strong>{{ is_numeric($act->judgment_number) ? toFrWords((int)$act->judgment_number) : ($act->judgment_number ?? '') }}</strong></td>
+                    </tr>
+                </table>
+                <div style="height: 15px;"></div>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 4px;">
+                    <tr>
+                        <td style="width: 1%; white-space: nowrap; padding: 0 4px 0 0; vertical-align: bottom;">Transcrit-le</td>
+                        <td style="border-bottom: 1px dotted #555; vertical-align: bottom; padding: 0;"><strong>{{ isset($act->parents_metadata['judgment_auth_date']) && $act->parents_metadata['judgment_auth_date'] ? dateToFrWords($act->parents_metadata['judgment_auth_date']) : '' }}</strong></td>
+                    </tr>
+                </table>
+                <p style="margin-bottom: 0;">Sur le régistre des Actes de Naissance de l'année</p>
             </td>
-            <td class="jugement-ref-cell">
-                <span class="field-value-bold">AN</span><br>
-                <span class="field-value-bold">N°</span><br>
-                <span class="jugement-ref-small">N° du jugement en chiffres</span><br><br>
-                <span class="field-value-bold">AN</span>
+            <td class="jugement-ref-cell" style="padding-bottom: 0; vertical-align: bottom;">
+                <span class="field-value-bold">AN {{ $act->judgment_date ? \Carbon\Carbon::parse($act->judgment_date)->format('Y') : '' }}</span><br>
+                <span class="field-value-bold">N° {{ $act->judgment_number ?? '' }}</span><br>
+                <span class="jugement-ref-small">N° du jugement en chiffres</span><br>
+                <span class="field-value-bold" style="display: block; line-height: 1; margin-bottom: 30px;">AN {{ isset($act->parents_metadata['judgment_auth_date']) && $act->parents_metadata['judgment_auth_date'] ? \Carbon\Carbon::parse($act->parents_metadata['judgment_auth_date'])->format('Y') : '' }}</span>
             </td>
         </tr>
     </table>
@@ -352,6 +403,8 @@
         <p class="mentions-content">{{ $act->officer_comments ?? '' }}</p>
     </div>
 
+    <div style="height: 34px;"></div>
+
     {{-- ===== FOOTER ===== --}}
     <table class="footer-row">
         <tr>
@@ -362,8 +415,9 @@
             <td class="footer-signature-cell">
                 <div class="signature-content">
                     POUR EXTRAIT CERTIFIE CONFORME<br>
-                    Fait à {{ strtoupper($center?->commune ?? 'ENAMPORE') }} le, {{ \Carbon\Carbon::parse($act->validated_at ?? now())->locale('fr')->isoFormat('D MMMM YYYY') }}<br>
-                    L'officier d'Etat-civil soussigné
+                    <strong>Fait à {{ strtoupper($center?->commune ?? 'ENAMPORE') }} le, {{ \Carbon\Carbon::parse($act->validated_at ?? now())->locale('fr')->isoFormat('D MMMM YYYY') }}</strong><br>
+                    <br><br><br>
+                    <em>L'officier d'Etat-civil soussigné</em>
                 </div>
             </td>
         </tr>
