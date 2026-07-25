@@ -83,10 +83,8 @@
         html, body { height: 100%; margin: 0; padding: 0; }
         body { font-family: 'Times New Roman', Times, serif; font-size: 12px; color: #000; line-height: 1.5; margin: 13mm 12mm; }
 
-        .outer-border-table { border: 1px solid #000; width: 100%; height: 100%; border-collapse: collapse; }
-        .outer-border-table > tbody > tr > td { padding: 0; }
-        .content-cell { vertical-align: top; }
-        .bottom-cell { vertical-align: bottom; height: 1%; }
+        .outer-border-table { border: 1px solid #000; width: 100%; border-collapse: collapse; }
+        .outer-border-table > tbody > tr > td { padding: 0; vertical-align: top; }
 
         .header-table { width: 100%; border-collapse: collapse; }
         .header-table td { vertical-align: middle; padding: 5px 10px; }
@@ -322,11 +320,6 @@
         @endif
 
     </div>
-
-</td>
-</tr>
-<tr>
-<td class="bottom-cell">
 
     {{-- ===== JUGEMENT (naissance uniquement) ===== --}}
     @if($type === 'naissance')
