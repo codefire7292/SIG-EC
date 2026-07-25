@@ -362,7 +362,7 @@
             </td>
             <td class="footer-signature-cell">
                 POUR EXTRAIT CERTIFIE CONFORME<br>
-                Fait à {{ $center?->commune ?? 'ENAMPORE' }} le, {{ \Carbon\Carbon::parse($act->validated_at ?? now())->locale('fr')->isoFormat('D MMMM YYYY') }}<br>
+                Fait à {{ strtoupper($center?->commune ?? 'ENAMPORE') }} le, {{ \Carbon\Carbon::parse($act->validated_at ?? now())->locale('fr')->isoFormat('D MMMM YYYY') }}<br>
                 L'officier d'Etat-civil soussigné
             </td>
         </tr>
