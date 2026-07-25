@@ -126,7 +126,7 @@
         .mentions-label { font-size: 9px; text-transform: uppercase; color: #444; letter-spacing: 0.5px; margin-bottom: 3px; }
         .mentions-content { font-size: 11px; min-height: 20px; }
 
-        .footer-row { border-top: 1px solid #000; width: 100%; border-collapse: collapse; }
+        .footer-row { width: 100%; border-collapse: collapse; }
         .footer-row td { vertical-align: bottom; padding: 7px 14px; }
         .footer-qr-cell { width: 100px; text-align: center; border-right: 1px solid #ccc; }
         .footer-qr-label { font-size: 9px; margin-bottom: 3px; }
