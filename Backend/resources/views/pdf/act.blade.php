@@ -36,9 +36,15 @@
         $yearFr   = $dob ? ucfirst(toFrWords((int)$dob->format('Y'))) : '';
         $dayFr    = $dob ? ($dob->day === 1 ? 'premier' : toFrWords($dob->day)) : '';
         $monthWord = $dob ? $months[$dob->month - 1] : '';
-        $timeDisplay = $act->time_of_birth
-            ? \Carbon\Carbon::createFromFormat('H:i:s', strlen($act->time_of_birth) === 5 ? $act->time_of_birth . ':00' : $act->time_of_birth)->format('H:i:s')
-            : null;
+        // Normalize time to avoid format mismatch
+        $rawTime = $act->time_of_birth;
+        if ($rawTime) {
+            // Accept both H:i and H:i:s
+            $timeParts = explode(':', $rawTime);
+            $timeDisplay = sprintf('%02d:%02d', $timeParts[0] ?? 0, $timeParts[1] ?? 0);
+        } else {
+            $timeDisplay = null;
+        }
         // Mother name split
         $motherFirst = '';
         $motherLast  = '';
@@ -164,14 +170,16 @@
     <table class="extrait-title-row">
         <tr>
             <td class="extrait-title-cell">
-                @if($type === 'naissance') Extrait du Registre des Actes de Naissance
-                @elseif($type === 'mariage') Extrait du Registre des Actes de Mariage
-                @else Extrait du Registre des Actes de Décès
+                @if($type === 'naissance')
+                    EXTRAIT DU REGISTRE DES ACTES DE NAISSANCE<br>
+                    <span style="font-size:10px; font-weight:normal;">Pour l'année <strong>{{ strtoupper($yearFr ?? '') }}</strong></span>
+                @elseif($type === 'mariage') EXTRAIT DU REGISTRE DES ACTES DE MARIAGE
+                @else EXTRAIT DU REGISTRE DES ACTES DE DÉCÈS
                 @endif
             </td>
             <td class="extrait-ref-cell">
                 <strong>AN {{ $refYear }}</strong><br>
-                <strong>{{ $refYear }} - {{ $refNum }}</strong><br>
+                <strong>{{ $refNum }}</strong><br>
                 <span class="extrait-ref-label">N° dans le registre en chiffres</span>
             </td>
         </tr>
@@ -182,37 +190,43 @@
 
         @if($type === 'naissance')
 
+        {{-- Ligne narrative : L'an ... le ... du mois de ... --}}
         <p class="narrative">
-            L'an {{ strtolower($yearFr) }}, le {{ $dayFr }} du mois de {{ $monthWord }}
-            @if($dob)({{ $dob->format('Y-m-d') }})@endif
+            L'an <strong>{{ strtoupper($yearFr) }}</strong>, le <strong>{{ $dayFr }}</strong> du mois de <strong>{{ strtoupper($monthWord) }}</strong>
+            @if($dob)({{ $dob->format('d/m/Y') }})@endif
+        </p>
+
+        {{-- Numéro en lettres --}}
+        <p class="narrative">
+            NUMERO : <strong>{{ strtoupper(toFrWords($refNum)) }}</strong>
         </p>
 
         <table class="field-row">
             <tr>
                 <td style="width:50%">
                     @if($timeDisplay)
-                    <span class="field-value">Heures : {{ $timeDisplay }}</span>
+                    <span class="field-value">Heures : <strong>{{ \Carbon\Carbon::parse('1970-01-01 ' . $timeDisplay)->format('H\hi') }}</strong></span>
                     @else
-                    <span class="field-value">Heures : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span class="field-value">Heures : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     @endif
                     <span class="field-label">Heure de Naissance</span>
                 </td>
                 <td style="width:50%">
-                    <span class="field-value">Est né(e) à : {{ $act->place_of_birth ?? '' }}</span>
+                    <span class="field-value">Est né(e) à : <strong>{{ strtoupper($act->place_of_birth ?? '') }}</strong></span>
                 </td>
             </tr>
         </table>
 
-        <p class="narrative">de sexe : {{ $act->gender === 'M' ? 'Masculin' : ($act->gender === 'F' ? 'Féminin' : 'N/A') }}</p>
+        <p class="narrative">de sexe : <strong>{{ $act->gender === 'M' ? 'MASCULIN' : ($act->gender === 'F' ? 'FÉMININ' : 'N/A') }}</strong></p>
 
         <table class="field-row">
             <tr>
                 <td style="width:50%">
-                    <span class="field-value field-value-bold">{{ $act->first_name }}</span>
+                    <span class="field-value field-value-bold">{{ strtoupper($act->first_name) }}</span>
                     <span class="field-label">PRENOM(S)</span>
                 </td>
                 <td style="width:50%">
-                    <span class="field-value field-value-bold">{{ $act->last_name }}</span>
+                    <span class="field-value field-value-bold">{{ strtoupper($act->last_name) }}</span>
                     <span class="field-label">NOM DE FAMILLE</span>
                 </td>
             </tr>
@@ -222,9 +236,11 @@
             <tr>
                 <td>
                     @if($isFatherUnrecognized)
-                    <span class="field-value" style="font-style:italic; color:#777;">Père non désigné</span>
+                    <span class="field-value" style="font-style:italic; color:#777;">Père non désigné à l'officier d'état-civil</span>
+                    @elseif($isFoundling)
+                    <span class="field-value" style="font-style:italic; color:#777;">non dénommé</span>
                     @else
-                    <span class="field-value">de {{ $act->father_name ?: 'non dénommé' }}</span>
+                    <span class="field-value">de <strong>{{ strtoupper($act->father_name ?? '') }}</strong></span>
                     @endif
                     <span class="field-label">PRENOM(S) DU PERE</span>
                 </td>
@@ -234,12 +250,18 @@
         <table class="field-row">
             <tr>
                 <td style="width:50%">
-                    <span class="field-value">et de {{ $motherFirst ?: 'non dénommée' }}</span>
+                    @if($isFoundling)
+                    <span class="field-value" style="font-style:italic; color:#777;">et de non dénommée</span>
+                    @else
+                    <span class="field-value">et de <strong>{{ strtoupper($motherFirst) }}</strong></span>
+                    @endif
                     <span class="field-label">PRENOM(S) DE LA MERE</span>
                 </td>
                 <td style="width:50%">
-                    <span class="field-value">{{ strtoupper($motherLast) }}</span>
+                    @if(!$isFoundling)
+                    <span class="field-value"><strong>{{ strtoupper($motherLast) }}</strong></span>
                     <span class="field-label">NOM DE FAMILLE DE LA MERE</span>
+                    @endif
                 </td>
             </tr>
         </table>
