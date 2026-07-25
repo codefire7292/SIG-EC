@@ -89,17 +89,17 @@
         .bottom-cell { vertical-align: bottom; height: 1%; }
 
         .header-table { width: 100%; border-collapse: collapse; }
-        .header-table td { vertical-align: middle; padding: 7px 10px; }
+        .header-table td { vertical-align: middle; padding: 5px 10px; }
         .header-left { width: 48%; border-right: 1px solid #000; text-align: center; }
         .header-right { width: 52%; text-align: center; }
-        .header-left p { font-size: 11px; line-height: 1.6; }
-        .header-logo { width: 55px; height: 55px; margin: 4px auto; display: block; }
-        .commune-label { font-size: 11px; font-weight: bold; margin-top: 3px; }
-        .republic-label { font-size: 11px; margin-bottom: 2px; }
-        .republic-motto { font-size: 10px; margin-bottom: 2px; }
-        .republic-divider { font-size: 11px; letter-spacing: 2px; margin: 2px 0; }
-        .etat-civil-title { font-size: 20px; font-weight: bold; letter-spacing: 1px; margin: 6px 0 4px; }
-        .centre-label { font-size: 10px; line-height: 1.5; }
+        .header-left p { font-size: 11px; line-height: 1.5; }
+        .header-logo { width: 52px; height: 52px; margin: 3px auto; display: block; }
+        .commune-label { font-size: 11px; font-weight: bold; margin-top: 2px; }
+        .republic-label { font-size: 11px; margin-bottom: 1px; }
+        .republic-motto { font-size: 10px; margin-bottom: 1px; }
+        .republic-divider { font-size: 11px; letter-spacing: 2px; margin: 1px 0; }
+        .etat-civil-title { font-size: 19px; font-weight: bold; letter-spacing: 1px; margin: 4px 0 3px; }
+        .centre-label { font-size: 10px; line-height: 1.4; }
 
         .extrait-title-row { border-top: 1px solid #000; border-bottom: 1px solid #000; width: 100%; border-collapse: collapse; }
         .extrait-title-row td { padding: 6px 12px; }
@@ -107,32 +107,32 @@
         .extrait-ref-cell { width: 22%; text-align: center; font-size: 11px; line-height: 1.8; }
         .extrait-ref-label { font-size: 9px; color: #555; }
 
-        .body-content { padding: 8px 14px 6px; }
-        .narrative { font-size: 12px; margin-bottom: 7px; }
+        .body-content { padding: 6px 14px 4px; }
+        .narrative { font-size: 12px; margin-bottom: 5px; }
 
-        .field-row { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
-        .field-row td { vertical-align: top; padding: 2px 0; }
+        .field-row { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+        .field-row td { vertical-align: top; padding: 1px 0; }
         .field-label { font-size: 9px; text-transform: uppercase; color: #444; letter-spacing: 0.5px; display: block; margin-top: 1px; }
         .field-value { font-size: 12px; display: block; }
         .field-value-bold { font-size: 13px; font-weight: bold; }
 
         .jugement-table { width: 100%; border-collapse: collapse; border-top: 1px solid #000; }
-        .jugement-table td { vertical-align: top; padding: 6px 8px; }
+        .jugement-table td { vertical-align: top; padding: 4px 8px; }
         .jugement-label-cell { width: 30px; border-right: 1px solid #000; text-align: center; vertical-align: middle; }
         .jugement-label-vertical { font-size: 8px; text-transform: uppercase; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 1px; white-space: nowrap; }
-        .jugement-content-cell { font-size: 11px; line-height: 2.2; border-right: 1px solid #000; }
-        .jugement-ref-cell { width: 60px; text-align: center; font-size: 11px; line-height: 2.4; }
+        .jugement-content-cell { font-size: 11px; line-height: 1.8; border-right: 1px solid #000; }
+        .jugement-ref-cell { width: 60px; text-align: center; font-size: 11px; line-height: 2.0; }
         .jugement-ref-small { font-size: 9px; color: #555; }
 
-        .mentions-box { border-top: 1px solid #000; padding: 8px 14px; min-height: 36px; }
-        .mentions-label { font-size: 9px; text-transform: uppercase; color: #444; letter-spacing: 0.5px; margin-bottom: 4px; }
-        .mentions-content { font-size: 11px; min-height: 22px; }
+        .mentions-box { border-top: 1px solid #000; padding: 5px 14px; min-height: 30px; }
+        .mentions-label { font-size: 9px; text-transform: uppercase; color: #444; letter-spacing: 0.5px; margin-bottom: 3px; }
+        .mentions-content { font-size: 11px; min-height: 20px; }
 
         .footer-row { border-top: 1px solid #000; width: 100%; border-collapse: collapse; }
-        .footer-row td { vertical-align: bottom; padding: 10px 14px; }
-        .footer-qr-cell { width: 110px; text-align: center; border-right: 1px solid #ccc; }
+        .footer-row td { vertical-align: bottom; padding: 7px 14px; }
+        .footer-qr-cell { width: 100px; text-align: center; border-right: 1px solid #ccc; }
         .footer-qr-label { font-size: 9px; margin-bottom: 3px; }
-        .footer-signature-cell { text-align: right; font-size: 11px; line-height: 1.8; }
+        .footer-signature-cell { text-align: right; font-size: 11px; line-height: 1.7; }
 
         .dotted-line { display: inline-block; width: 75%; border-bottom: 1px dotted #555; vertical-align: middle; }
     </style>
