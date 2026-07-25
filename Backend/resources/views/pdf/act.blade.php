@@ -127,7 +127,7 @@
         .mentions-content { font-size: 11px; min-height: 20px; }
 
         .footer-row { width: 100%; border-collapse: collapse; }
-        .footer-row td { vertical-align: middle; padding: 7px 14px; }
+        .footer-row td { vertical-align: top; padding: 7px 14px; }
         .footer-qr-cell { width: 100px; text-align: center; border-right: 1px solid #ccc; }
         .footer-qr-label { font-size: 9px; margin-bottom: 3px; }
         .footer-signature-cell { text-align: right; font-size: 11px; line-height: 1.7; }
