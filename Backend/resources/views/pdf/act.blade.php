@@ -125,7 +125,7 @@
         .republic-label { font-size: 15px; margin-bottom: 1px; }
         .republic-motto { font-size: 14px; margin-bottom: 1px; }
         .republic-divider { font-size: 15px; letter-spacing: 3px; margin: 1px 0; }
-        .etat-civil-title { font-size: 24px; font-weight: bold; letter-spacing: 1px; margin: 4px 0 3px; }
+        .etat-civil-title { font-size: 24px; font-weight: bold; letter-spacing: 1px; margin: 12px 0 10px; }
         .centre-label { font-size: 14px; line-height: 1.4; }
 
         .extrait-title-row { border-top: 1px solid #000; border-bottom: 1px solid #000; width: 100%; border-collapse: collapse; }
@@ -186,9 +186,7 @@
                 <p class="republic-label">REPUBLIQUE DU SENEGAL</p>
                 <p class="republic-motto">Un-Peuple Un-But Une-Foi</p>
                 <p class="republic-divider">----------</p>
-                <br>
                 <p class="etat-civil-title">ETAT-CIVIL</p>
-                <br>
                 <p class="centre-label">
                     {{ strtoupper($center?->name ?? 'CENTRE PRINCIPAL (1) ENAMPORE1') }}<br>
                     ENAMPORE CENTRE PRINCIPAL
