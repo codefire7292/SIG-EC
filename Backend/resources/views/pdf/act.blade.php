@@ -116,7 +116,7 @@
 
         .jugement-table { width: 100%; border-collapse: collapse; border-top: 1px solid #000; }
         .jugement-table td { vertical-align: top; padding: 4px 8px; }
-        .jugement-label-cell { width: 30px; border-right: 1px solid #000; text-align: center; vertical-align: middle; }
+        .jugement-label-cell { width: 55px; border-right: 1px solid #000; text-align: center; vertical-align: middle; }
         .jugement-label-vertical { font-size: 8px; text-transform: uppercase; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 1px; white-space: nowrap; }
         .jugement-content-cell { font-size: 11px; line-height: 1.8; border-right: 1px solid #000; }
         .jugement-ref-cell { width: 95px; text-align: center; font-size: 11px; line-height: 2.0; }
@@ -327,7 +327,7 @@
     <table class="jugement-table">
         <tr>
             <td class="jugement-label-cell">
-                <img src="{{ public_path('images/partie_jugement.png') }}" alt="Jugement" style="width: 25px;">
+                <img src="{{ public_path('images/partie_jugement.png') }}" alt="Jugement" style="width: 50px;">
             </td>
             <td class="jugement-content-cell">
                 <p>Délivré par le Juge du tribunal de {{ strtoupper($center?->region ?? 'ZIGUINCHOR') }}</p>
