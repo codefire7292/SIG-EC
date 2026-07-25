@@ -78,10 +78,10 @@
     <meta charset="utf-8">
     <title>Extrait d'Acte — {{ $act->reference_number }}</title>
     <style>
-        @page { margin: 15mm 14mm 15mm 14mm; }
+        @page { margin: 0; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; margin: 0; padding: 0; }
-        body { font-family: 'Times New Roman', Times, serif; font-size: 11px; color: #000; line-height: 1.4; }
+        html { height: 100%; margin: 0; padding: 0; }
+        body { font-family: 'Times New Roman', Times, serif; font-size: 11px; color: #000; line-height: 1.4; margin: 14mm 13mm; height: 100%; }
 
         .outer-border-table { border: 1px solid #000; width: 100%; border-collapse: collapse; }
         .outer-border-table > tbody > tr > td { padding: 0; }
