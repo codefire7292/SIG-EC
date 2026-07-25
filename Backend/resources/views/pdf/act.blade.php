@@ -90,14 +90,14 @@
         .header-table td { vertical-align: middle; padding: 5px 10px; }
         .header-left { width: 48%; border-right: 1px solid #000; text-align: center; }
         .header-right { width: 52%; text-align: center; }
-        .header-left p { font-size: 13px; line-height: 1.5; }
+        .header-left p { font-size: 15px; line-height: 1.5; }
         .header-logo { width: 90px; height: 90px; margin: 3px auto; display: block; }
-        .commune-label { font-size: 13px; font-weight: bold; margin-top: 2px; }
-        .republic-label { font-size: 13px; margin-bottom: 1px; }
-        .republic-motto { font-size: 12px; margin-bottom: 1px; }
-        .republic-divider { font-size: 13px; letter-spacing: 2px; margin: 1px 0; }
-        .etat-civil-title { font-size: 21px; font-weight: bold; letter-spacing: 1px; margin: 4px 0 3px; }
-        .centre-label { font-size: 12px; line-height: 1.4; }
+        .commune-label { font-size: 15px; font-weight: bold; margin-top: 2px; }
+        .republic-label { font-size: 15px; margin-bottom: 1px; }
+        .republic-motto { font-size: 14px; margin-bottom: 1px; }
+        .republic-divider { font-size: 15px; letter-spacing: 2px; margin: 1px 0; }
+        .etat-civil-title { font-size: 24px; font-weight: bold; letter-spacing: 1px; margin: 4px 0 3px; }
+        .centre-label { font-size: 14px; line-height: 1.4; }
 
         .extrait-title-row { border-top: 1px solid #000; border-bottom: 1px solid #000; width: 100%; border-collapse: collapse; }
         .extrait-title-row td { padding: 6px 12px; }
