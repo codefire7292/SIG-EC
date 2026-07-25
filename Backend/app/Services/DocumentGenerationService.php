@@ -98,7 +98,11 @@ class DocumentGenerationService
         $pdf->setPaper('a4', 'portrait');
         $pdf->setOptions([
             'isHtml5ParserEnabled' => true,
-            'isRemoteEnabled' => true,
+            'isRemoteEnabled'      => true,
+            'margin_top'           => 15,
+            'margin_right'         => 14,
+            'margin_bottom'        => 15,
+            'margin_left'          => 14,
         ]);
 
         return $pdf->output();
