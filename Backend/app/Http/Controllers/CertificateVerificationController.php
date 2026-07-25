@@ -76,7 +76,7 @@ class CertificateVerificationController extends Controller
     /**
      * Display the public view of a civil act (naissance, mariage, décès).
      */
-    public function showAct(string $type, string $uuid): Response
+    public function showAct(string $type, string $uuid, Request $request): Response
     {
         $act = match ($type) {
             'naissance' => BirthAct::with('registry')->where('uuid', $uuid)
@@ -91,9 +91,21 @@ class CertificateVerificationController extends Controller
             default     => abort(404),
         };
 
+        $isExpired = false;
+        $generationDate = null;
+        if ($request->has('t')) {
+            $timestamp = (int)$request->query('t');
+            $generationDate = \Carbon\Carbon::createFromTimestamp($timestamp)->locale('fr');
+            if ($generationDate->diffInDays(now()) > 90) {
+                $isExpired = true;
+            }
+        }
+
         return Inertia::render('Public/ActView', [
-            'act'  => $act,
-            'type' => $type,
+            'act'            => $act,
+            'type'           => $type,
+            'isExpired'      => $isExpired,
+            'generationDate' => $generationDate ? $generationDate->isoFormat('D MMMM YYYY') : null,
         ]);
     }
 

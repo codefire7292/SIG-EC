@@ -11,6 +11,8 @@ import {
 const props = defineProps({
     act: Object,
     type: String,
+    isExpired: Boolean,
+    generationDate: String,
 })
 
 const typeConfig = {
@@ -105,6 +107,21 @@ const spousesMeta = computed(() => props.act?.spouses_metadata ?? null)
                                 Télécharger l'Extrait PDF
                             </a>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- ALERT EXPIRATION -->
+                <div v-if="isExpired" class="bg-rose-50 border-b border-rose-100 px-8 py-6 flex items-start gap-4">
+                    <div class="w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center shrink-0">
+                        <ClockIcon class="h-6 w-6 text-rose-600" />
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-black text-rose-950 mb-1">Attention : Extrait expiré</h3>
+                        <p class="text-xs text-rose-800 leading-relaxed font-semibold">
+                            Cet extrait d'acte a été généré le <strong class="font-black text-rose-950">{{ generationDate }}</strong>. 
+                            Selon la législation en vigueur en République du Sénégal, la durée de validité légale d'un extrait de l'état civil est limitée à <strong>3 mois</strong> (90 jours). 
+                            Ce document physique n'est plus valable administrativement. Veuillez demander la délivrance d'un nouvel extrait d'acte.
+                        </p>
                     </div>
                 </div>
 

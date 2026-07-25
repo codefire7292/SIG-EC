@@ -60,7 +60,7 @@ class DocumentGenerationService
     public function generateActExtractPdf($act, string $type): string
     {
         // 1. Generate QR Code pointing to the public verification URL
-        $verificationUrl = route('acts.verify.show', ['type' => $type, 'uuid' => $act->uuid]);
+        $verificationUrl = route('acts.verify.show', ['type' => $type, 'uuid' => $act->uuid, 't' => time()]);
         $qrCodeBase64 = base64_encode(QrCode::format('svg')
             ->size(150)
             ->errorCorrection('H')
