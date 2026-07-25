@@ -158,7 +158,7 @@
                 <p class="republic-divider">- - - - - - - - - - - -</p>
                 <p class="etat-civil-title">ETAT-CIVIL</p>
                 <p class="centre-label">
-                    CENTRE PRINCIPAL (1) {{ strtoupper($center?->name ?? 'ENAMPORE CENTRE PRINCIPAL') }}
+                    {{ strtoupper($center?->name ?? 'CENTRE PRINCIPAL (1) ENAMPORE1') }}
                 </p>
             </td>
         </tr>
