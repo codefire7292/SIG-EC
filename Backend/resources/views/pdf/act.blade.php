@@ -128,7 +128,7 @@
 
         .footer-row { width: 100%; border-collapse: collapse; }
         .footer-row td { vertical-align: top; padding: 7px 14px; }
-        .footer-qr-cell { width: 100px; text-align: center; border-right: 1px solid #ccc; }
+        .footer-qr-cell { width: 120px; text-align: center; border-right: 1px solid #ccc; }
         .footer-qr-label { font-size: 9px; margin-bottom: 3px; }
         .footer-signature-cell { text-align: right; font-size: 11px; line-height: 1.7; }
         .signature-content { display: inline-block; text-align: center; padding-right: 15px; }
@@ -357,7 +357,7 @@
         <tr>
             <td class="footer-qr-cell">
                 <p class="footer-qr-label">QRcode</p>
-                <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="80" alt="QR Code">
+                <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="110" alt="QR Code">
             </td>
             <td class="footer-signature-cell">
                 <div class="signature-content">
