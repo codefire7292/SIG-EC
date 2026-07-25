@@ -131,6 +131,7 @@
         .footer-qr-cell { width: 100px; text-align: center; border-right: 1px solid #ccc; }
         .footer-qr-label { font-size: 9px; margin-bottom: 3px; }
         .footer-signature-cell { text-align: right; font-size: 11px; line-height: 1.7; }
+        .signature-content { display: inline-block; text-align: center; padding-right: 15px; }
 
         .dotted-line { display: inline-block; width: 75%; border-bottom: 1px dotted #555; vertical-align: middle; }
     </style>
@@ -361,9 +362,11 @@
                 <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="80" alt="QR Code">
             </td>
             <td class="footer-signature-cell">
-                POUR EXTRAIT CERTIFIE CONFORME<br>
-                Fait à {{ strtoupper($center?->commune ?? 'ENAMPORE') }} le, {{ \Carbon\Carbon::parse($act->validated_at ?? now())->locale('fr')->isoFormat('D MMMM YYYY') }}<br>
-                L'officier d'Etat-civil soussigné
+                <div class="signature-content">
+                    POUR EXTRAIT CERTIFIE CONFORME<br>
+                    Fait à {{ strtoupper($center?->commune ?? 'ENAMPORE') }} le, {{ \Carbon\Carbon::parse($act->validated_at ?? now())->locale('fr')->isoFormat('D MMMM YYYY') }}<br>
+                    L'officier d'Etat-civil soussigné
+                </div>
             </td>
         </tr>
     </table>
