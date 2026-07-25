@@ -155,7 +155,7 @@
             <td class="header-right">
                 <p class="republic-label">REPUBLIQUE DU SENEGAL</p>
                 <p class="republic-motto">Un-Peuple Un-But Une-Foi</p>
-                <p class="republic-divider">-------------</p>
+                <p class="republic-divider">----------</p>
                 <p class="etat-civil-title">ETAT-CIVIL</p>
                 <p class="centre-label">
                     {{ strtoupper($center?->name ?? 'CENTRE PRINCIPAL (1) ENAMPORE1') }}<br>
