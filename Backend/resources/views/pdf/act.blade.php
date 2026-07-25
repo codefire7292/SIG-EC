@@ -95,7 +95,7 @@
         .commune-label { font-size: 15px; font-weight: bold; margin-top: 2px; }
         .republic-label { font-size: 15px; margin-bottom: 1px; }
         .republic-motto { font-size: 14px; margin-bottom: 1px; }
-        .republic-divider { font-size: 15px; letter-spacing: 2px; margin: 1px 0; }
+        .republic-divider { font-size: 15px; letter-spacing: 3px; margin: 1px 0; }
         .etat-civil-title { font-size: 24px; font-weight: bold; letter-spacing: 1px; margin: 4px 0 3px; }
         .centre-label { font-size: 14px; line-height: 1.4; }
 
@@ -155,7 +155,7 @@
             <td class="header-right">
                 <p class="republic-label">REPUBLIQUE DU SENEGAL</p>
                 <p class="republic-motto">Un-Peuple Un-But Une-Foi</p>
-                <p class="republic-divider">- - - - - - - - - - - -</p>
+                <p class="republic-divider">-------------</p>
                 <p class="etat-civil-title">ETAT-CIVIL</p>
                 <p class="centre-label">
                     {{ strtoupper($center?->name ?? 'CENTRE PRINCIPAL (1) ENAMPORE1') }}<br>
