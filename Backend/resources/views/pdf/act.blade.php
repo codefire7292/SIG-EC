@@ -327,9 +327,7 @@
     <table class="jugement-table">
         <tr>
             <td class="jugement-label-cell">
-                <div class="jugement-label-vertical">
-                    JUGEMENT<br>d'Autorisation<br>d'Inscription<br>(ex supplétif)
-                </div>
+                <img src="{{ public_path('images/partie_jugement.png') }}" alt="Jugement" style="width: 25px;">
             </td>
             <td class="jugement-content-cell">
                 <p>Délivré par le Juge du tribunal de {{ strtoupper($center?->region ?? 'ZIGUINCHOR') }}</p>
