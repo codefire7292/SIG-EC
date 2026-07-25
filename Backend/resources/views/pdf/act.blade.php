@@ -410,7 +410,12 @@
         <tr>
             <td class="footer-qr-cell">
                 <p class="footer-qr-label">QRcode</p>
-                <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="110" alt="QR Code">
+                <div style="position: relative; display: inline-block; width: 110px; height: 110px; margin: 0 auto;">
+                    <img src="data:image/svg+xml;base64,{{ $qrCode }}" width="110" height="110" alt="QR Code">
+                    <div style="position: absolute; top: 40px; left: 40px; width: 30px; height: 30px; background: #ffffff; border-radius: 2px;">
+                        <img src="data:image/png;base64,{{ $logo }}" width="26" height="26" style="margin: 2px; display: block;">
+                    </div>
+                </div>
             </td>
             <td class="footer-signature-cell">
                 <div class="signature-content">
