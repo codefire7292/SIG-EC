@@ -6,6 +6,7 @@ import {
     PlusIcon, 
     MagnifyingGlassIcon,
     ChevronRightIcon,
+    ChevronLeftIcon,
     FingerPrintIcon,
     BuildingLibraryIcon,
     ShieldCheckIcon,
@@ -105,18 +106,27 @@ const cancelImport = () => {
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-blue-600 rounded-lg shadow-lg shadow-blue-200">
-                        <component :is="icon" class="h-6 w-6 text-white" />
+            <div class="flex flex-col gap-3">
+                <!-- Breadcrumb back to hub -->
+                <Link
+                    :href="`/acts/${type}`"
+                    class="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors w-fit"
+                >
+                    <ChevronLeftIcon class="h-3.5 w-3.5 stroke-[3]" />
+                    Retour au hub
+                </Link>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-blue-600 rounded-lg shadow-lg shadow-blue-200">
+                            <component :is="icon" class="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                            <h2 class="font-black text-2xl text-gray-900 tracking-tight">{{ title }}</h2>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                Gestion des actes et registres officiels
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 class="font-black text-2xl text-gray-900 tracking-tight">{{ title }}</h2>
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                            Gestion des actes et registres officiels
-                        </p>
-                    </div>
-                </div>
 
                 <div class="flex items-center gap-3">
                     <input
@@ -157,6 +167,7 @@ const cancelImport = () => {
                         <PlusIcon class="w-4 h-4 mr-2 stroke-[3]" />
                         Nouvel Acte
                     </Link>
+                </div>
                 </div>
             </div>
         </template>

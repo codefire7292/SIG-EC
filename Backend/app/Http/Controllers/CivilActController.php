@@ -22,6 +22,41 @@ class CivilActController extends Controller
         };
     }
 
+    public function hub(Request $request)
+    {
+        $type = $request->route('type') ?? $request->route()->getAction('type');
+        $model = $this->getModel($type);
+        $year = now()->year;
+
+        $totalActs = $model->where('is_current', true)->count();
+
+        $actsThisYear = $model->where('is_current', true)
+            ->whereYear('created_at', $year)
+            ->count();
+
+        $openRegistries = \App\Models\Registry::where('type', $type)
+            ->where('status', 'open')
+            ->count();
+
+        $totalRegistries = \App\Models\Registry::where('type', $type)->count();
+
+        $totalCertificates = \App\Models\CivilCertificate::count();
+
+        $certificatesThisYear = \App\Models\CivilCertificate::whereYear('created_at', $year)->count();
+
+        return Inertia::render('CivilActs/Hub', [
+            'type'  => $type,
+            'stats' => [
+                'total_acts'           => $totalActs,
+                'acts_this_year'       => $actsThisYear,
+                'open_registries'      => $openRegistries,
+                'total_registries'     => $totalRegistries,
+                'total_certificates'   => $totalCertificates,
+                'certificates_this_year' => $certificatesThisYear,
+            ],
+        ]);
+    }
+
     public function index(Request $request)
     {
         if (!$request->user()->hasPermissionTo('view-registries')) {

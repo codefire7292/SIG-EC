@@ -116,7 +116,10 @@ Route::middleware(['auth'])->group(function (): void {
     Route::prefix('acts')->name('acts.')->group(function () {
         foreach (['naissance', 'mariage', 'deces'] as $type) {
             Route::prefix($type)->name($type . '.')->group(function () use ($type) {
-                Route::get("/", [\App\Http\Controllers\CivilActController::class, 'index'])->name('index')->defaults('type', $type);
+                // Hub (landing page par type)
+                Route::get("/", [\App\Http\Controllers\CivilActController::class, 'hub'])->name('hub')->defaults('type', $type);
+                // Liste des actes
+                Route::get("/list", [\App\Http\Controllers\CivilActController::class, 'index'])->name('index')->defaults('type', $type);
                 Route::get("/create", [\App\Http\Controllers\CivilActController::class, 'create'])->name('create')->defaults('type', $type);
                 Route::post("/", [\App\Http\Controllers\CivilActController::class, 'store'])->name('store')->defaults('type', $type);
                 Route::get("/template", [\App\Http\Controllers\CivilActImportController::class, 'downloadTemplate'])->name('template')->defaults('type', $type);
