@@ -3,15 +3,16 @@ import { computed } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {
-    FingerPrintIcon,
-    BuildingLibraryIcon,
-    ShieldCheckIcon,
-    InboxArrowDownIcon,
-    BookOpenIcon,
-    DocumentCheckIcon,
+    UserPlusIcon,
+    HeartIcon,
+    MoonIcon,
+    ClipboardDocumentListIcon,
+    ArchiveBoxIcon,
+    CheckBadgeIcon,
     ArrowRightIcon,
     SparklesIcon,
-    ChartBarIcon,
+    RectangleStackIcon,
+    LightBulbIcon,
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -33,49 +34,41 @@ const typeConfig = computed(() => {
             return {
                 label: 'Naissances',
                 sublabel: 'Registre des Actes de Naissance',
-                icon: FingerPrintIcon,
-                gradient: 'from-sky-500 to-indigo-600',
-                lightBg: 'bg-sky-50',
-                lightBorder: 'border-sky-100',
+                icon: UserPlusIcon,
+                gradientFrom: '#0EA5E9',
+                gradientTo: '#6366F1',
                 accent: '#3B82F6',
                 accentLight: 'rgba(59,130,246,0.08)',
-                badge: 'Naissance',
             };
         case 'mariage':
             return {
                 label: 'Mariages',
                 sublabel: 'Registre des Actes de Mariage',
-                icon: BuildingLibraryIcon,
-                gradient: 'from-rose-500 to-pink-600',
-                lightBg: 'bg-rose-50',
-                lightBorder: 'border-rose-100',
+                icon: HeartIcon,
+                gradientFrom: '#F43F5E',
+                gradientTo: '#EC4899',
                 accent: '#EC4899',
                 accentLight: 'rgba(236,72,153,0.08)',
-                badge: 'Mariage',
             };
         case 'deces':
             return {
                 label: 'Décès',
                 sublabel: 'Registre des Actes de Décès',
-                icon: ShieldCheckIcon,
-                gradient: 'from-slate-600 to-gray-800',
-                lightBg: 'bg-slate-50',
-                lightBorder: 'border-slate-100',
+                icon: MoonIcon,
+                gradientFrom: '#475569',
+                gradientTo: '#1E293B',
                 accent: '#475569',
                 accentLight: 'rgba(71,85,105,0.08)',
-                badge: 'Décès',
             };
         default:
             return {
                 label: 'État Civil',
                 sublabel: 'Registres',
-                icon: FingerPrintIcon,
-                gradient: 'from-green-600 to-emerald-700',
-                lightBg: 'bg-green-50',
-                lightBorder: 'border-green-100',
+                icon: UserPlusIcon,
+                gradientFrom: '#16a34a',
+                gradientTo: '#0D9488',
                 accent: '#16a34a',
                 accentLight: 'rgba(22,163,74,0.08)',
-                badge: 'Acte',
             };
     }
 });
@@ -84,8 +77,7 @@ const typeConfig = computed(() => {
 const folders = computed(() => [
     {
         id: 'declarations',
-        icon: InboxArrowDownIcon,
-        emoji: '📥',
+        icon: ClipboardDocumentListIcon,
         title: 'Déclarations et établissement des actes',
         description: 'Saisir, enregistrer et gérer les actes d\'état civil. Suivi complet du cycle de vie de chaque acte.',
         href: `/acts/${props.type}/list`,
@@ -103,8 +95,7 @@ const folders = computed(() => [
     },
     {
         id: 'registres',
-        icon: BookOpenIcon,
-        emoji: '📚',
+        icon: ArchiveBoxIcon,
         title: 'Registres',
         description: 'Consulter, créer et administrer les volumes de registres. Gestion des statuts d\'ouverture et de clôture.',
         href: `/admin/registries`,
@@ -122,8 +113,7 @@ const folders = computed(() => [
     },
     {
         id: 'actes-delivres',
-        icon: DocumentCheckIcon,
-        emoji: '📄',
+        icon: CheckBadgeIcon,
         title: 'Actes délivrés',
         description: 'Historique des extraits et actes délivrés aux administrés. Suivi des certifications et délivrance officielle.',
         href: `/civil-certificates`,
@@ -212,7 +202,7 @@ const pageTitle = computed(() => `${typeConfig.value.label} — État Civil`);
 
             <!-- ── Section Title ───────────────────────────────────────── -->
             <div class="flex items-center gap-3">
-                <ChartBarIcon class="h-5 w-5 text-gray-400" />
+                <RectangleStackIcon class="h-5 w-5 text-gray-400" />
                 <span class="text-xs font-black uppercase tracking-[0.25em] text-gray-400">Dossiers disponibles</span>
                 <div class="flex-1 h-px bg-gray-100"></div>
                 <span class="text-[10px] font-bold text-gray-300">{{ visibleFolders.length }} section{{ visibleFolders.length > 1 ? 's' : '' }}</span>
@@ -245,9 +235,9 @@ const pageTitle = computed(() => `${typeConfig.value.label} — État Civil`);
                         <!-- Icon -->
                         <div
                             class="h-14 w-14 rounded-2xl flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110"
-                            :style="`background: linear-gradient(135deg, ${folder.gradientFrom}, ${folder.gradientTo}); box-shadow: 0 8px 24px ${folder.colorLight};`"
+                            :style="`background: linear-gradient(135deg, ${folder.gradientFrom}, ${folder.gradientTo}); box-shadow: 0 8px 32px ${folder.colorLight};`"
                         >
-                            <span class="text-2xl">{{ folder.emoji }}</span>
+                            <component :is="folder.icon" class="h-7 w-7 text-white stroke-[1.5]" />
                         </div>
 
                         <!-- Title & description -->
@@ -299,7 +289,7 @@ const pageTitle = computed(() => `${typeConfig.value.label} — État Civil`);
             <!-- ── Bottom tip ──────────────────────────────────────────── -->
             <div class="bg-gray-50 border border-gray-100 rounded-2xl px-6 py-4 flex items-center gap-3">
                 <div class="h-8 w-8 rounded-xl flex items-center justify-center flex-shrink-0" :style="`background: ${typeConfig.accentLight ?? 'rgba(59,130,246,0.08)'};`">
-                    <span class="text-base">💡</span>
+                    <LightBulbIcon class="h-4 w-4" :style="`color: ${typeConfig.accent};`" />
                 </div>
                 <p class="text-xs text-gray-500 font-medium leading-relaxed">
                     Sélectionnez un dossier ci-dessus pour accéder aux fonctionnalités correspondantes du module
