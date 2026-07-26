@@ -57,6 +57,27 @@ class CivilActController extends Controller
         ]);
     }
 
+    public function registries(Request $request)
+    {
+        $type = $request->route('type') ?? $request->route()->getAction('type');
+        $model = $this->getModel($type);
+
+        $registries = \App\Models\Registry::where('type', $type)
+            ->with('center')
+            ->orderBy('year', 'desc')
+            ->orderBy('number', 'asc')
+            ->get()
+            ->map(function ($registry) use ($model) {
+                $registry->acts_count = $model->where('registry_id', $registry->id)->count();
+                return $registry;
+            });
+
+        return Inertia::render('CivilActs/Registries', [
+            'type'       => $type,
+            'registries' => $registries,
+        ]);
+    }
+
     public function index(Request $request)
     {
         if (!$request->user()->hasPermissionTo('view-registries')) {
@@ -65,15 +86,21 @@ class CivilActController extends Controller
 
         $type = $request->route('type') ?? $request->route()->getAction('type');
         $model = $this->getModel($type);
-        
-        $acts = $model->where('is_current', true)
-            ->with(['registry'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+
+        $query = $model->where('is_current', true)->with(['registry']);
+
+        $activeRegistry = null;
+        if ($registryId = $request->query('registry_id')) {
+            $query->where('registry_id', $registryId);
+            $activeRegistry = \App\Models\Registry::find($registryId);
+        }
+
+        $acts = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         return Inertia::render('CivilActs/Index', [
-            'acts' => $acts,
-            'type' => $type
+            'acts'           => $acts,
+            'type'           => $type,
+            'activeRegistry' => $activeRegistry,
         ]);
     }
 

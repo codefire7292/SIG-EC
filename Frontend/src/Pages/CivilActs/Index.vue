@@ -20,6 +20,7 @@ import { router } from '@inertiajs/vue3';
 const props = defineProps({
     acts: Object,
     type: String,
+    activeRegistry: Object,   // set when filtered by a specific registry
 });
 
 const canImportExcel = computed(() => {
@@ -107,14 +108,23 @@ const cancelImport = () => {
     <AuthenticatedLayout>
         <template #header>
             <div class="flex flex-col gap-3">
-                <!-- Breadcrumb back to hub -->
-                <Link
-                    :href="`/acts/${type}`"
-                    class="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors w-fit"
-                >
-                    <ChevronLeftIcon class="h-3.5 w-3.5 stroke-[3]" />
-                    Retour au hub
-                </Link>
+                <!-- Breadcrumb -->
+                <div class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                    <Link :href="`/acts/${type}`" class="hover:text-blue-600 transition-colors flex items-center gap-1">
+                        <ChevronLeftIcon class="h-3 w-3 stroke-[3]" />
+                        {{ type === 'naissance' ? 'Naissances' : type === 'mariage' ? 'Mariages' : 'Décès' }}
+                    </Link>
+                    <template v-if="activeRegistry">
+                        <ChevronRightIcon class="h-3 w-3 stroke-[2]" />
+                        <Link :href="`/acts/${type}/registres`" class="hover:text-blue-600 transition-colors">Registres</Link>
+                        <ChevronRightIcon class="h-3 w-3 stroke-[2]" />
+                        <span class="text-gray-600">Volume {{ activeRegistry.number }} — {{ activeRegistry.year }}</span>
+                    </template>
+                    <template v-else>
+                        <ChevronRightIcon class="h-3 w-3 stroke-[2]" />
+                        <span class="text-gray-600">Tous les actes</span>
+                    </template>
+                </div>
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
                         <div class="p-2 bg-blue-600 rounded-lg shadow-lg shadow-blue-200">

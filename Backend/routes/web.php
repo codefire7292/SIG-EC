@@ -118,7 +118,9 @@ Route::middleware(['auth'])->group(function (): void {
             Route::prefix($type)->name($type . '.')->group(function () use ($type) {
                 // Hub (landing page par type)
                 Route::get("/", [\App\Http\Controllers\CivilActController::class, 'hub'])->name('hub')->defaults('type', $type);
-                // Liste des actes
+                // Liste des registres du type
+                Route::get("/registres", [\App\Http\Controllers\CivilActController::class, 'registries'])->name('registries')->defaults('type', $type);
+                // Liste des actes (filtrable par ?registry_id=X)
                 Route::get("/list", [\App\Http\Controllers\CivilActController::class, 'index'])->name('index')->defaults('type', $type);
                 Route::get("/create", [\App\Http\Controllers\CivilActController::class, 'create'])->name('create')->defaults('type', $type);
                 Route::post("/", [\App\Http\Controllers\CivilActController::class, 'store'])->name('store')->defaults('type', $type);

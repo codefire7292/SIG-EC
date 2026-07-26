@@ -98,7 +98,7 @@ const folders = computed(() => [
         icon: ArchiveBoxIcon,
         title: 'Registres',
         description: 'Consulter, créer et administrer les volumes de registres. Gestion des statuts d\'ouverture et de clôture.',
-        href: `/admin/registries`,
+        href: `/acts/${props.type}/registres`,
         show: canManageRegistries.value,
         stats: [
             { label: 'Volumes ouverts', value: props.stats?.open_registries ?? '—' },
