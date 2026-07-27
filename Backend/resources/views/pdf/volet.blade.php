@@ -293,48 +293,72 @@
 
     {{-- ===== RENSEIGNEMENTS SUR LE PERE ===== --}}
     @php
-        $fatherMeta = $act->parents_metadata['father'] ?? [];
-        $fatherName = $act->father_name ?? ($fatherMeta['name'] ?? '');
-        $fatherParts = explode(' ', $fatherName);
-        $fatherLastName = count($fatherParts) > 1 ? array_pop($fatherParts) : '';
-        $fatherFirstName = implode(' ', $fatherParts) ?: $fatherName;
+        $getMeta = function($keyFlat, $keyNestedCat, $keyNestedField, $default = '') use ($act) {
+            $meta = $act->parents_metadata ?? [];
+            if (is_array($meta)) {
+                if (!empty($meta[$keyFlat])) return $meta[$keyFlat];
+                if (isset($meta[$keyNestedCat]) && is_array($meta[$keyNestedCat]) && !empty($meta[$keyNestedCat][$keyNestedField])) {
+                    return $meta[$keyNestedCat][$keyNestedField];
+                }
+            }
+            return $default;
+        };
 
-        $fatherBirthDate = !empty($fatherMeta['birth_date']) ? $fatherMeta['birth_date'] : '';
-        $fDay = $fatherBirthDate ? toDigitArray(date('d', strtotime($fatherBirthDate)), 2) : ['_','_'];
-        $fMonth = $fatherBirthDate ? toDigitArray(date('m', strtotime($fatherBirthDate)), 2) : ['_','_'];
-        $fYear = $fatherBirthDate ? toDigitArray(date('Y', strtotime($fatherBirthDate)), 4) : ['_','_','_','_'];
+        $fatherName = $act->father_name ?? $getMeta('father_name', 'father', 'name', '');
+        $fatherParts = explode(' ', trim($fatherName));
+        $fatherLastName = count($fatherParts) > 1 ? array_pop($fatherParts) : ($getMeta('father_last_name', 'father', 'last_name') ?: $act->last_name);
+        $fatherFirstName = count($fatherParts) > 0 ? implode(' ', $fatherParts) : $fatherName;
+
+        $fatherBirthDate = $getMeta('father_date_of_birth', 'father', 'birth_date', '');
+        $hasFBirth = !empty($fatherBirthDate) && strtotime($fatherBirthDate);
+        $fDay = $hasFBirth ? toDigitArray(date('d', strtotime($fatherBirthDate)), 2) : ['&nbsp;','&nbsp;'];
+        $fMonth = $hasFBirth ? toDigitArray(date('m', strtotime($fatherBirthDate)), 2) : ['&nbsp;','&nbsp;'];
+        $fYear = $hasFBirth ? toDigitArray(date('Y', strtotime($fatherBirthDate)), 4) : ['&nbsp;','&nbsp;','&nbsp;','&nbsp;'];
+        
+        $fatherPlace = $getMeta('father_place_of_birth', 'father', 'birth_place', '');
+        $fatherJob = $getMeta('father_profession', 'father', 'profession', '');
+        $fatherAddress = $getMeta('father_domicile', 'father', 'residence', '');
     @endphp
     <div class="section-header">RENSEIGNEMENTS SUR LE PERE</div>
     <div class="field-row">
         <strong>Prénoms :</strong> <span class="dotted-line" style="width: 230px;">{{ $fatherFirstName }}</span>
-        <strong style="margin-left: 15px;">NOM :</strong> <span class="dotted-line" style="width: 180px;">{{ strtoupper($fatherLastName ?: $act->last_name) }}</span>
+        <strong style="margin-left: 15px;">NOM :</strong> <span class="dotted-line" style="width: 180px;">{{ strtoupper($fatherLastName) }}</span>
     </div>
     <div class="field-row">
         <strong>Date de Naissance :</strong> 
-        @foreach($fDay as $d)<span class="box-digit">{{ $d }}</span>@endforeach JJ
-        @foreach($fMonth as $d)<span class="box-digit">{{ $d }}</span>@endforeach MM
-        @foreach($fYear as $d)<span class="box-digit">{{ $d }}</span>@endforeach ANNEE
+        @foreach($fDay as $d)<span class="box-digit">{!! $d !!}</span>@endforeach JJ
+        @foreach($fMonth as $d)<span class="box-digit">{!! $d !!}</span>@endforeach MM
+        @foreach($fYear as $d)<span class="box-digit">{!! $d !!}</span>@endforeach ANNEE
     </div>
     <div class="field-row">
-        <strong>Lieu de naissance :</strong> <span class="dotted-line" style="width: 320px;">{{ $fatherMeta['birth_place'] ?? $act->place_of_birth }}</span>
+        <strong>Lieu de naissance :</strong> <span class="dotted-line" style="width: 320px;">{{ $fatherPlace }}</span>
     </div>
     <div class="field-row">
-        <strong>Profession :</strong> <span class="dotted-line" style="width: 220px;">{{ $fatherMeta['profession'] ?? '' }}</span>
-        <strong style="margin-left: 15px;">Domicile :</strong> <span class="dotted-line" style="width: 180px;">{{ $fatherMeta['residence'] ?? '' }}</span>
+        <strong>Profession :</strong> <span class="dotted-line" style="width: 220px;">{{ $fatherJob }}</span>
+        <strong style="margin-left: 15px;">Domicile :</strong> <span class="dotted-line" style="width: 180px;">{{ $fatherAddress }}</span>
     </div>
 
     {{-- ===== RENSEIGNEMENTS SUR LA MERE ===== --}}
     @php
-        $motherMeta = $act->parents_metadata['mother'] ?? [];
-        $motherName = $act->mother_name ?? ($motherMeta['name'] ?? '');
-        $motherParts = explode(' ', $motherName);
-        $motherLastName = count($motherParts) > 1 ? array_pop($motherParts) : '';
-        $motherFirstName = implode(' ', $motherParts) ?: $motherName;
+        $motherName = $act->mother_name ?? $getMeta('mother_name', 'mother', 'name', '');
+        $motherParts = explode(' ', trim($motherName));
+        if (count($motherParts) > 1) {
+            $motherLastName = array_pop($motherParts);
+            $motherFirstName = implode(' ', $motherParts);
+        } else {
+            $motherFirstName = $motherParts[0] ?? $motherName;
+            $motherLastName = $getMeta('mother_last_name', 'mother', 'last_name', '');
+        }
 
-        $motherBirthDate = !empty($motherMeta['birth_date']) ? $motherMeta['birth_date'] : '';
-        $mDay = $motherBirthDate ? toDigitArray(date('d', strtotime($motherBirthDate)), 2) : ['_','_'];
-        $mMonth = $motherBirthDate ? toDigitArray(date('m', strtotime($motherBirthDate)), 2) : ['_','_'];
-        $mYear = $motherBirthDate ? toDigitArray(date('Y', strtotime($motherBirthDate)), 4) : ['_','_','_','_'];
+        $motherBirthDate = $getMeta('mother_date_of_birth', 'mother', 'birth_date', '');
+        $hasMBirth = !empty($motherBirthDate) && strtotime($motherBirthDate);
+        $mDay = $hasMBirth ? toDigitArray(date('d', strtotime($motherBirthDate)), 2) : ['&nbsp;','&nbsp;'];
+        $mMonth = $hasMBirth ? toDigitArray(date('m', strtotime($motherBirthDate)), 2) : ['&nbsp;','&nbsp;'];
+        $mYear = $hasMBirth ? toDigitArray(date('Y', strtotime($motherBirthDate)), 4) : ['&nbsp;','&nbsp;','&nbsp;','&nbsp;'];
+
+        $motherPlace = $getMeta('mother_place_of_birth', 'mother', 'birth_place', '');
+        $motherJob = $getMeta('mother_profession', 'mother', 'profession', '');
+        $motherAddress = $getMeta('mother_domicile', 'mother', 'residence', '');
     @endphp
     <div class="section-header">RENSEIGNEMENTS SUR LA MERE</div>
     <div class="field-row">
@@ -343,32 +367,47 @@
     </div>
     <div class="field-row">
         <strong>Date de Naissance :</strong> 
-        @foreach($mDay as $d)<span class="box-digit">{{ $d }}</span>@endforeach JJ
-        @foreach($mMonth as $d)<span class="box-digit">{{ $d }}</span>@endforeach MM
-        @foreach($mYear as $d)<span class="box-digit">{{ $d }}</span>@endforeach ANNEE
+        @foreach($mDay as $d)<span class="box-digit">{!! $d !!}</span>@endforeach JJ
+        @foreach($mMonth as $d)<span class="box-digit">{!! $d !!}</span>@endforeach MM
+        @foreach($mYear as $d)<span class="box-digit">{!! $d !!}</span>@endforeach ANNEE
     </div>
     <div class="field-row">
-        <strong>Lieu de naissance :</strong> <span class="dotted-line" style="width: 320px;">{{ $motherMeta['birth_place'] ?? '' }}</span>
+        <strong>Lieu de naissance :</strong> <span class="dotted-line" style="width: 320px;">{{ $motherPlace }}</span>
     </div>
     <div class="field-row">
-        <strong>Profession :</strong> <span class="dotted-line" style="width: 220px;">{{ $motherMeta['profession'] ?? '' }}</span>
-        <strong style="margin-left: 15px;">Domicile :</strong> <span class="dotted-line" style="width: 180px;">{{ $motherMeta['residence'] ?? '' }}</span>
+        <strong>Profession :</strong> <span class="dotted-line" style="width: 220px;">{{ $motherJob }}</span>
+        <strong style="margin-left: 15px;">Domicile :</strong> <span class="dotted-line" style="width: 180px;">{{ $motherAddress }}</span>
     </div>
 
     {{-- ===== SUR LA DECLARATION DE ===== --}}
+    @php
+        $declarantRel = $getMeta('declarant_relationship', 'declarant', 'relationship', '');
+        $declarantFN = $getMeta('declarant_first_name', 'declarant', 'first_name', '');
+        $declarantLN = $getMeta('declarant_last_name', 'declarant', 'last_name', '');
+        $declarantFull = trim($declarantFN . ' ' . $declarantLN);
+
+        $declLabel = 'PERE';
+        if ($fatherFirstName || $fatherName) {
+            $declLabel = 'PERE';
+        } elseif ($motherFirstName || $motherName) {
+            $declLabel = 'MERE';
+        } elseif ($declarantRel) {
+            $declLabel = strtoupper($declarantRel);
+        }
+    @endphp
     <div class="section-header">SUR LA DECLARATION DE</div>
     <div class="field-row">
-        <strong>SUR LA DECLARATION DE :</strong> <span class="dotted-line" style="width: 140px;">{{ $fatherName ? 'PERE' : 'DECLARANT' }}</span>
-        <strong style="margin-left: 10px;">OU DE :</strong> <span class="dotted-line" style="width: 200px;"></span>
+        <strong>SUR LA DECLARATION DE :</strong> <span class="dotted-line" style="width: 140px;">{{ $declLabel }}</span>
+        <strong style="margin-left: 10px;">OU DE :</strong> <span class="dotted-line" style="width: 200px;">{{ $declarantFull }}</span>
     </div>
     <div class="field-row">
-        <strong>Numéro d'identification / Référence :</strong> <span class="dotted-line" style="width: 310px;">{{ $act->parents_metadata['marriage_cert'] ?? ('Acte N° ' . $act->reference_number) }}</span>
+        <strong>Numéro d'identification / Référence :</strong> <span class="dotted-line" style="width: 310px;">{{ $getMeta('marriage_cert', 'declarant', 'marriage_cert') ?: ($getMeta('declarant_id_number', 'declarant', 'id_number') ?: ('Acte N° ' . $act->reference_number)) }}</span>
     </div>
     <div class="field-row">
         <strong>Date et Heure de la Déclaration :</strong> 
-        @foreach($declDayDigits as $d)<span class="box-digit">{{ $d }}</span>@endforeach JJ
-        @foreach($declMonthDigits as $d)<span class="box-digit">{{ $d }}</span>@endforeach MM
-        @foreach($declYearDigits as $d)<span class="box-digit">{{ $d }}</span>@endforeach ANNEE
+        @foreach($declDayDigits as $d)<span class="box-digit">{!! $d !!}</span>@endforeach JJ
+        @foreach($declMonthDigits as $d)<span class="box-digit">{!! $d !!}</span>@endforeach MM
+        @foreach($declYearDigits as $d)<span class="box-digit">{!! $d !!}</span>@endforeach ANNEE
     </div>
     @if($act->is_judgment)
     <div class="field-row">
