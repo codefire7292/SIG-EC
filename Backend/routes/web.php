@@ -69,11 +69,6 @@ Route::get('/verify/{type}/{uuid}', [CertificateVerificationController::class, '
     ->where('type', 'naissance|mariage|deces')
     ->middleware('throttle:20,1');
 
-Route::get('/verify/{type}/{uuid}/download', [CertificateVerificationController::class, 'downloadExtract'])
-    ->name('acts.verify.download')
-    ->where('type', 'naissance|mariage|deces')
-    ->middleware('throttle:10,1');
-
 // Affichage public d'un certificat civil (legacy)
 Route::get('/certificates/v/{uuid}', [CertificateVerificationController::class, 'show'])
     ->name('certificates.view')
@@ -83,6 +78,12 @@ Route::get('/certificates/v/{uuid}', [CertificateVerificationController::class, 
 // Authenticated Routes (Civil Certificates)
 // -----------------------------------------------------------------------
 Route::middleware(['auth'])->group(function (): void {
+    // Download the PDF extract of a civil act (Authenticated only)
+    Route::get('/verify/{type}/{uuid}/download', [CertificateVerificationController::class, 'downloadExtract'])
+        ->name('acts.verify.download')
+        ->where('type', 'naissance|mariage|deces')
+        ->middleware('throttle:10,1');
+
     // Dashboard
     Route::get('/dashboard', [CivilCertificateController::class, 'dashboard'])
         ->name('dashboard');

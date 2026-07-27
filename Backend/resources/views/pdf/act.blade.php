@@ -100,6 +100,9 @@
             ? \Carbon\Carbon::createFromFormat('H:i:s', strlen($act->time_of_death) === 5 ? $act->time_of_death . ':00' : $act->time_of_death)->format('H:i:s')
             : null;
     }
+
+    $hasMention = !empty(trim($act->officer_comments ?? ''));
+    $fieldMargin = $hasMention ? 'margin-bottom: 4px;' : 'margin-bottom: 20px;';
 @endphp
 <!DOCTYPE html>
 <html>
@@ -149,16 +152,16 @@
          .jugement-label-cell img { width: 54px !important; }
          .jugement-label-vertical { font-size: 8px; text-transform: uppercase; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 1px; white-space: nowrap; }
         .jugement-content-cell { font-size: 14px; line-height: 1.6; border-right: 1px solid #000; }
-        .jugement-ref-cell { width: 95px; text-align: left; font-size: 14px; line-height: 1.8; vertical-align: bottom; }
+        .jugement-ref-cell { width: 115px; text-align: left; font-size: 14px; line-height: 1.8; vertical-align: bottom; white-space: nowrap; }
         .jugement-ref-small { font-size: 10px; color: #555; white-space: nowrap; }
 
-        .mentions-box { border-top: 1px solid #000; padding: 0 14px 5px; min-height: 30px; }
-        .mentions-label { font-size: 12px; text-transform: uppercase; color: #444; letter-spacing: 0.5px; margin-bottom: 3px; }
-        .mentions-content { font-size: 11px; min-height: 20px; }
+        .mentions-box { border-top: 1.5px solid #000; padding: 4px 14px 6px; min-height: 25px; margin-top: 4px; }
+        .mentions-label { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #000; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .mentions-content { font-size: 10.5px; font-weight: bold; font-style: italic; line-height: 1.35; color: #111; white-space: pre-line; word-wrap: break-word; }
 
         .footer-row { width: 100%; border-collapse: collapse; }
         .footer-row td { vertical-align: top; padding: 7px 14px; }
-        .footer-qr-cell { width: 120px; text-align: center; border-right: 1px solid #ccc; }
+        .footer-qr-cell { width: 120px; text-align: center; }
         .footer-qr-label { font-size: 9px; margin-bottom: 3px; }
         .footer-signature-cell { text-align: right; font-size: 11px; line-height: 1.7; }
         .signature-content { display: inline-block; text-align: center; padding-right: 15px; position: relative; top: -60px; font-weight: normal; }
@@ -231,7 +234,7 @@
             @if($dob)({{ $dob->format('d/m/Y') }})@endif
         </p>
 
-        <table class="field-row" style="margin-bottom: 20px;">
+        <table class="field-row" style="{{ $fieldMargin }}">
             <tr>
                 <td style="width:65%">
                     @if($timeDisplay)
@@ -247,9 +250,9 @@
             </tr>
         </table>
 
-        <p class="narrative" style="margin-bottom: 20px;">de sexe : <strong>{{ $act->gender === 'M' ? 'MASCULIN' : ($act->gender === 'F' ? 'FÉMININ' : 'N/A') }}</strong></p>
+        <p class="narrative" style="{{ $fieldMargin }}">de sexe : <strong>{{ $act->gender === 'M' ? 'MASCULIN' : ($act->gender === 'F' ? 'FÉMININ' : 'N/A') }}</strong></p>
 
-        <table class="field-row" style="margin-bottom: 20px;">
+        <table class="field-row" style="{{ $fieldMargin }}">
             <tr>
                 <td style="width:65%">
                     <span class="field-value field-value-bold">{{ strtoupper($act->first_name) }}</span>
@@ -262,7 +265,7 @@
             </tr>
         </table>
 
-        <table class="field-row" style="margin-bottom: 20px;">
+        <table class="field-row" style="{{ $fieldMargin }}">
             <tr>
                 <td>
                     @if($isFatherUnrecognized)
@@ -389,7 +392,7 @@
             </td>
             <td class="jugement-ref-cell" style="padding-bottom: 0; vertical-align: bottom;">
                 <span class="field-value-bold">AN {{ $act->judgment_date ? \Carbon\Carbon::parse($act->judgment_date)->format('Y') : '' }}</span><br>
-                <span class="field-value-bold">N° {{ $act->judgment_number ?? '' }}</span><br>
+                <span class="field-value-bold" style="white-space: nowrap;">N° {{ $act->judgment_number ?? '' }}</span><br>
                 <span class="jugement-ref-small">N° du jugement en chiffres</span><br>
                 <span class="field-value-bold" style="display: block; line-height: 1; margin-bottom: 30px;">AN {{ isset($act->parents_metadata['judgment_auth_date']) && $act->parents_metadata['judgment_auth_date'] ? \Carbon\Carbon::parse($act->parents_metadata['judgment_auth_date'])->format('Y') : '' }}</span>
             </td>
@@ -398,12 +401,18 @@
     @endif
 
     {{-- ===== MENTIONS MARGINALES ===== --}}
-    <div class="mentions-box">
+    <div class="mentions-box" style="{{ $hasMention ? 'border-bottom: 1.5px solid #000; padding-bottom: 14px; min-height: 45px; margin-bottom: 8px;' : '' }}">
         <p class="mentions-label">Mentions Marginales</p>
-        <p class="mentions-content">{{ $act->officer_comments ?? '' }}</p>
+        <div class="mentions-content">
+            @if(!empty(trim($act->officer_comments ?? '')))
+                {!! nl2br(e(trim($act->officer_comments))) !!}
+            @else
+                <span style="font-weight: normal; font-style: italic; color: #888;">Néant</span>
+            @endif
+        </div>
     </div>
 
-    <div style="height: 34px;"></div>
+    <div style="height: {{ $hasMention ? '6px' : '20px' }};"></div>
 
     {{-- ===== FOOTER ===== --}}
     <table class="footer-row">
@@ -418,7 +427,7 @@
                 </div>
             </td>
             <td class="footer-signature-cell">
-                <div class="signature-content">
+                <div class="signature-content" style="top: {{ $hasMention ? '-5px' : '-50px' }};">
                     POUR EXTRAIT CERTIFIE CONFORME<br>
                     <strong>Fait à {{ strtoupper($center?->commune ?? 'ENAMPORE') }} le, {{ \Carbon\Carbon::parse($act->validated_at ?? now())->locale('fr')->isoFormat('D MMMM YYYY') }}</strong><br>
                     <br><br><br>

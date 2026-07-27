@@ -13,6 +13,7 @@ import {
     SparklesIcon,
     RectangleStackIcon,
     LightBulbIcon,
+    ChevronRightIcon,
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -33,7 +34,7 @@ const typeConfig = computed(() => {
         case 'naissance':
             return {
                 label: 'Naissances',
-                sublabel: 'Registre des Actes de Naissance',
+                sublabel: 'Gestion des actes de naissance',
                 icon: UserPlusIcon,
                 gradientFrom: '#0EA5E9',
                 gradientTo: '#6366F1',
@@ -43,7 +44,7 @@ const typeConfig = computed(() => {
         case 'mariage':
             return {
                 label: 'Mariages',
-                sublabel: 'Registre des Actes de Mariage',
+                sublabel: 'Gestion des actes de mariage',
                 icon: HeartIcon,
                 gradientFrom: '#F43F5E',
                 gradientTo: '#EC4899',
@@ -53,7 +54,7 @@ const typeConfig = computed(() => {
         case 'deces':
             return {
                 label: 'Décès',
-                sublabel: 'Registre des Actes de Décès',
+                sublabel: 'Gestion des actes de décès',
                 icon: MoonIcon,
                 gradientFrom: '#475569',
                 gradientTo: '#1E293B',
@@ -83,8 +84,8 @@ const folders = computed(() => [
         href: `/acts/${props.type}/list`,
         show: canViewRegistries.value || canCreateDrafts.value,
         stats: [
-            { label: 'Total actes', value: props.stats?.total_acts ?? '—' },
-            { label: `En ${new Date().getFullYear()}`, value: props.stats?.acts_this_year ?? '—' },
+            { label: 'Actes en cours', value: props.stats?.pending_acts ?? '—' },
+            { label: `En ${new Date().getFullYear()}`, value: props.stats?.pending_acts_this_year ?? '—' },
         ],
         color: '#3B82F6',
         colorLight: 'rgba(59,130,246,0.07)',
@@ -141,17 +142,10 @@ const pageTitle = computed(() => `${typeConfig.value.label} — État Civil`);
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center gap-4">
-                <div
-                    class="h-12 w-12 rounded-2xl flex items-center justify-center shadow-lg"
-                    :style="`background: linear-gradient(135deg, ${typeConfig.gradientFrom ?? typeConfig.accent}, ${typeConfig.gradientTo ?? typeConfig.accent});`"
-                >
-                    <component :is="typeConfig.icon" class="h-6 w-6 text-white" />
-                </div>
-                <div>
-                    <h2 class="font-black text-2xl text-gray-900 tracking-tight">{{ typeConfig.label }}</h2>
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ typeConfig.sublabel }}</p>
-                </div>
+            <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                <span>Services État Civil</span>
+                <ChevronRightIcon class="h-3 w-3 stroke-[2.5]" />
+                <span class="text-gray-900 font-black">{{ typeConfig.label }}</span>
             </div>
         </template>
 

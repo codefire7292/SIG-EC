@@ -4,8 +4,7 @@ import GuestLayout from '@/Layouts/GuestLayout.vue'
 import {
     CheckBadgeIcon, ArrowLeftIcon, CalendarIcon, MapPinIcon,
     UserIcon, DocumentTextIcon, HeartIcon, UserGroupIcon,
-    ShieldCheckIcon, ClockIcon, BuildingOffice2Icon, PaperClipIcon,
-    ArrowDownTrayIcon
+    ShieldCheckIcon, ClockIcon, BuildingOffice2Icon, PaperClipIcon
 } from '@heroicons/vue/24/outline'
 
 const props = defineProps({
@@ -98,15 +97,6 @@ const spousesMeta = computed(() => props.act?.spouses_metadata ?? null)
                         </div>
                         <h1 class="text-3xl font-black tracking-tight mb-2">{{ config.label }}</h1>
                         <p class="text-white/70 font-bold tracking-widest text-xs uppercase">Réf : {{ act.reference_number }}</p>
-                        
-                        <!-- Button to download extract (Only for Signed/Sealed Acts) -->
-                        <div v-if="act.status === 'signe'" class="mt-6">
-                            <a :href="route('acts.verify.download', { type: type, uuid: act.uuid })" target="_blank"
-                               class="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-full font-black text-xs uppercase tracking-wider hover:bg-gray-100 hover:scale-105 active:scale-95 transition-all shadow-lg">
-                                <ArrowDownTrayIcon class="h-4 w-4 text-[#1E690F] shrink-0" />
-                                Télécharger l'Extrait PDF
-                            </a>
-                        </div>
                     </div>
                 </div>
                 
@@ -323,6 +313,14 @@ const spousesMeta = computed(() => props.act?.spouses_metadata ?? null)
                                 <p class="text-[9px] font-black text-amber-600 uppercase tracking-widest mb-1">Juridiction</p>
                                 <p class="font-bold text-gray-800">{{ act.judgment_court }}</p>
                             </div>
+                        </div>
+                    </section>
+
+                    <!-- ══ MENTIONS MARGINALES ══ -->
+                    <section v-if="act.officer_comments">
+                        <h2 class="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-3 mb-6">Mentions Marginales &amp; Observations</h2>
+                        <div class="p-5 bg-amber-50/70 rounded-2xl border border-amber-200/80">
+                            <p class="text-xs font-bold text-amber-950 leading-relaxed whitespace-pre-line">{{ act.officer_comments }}</p>
                         </div>
                     </section>
 

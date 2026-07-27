@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { 
     CalendarIcon, 
@@ -16,7 +16,13 @@ import {
     CheckCircleIcon,
     ArrowPathIcon,
     ExclamationTriangleIcon,
-    ArrowDownTrayIcon
+    ArrowDownTrayIcon,
+    ChevronRightIcon,
+    UserIcon,
+    ShieldCheckIcon,
+    SparklesIcon,
+    BuildingOfficeIcon,
+    DocumentTextIcon
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -34,6 +40,15 @@ const title = computed(() => {
     }
 });
 
+const typePlural = computed(() => {
+    switch (props.type) {
+        case 'naissance': return 'Naissances';
+        case 'mariage': return 'Mariages';
+        case 'deces': return 'Décès';
+        default: return 'Actes';
+    }
+});
+
 const formatDate = (date) => {
     if (!date) return '-';
     return new Date(date).toLocaleDateString('fr-FR', {
@@ -48,8 +63,6 @@ const formatTime = (timeStr) => {
     const parts = timeStr.split(':');
     return parts.length >= 2 ? `${parts[0]}h${parts[1]}` : timeStr;
 };
-
-import { router, usePage } from '@inertiajs/vue3';
 
 // Pour les actes de naissance : si aucun déclarant tiers n'est renseigné,
 // le père est considéré comme déclarant par défaut (règle légale).
@@ -110,7 +123,7 @@ const openStatusModal = (newStatus) => {
         statusModalTitle.value = 'Renvoyer à la correction';
         statusModalDescription.value = "Confirmez-vous le passage au statut: À CORRIGER ? L'acte sera renvoyé à l'agent d'état civil pour modification.";
         statusModalConfirmText.value = 'Renvoyer pour correction';
-        statusModalConfirmClass.value = 'bg-yellow-500 hover:bg-yellow-600 text-white focus:ring-yellow-500';
+        statusModalConfirmClass.value = 'bg-amber-500 hover:bg-amber-600 text-white focus:ring-amber-500';
     } else if (newStatus === 'rejete') {
         statusModalTitle.value = 'Rejeter Définitivement';
         statusModalDescription.value = "Attention : Confirmez-vous le rejet définitif de cet acte ? Cette action est irréversible.";
@@ -120,7 +133,7 @@ const openStatusModal = (newStatus) => {
         statusModalTitle.value = 'Signer et Sceller';
         statusModalDescription.value = "Voulez-vous procéder à la SIGNATURE FINALE ? Après cette action, l'acte deviendra IMMUABLE et sera définitivement archivé au registre numérique.";
         statusModalConfirmText.value = 'Signer et Sceller';
-        statusModalConfirmClass.value = 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500';
+        statusModalConfirmClass.value = 'bg-emerald-600 hover:bg-emerald-700 text-white focus:ring-emerald-500';
     }
     
     showStatusModal.value = true;
@@ -140,36 +153,129 @@ const getStatusModalIcon = () => {
     if (pendingStatus.value === 'signe') return CheckBadgeIcon;
     return CheckCircleIcon;
 };
+
+const getStatusBadge = (status) => {
+    switch (status) {
+        case 'signe':
+            return { label: 'Signé & Scellé', bg: 'bg-emerald-100/80 text-emerald-800 border-emerald-200' };
+        case 'valide':
+            return { label: 'Validé (En attente de signature)', bg: 'bg-blue-100/80 text-blue-800 border-blue-200' };
+        case 'a_corriger':
+            return { label: 'À Corriger', bg: 'bg-amber-100/80 text-amber-800 border-amber-200' };
+        case 'brouillon':
+            return { label: 'Brouillon', bg: 'bg-gray-100 text-gray-700 border-gray-200' };
+        case 'rejete':
+            return { label: 'Rejeté', bg: 'bg-red-100/80 text-red-800 border-red-200' };
+        default:
+            return { label: status, bg: 'bg-gray-100 text-gray-700 border-gray-200' };
+    }
+};
+
+const goBack = () => {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        router.visit(`/acts/${props.type}`);
+    }
+};
 </script>
 
 <template>
-    <Head :title="title" />
+    <Head :title="`${title} - ${act.reference_number || 'Consultation'}`" />
 
     <AuthenticatedLayout>
         <template #header>
-            <div class="flex items-center gap-4">
-                <Link :href="`/acts/${type}`" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <ArrowLeftIcon class="h-5 w-5 text-gray-500" />
-                </Link>
-                <div>
-                    <h2 class="font-black text-2xl text-gray-900 tracking-tight">{{ title }}</h2>
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                        Référence : {{ act.reference_number || 'SANS RÉFÉRENCE' }}
-                    </p>
+            <div class="flex flex-col gap-2">
+                <!-- Breadcrumbs -->
+                <nav class="flex items-center text-xs font-bold text-gray-400 gap-2">
+                    <Link href="/acts/hub" class="hover:text-[#1E690F] transition-colors">Registres</Link>
+                    <ChevronRightIcon class="w-3 h-3 text-gray-300" />
+                    <button type="button" @click="goBack" class="hover:text-[#1E690F] transition-colors cursor-pointer">{{ typePlural }}</button>
+                    <ChevronRightIcon class="w-3 h-3 text-gray-300" />
+                    <span class="text-gray-700 font-extrabold">{{ act.reference_number || 'Détails de l\'acte' }}</span>
+                </nav>
+
+                <!-- Action Header Bar -->
+                <div class="flex items-center justify-between mt-1">
+                    <div class="flex items-center gap-3">
+                        <button type="button" @click="goBack" class="p-2.5 bg-white border border-gray-200 rounded-2xl shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95 cursor-pointer" title="Retour à la liste précédente">
+                            <ArrowLeftIcon class="h-5 w-5 text-gray-600" />
+                        </button>
+                        <div>
+                            <h2 class="font-black text-2xl text-gray-900 tracking-tight flex items-center gap-3">
+                                {{ title }}
+                                <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border shadow-xs" :class="getStatusBadge(act.status).bg">
+                                    {{ getStatusBadge(act.status).label }}
+                                </span>
+                            </h2>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+                                Référence officielle : <span class="text-gray-900 font-black">{{ act.reference_number || 'SANS RÉFÉRENCE' }}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Quick Print / Edit Action -->
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                        <Link v-if="['brouillon', 'a_corriger'].includes(act.status)" :href="`/acts/${type}/${act.id}/edit`" 
+                              class="inline-flex items-center px-5 py-3 bg-white border border-gray-200 text-gray-700 rounded-2xl text-xs font-black uppercase tracking-wider shadow-sm hover:bg-gray-50 transition-all active:scale-95">
+                            <PencilSquareIcon class="h-4 w-4 mr-2 text-gray-500" />
+                            Modifier
+                        </Link>
+                        <template v-if="act.status === 'signe'">
+                            <!-- Bouton 1 : Télécharger l'Extrait PDF (Original) -->
+                            <a :href="`/verify/${type}/${act.uuid}/download`" target="_blank" 
+                               title="Extrait d'acte d'état civil officiel"
+                               class="inline-flex items-center px-5 py-3 bg-[#1E690F] hover:bg-[#185709] text-white rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg shadow-green-900/10 transition-all active:scale-95">
+                                <ArrowDownTrayIcon class="h-4 w-4 mr-2" />
+                                Télécharger l'Extrait PDF
+                            </a>
+                            <!-- Groupe collé : Volet 1, Volet 2 & Volet 3 (Côte à côte) -->
+                            <div class="inline-flex rounded-2xl shadow-lg overflow-hidden border border-[#185709] divide-x divide-white/20">
+                                <a :href="`/verify/${type}/${act.uuid}/download?volet=1`" target="_blank" 
+                                   title="Exemplaire conservé au Centre d'État Civil (Mairie)"
+                                   class="inline-flex items-center px-4 py-3 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-black uppercase tracking-wider transition-all active:scale-95">
+                                    <ArrowDownTrayIcon class="h-4 w-4 mr-1.5" />
+                                    Volet 1 (Mairie)
+                                </a>
+                                <a :href="`/verify/${type}/${act.uuid}/download?volet=2`" target="_blank" 
+                                   title="Exemplaire transmis au Greffe du Tribunal"
+                                   class="inline-flex items-center px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white text-xs font-black uppercase tracking-wider transition-all active:scale-95">
+                                    <ArrowDownTrayIcon class="h-4 w-4 mr-1.5 text-amber-400" />
+                                    Volet 2 (Tribunal)
+                                </a>
+                                <a :href="`/verify/${type}/${act.uuid}/download?volet=3`" target="_blank" 
+                                   title="Exemplaire remis au Titulaire / Déclarant"
+                                   class="inline-flex items-center px-4 py-3 bg-indigo-800 hover:bg-indigo-900 text-white text-xs font-black uppercase tracking-wider transition-all active:scale-95">
+                                    <ArrowDownTrayIcon class="h-4 w-4 mr-1.5 text-indigo-300" />
+                                    Volet 3 (Titulaire)
+                                </a>
+                            </div>
+                        </template>
+                    </div>
                 </div>
             </div>
         </template>
 
-        <div class="max-w-5xl mx-auto space-y-8 pb-20">
+        <div class="max-w-5xl mx-auto space-y-8 pb-20 mt-6">
             <!-- Main Content Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
                 <!-- Left Column: Primary Details -->
                 <div class="lg:col-span-2 space-y-8">
                     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="bg-blue-600 px-8 py-4 flex items-center justify-between">
-                            <span class="text-[10px] font-black text-blue-100 uppercase tracking-widest">Détails de l'acte</span>
-                            <span class="px-3 py-1 bg-white/20 text-white rounded-full text-[9px] font-black uppercase">
+                        
+                        <!-- Hero Card Banner -->
+                        <div class="bg-gradient-to-r from-[#1E690F] via-[#267b14] to-[#154d0a] px-8 py-5 flex items-center justify-between text-white shadow-md">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2.5 bg-white/10 backdrop-blur-md rounded-xl">
+                                    <DocumentTextIcon class="h-6 w-6 text-white" />
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-black uppercase tracking-widest text-green-200 block">Registre Officiel</span>
+                                    <h3 class="text-lg font-black tracking-tight leading-tight">Détails Certifiés de l'Acte</h3>
+                                </div>
+                            </div>
+                            <span class="px-3.5 py-1.5 bg-white/20 backdrop-blur-md text-white rounded-xl text-xs font-black uppercase tracking-wider border border-white/10">
                                 Version {{ act.version_number }}
                             </span>
                         </div>
@@ -177,105 +283,109 @@ const getStatusModalIcon = () => {
                         <div class="p-8 space-y-8">
                             <!-- Naissance Context -->
                             <div v-if="type === 'naissance'" class="space-y-6">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 bg-gray-50/60 rounded-2xl border border-gray-100/80">
                                     <div>
-                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Enfant</h4>
-                                        <div class="text-xl font-black text-gray-900">{{ act.first_name }} {{ act.last_name }}</div>
-                                        <div class="text-sm font-bold text-blue-600">{{ act.gender === 'M' ? 'Masculin' : 'Féminin' }}</div>
+                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                            <UserIcon class="h-3.5 w-3.5 text-[#1E690F]" />
+                                            Enfant
+                                        </h4>
+                                        <div class="text-2xl font-black text-gray-900 tracking-tight">{{ act.first_name }} {{ act.last_name }}</div>
+                                        <div class="inline-flex items-center mt-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-extrabold border border-blue-100">
+                                            {{ act.gender === 'M' ? 'Masculin' : 'Féminin' }}
+                                        </div>
                                     </div>
                                     <div>
-                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Naissance</h4>
-                                        <div class="text-sm font-black text-gray-900">{{ formatDate(act.date_of_birth) }}<span v-if="act.time_of_birth" class="text-gray-500 font-medium ml-2">à {{ formatTime(act.time_of_birth) }}</span></div>
-                                        <div class="text-xs font-bold text-gray-500 italic">{{ act.place_of_birth }}</div>
-                                        <div v-if="act.health_facility" class="text-xs font-bold text-green-700 mt-1">Formation : {{ act.health_facility }}</div>
+                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                            <CalendarIcon class="h-3.5 w-3.5 text-[#1E690F]" />
+                                            Naissance
+                                        </h4>
+                                        <div class="text-base font-black text-gray-900">
+                                            {{ formatDate(act.date_of_birth) }}
+                                            <span v-if="act.time_of_birth" class="text-gray-500 font-bold text-xs ml-2">à {{ formatTime(act.time_of_birth) }}</span>
+                                        </div>
+                                        <div class="text-xs font-bold text-gray-500 italic mt-1 flex items-center gap-1">
+                                            <MapPinIcon class="h-3.5 w-3.5 text-gray-400" />
+                                            {{ act.place_of_birth }}
+                                        </div>
+                                        <div v-if="act.health_facility" class="text-xs font-extrabold text-[#1E690F] mt-2 bg-green-50 px-3 py-1 rounded-lg border border-green-100 inline-block">
+                                            Formation : {{ act.health_facility }}
+                                        </div>
                                     </div>
                                 </div>
-                                <div v-if="act.is_judgment" class="p-4 bg-green-50/50 rounded-2xl border border-green-100 flex flex-wrap gap-6 items-center">
-                                    <div class="px-3 py-1 bg-[#1E690F] text-white rounded-full text-[9px] font-black uppercase tracking-wider">Jugement de Naissance</div>
-                                    <div>
-                                        <div class="text-[9px] font-black text-gray-400 uppercase">Numéro du Jugement</div>
-                                        <div class="text-xs font-black text-gray-900">{{ act.judgment_number }}</div>
+
+                                <!-- Jugement de Naissance -->
+                                <div v-if="act.is_judgment" class="p-5 bg-emerald-50/50 rounded-2xl border border-emerald-100/80 space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <div class="px-3 py-1 bg-[#1E690F] text-white rounded-lg text-[10px] font-black uppercase tracking-wider shadow-xs">Jugement de Naissance</div>
+                                        <span class="text-xs font-black text-emerald-800">Tribunal : {{ act.judgment_court }}</span>
                                     </div>
-                                    <div>
-                                        <div class="text-[9px] font-black text-gray-400 uppercase">Date du Jugement</div>
-                                        <div class="text-xs font-black text-gray-900">{{ formatDate(act.judgment_date) }}</div>
-                                    </div>
-                                    <div>
-                                        <div class="text-[9px] font-black text-gray-400 uppercase">Tribunal</div>
-                                        <div class="text-xs font-black text-gray-900">{{ act.judgment_court }}</div>
-                                    </div>
-                                    <div v-if="act.parents_metadata?.judgment_auth_date">
-                                        <div class="text-[9px] font-black text-gray-400 uppercase">Date Autorisation</div>
-                                        <div class="text-xs font-black text-gray-900">{{ formatDate(act.parents_metadata.judgment_auth_date) }}</div>
-                                    </div>
-                                    <div v-if="act.parents_metadata?.judgment_auth_ref">
-                                        <div class="text-[9px] font-black text-gray-400 uppercase">Réf. Autorisation</div>
-                                        <div class="text-xs font-black text-gray-900">{{ act.parents_metadata.judgment_auth_ref }}</div>
-                                    </div>
-                                </div>
-                                <div class="pt-4 border-t border-gray-50 grid grid-cols-2 gap-8">
-                                    <div>
-                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Père</h4>
-                                        <div class="text-sm font-bold text-gray-700">{{ act.father_name || 'Non renseigné' }}</div>
-                                        <div v-if="act.parents_metadata?.father_date_of_birth" class="text-xs text-gray-500">Né le {{ formatDate(act.parents_metadata.father_date_of_birth) }}<span v-if="act.parents_metadata.father_place_of_birth"> — {{ act.parents_metadata.father_place_of_birth }}</span></div>
-                                        <div v-if="act.parents_metadata?.father_domicile" class="text-xs text-gray-500">Domicile : {{ act.parents_metadata.father_domicile }}</div>
-                                        <div v-if="act.parents_metadata?.father_profession" class="text-xs text-gray-500">Profession : {{ act.parents_metadata.father_profession }}</div>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Mère</h4>
-                                        <div class="text-sm font-bold text-gray-700">{{ act.mother_name || 'Non renseignée' }}</div>
-                                        <div v-if="act.parents_metadata?.mother_date_of_birth" class="text-xs text-gray-500">Née le {{ formatDate(act.parents_metadata.mother_date_of_birth) }}<span v-if="act.parents_metadata.mother_place_of_birth"> — {{ act.parents_metadata.mother_place_of_birth }}</span></div>
-                                        <div v-if="act.parents_metadata?.mother_domicile" class="text-xs text-gray-500">Domicile : {{ act.parents_metadata.mother_domicile }}</div>
-                                        <div v-if="act.parents_metadata?.mother_profession" class="text-xs text-gray-500">Profession : {{ act.parents_metadata.mother_profession }}</div>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs pt-1">
+                                        <div>
+                                            <div class="text-[9px] font-black text-gray-400 uppercase">N° Jugement</div>
+                                            <div class="text-xs font-black text-gray-900">{{ act.judgment_number }}</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-[9px] font-black text-gray-400 uppercase">Date Jugement</div>
+                                            <div class="text-xs font-black text-gray-900">{{ formatDate(act.judgment_date) }}</div>
+                                        </div>
+                                        <div v-if="act.parents_metadata?.judgment_auth_date">
+                                            <div class="text-[9px] font-black text-gray-400 uppercase">Date Autorisation</div>
+                                            <div class="text-xs font-black text-gray-900">{{ formatDate(act.parents_metadata.judgment_auth_date) }}</div>
+                                        </div>
+                                        <div v-if="act.parents_metadata?.judgment_auth_ref">
+                                            <div class="text-[9px] font-black text-gray-400 uppercase">Réf. Autorisation</div>
+                                            <div class="text-xs font-black text-gray-900">{{ act.parents_metadata.judgment_auth_ref }}</div>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <!-- Filiation (Père & Mère) -->
+                                <div class="pt-4 border-t border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div class="p-5 bg-blue-50/20 rounded-2xl border border-blue-100/40 space-y-2">
+                                        <h4 class="text-[10px] font-black text-blue-900 uppercase tracking-widest">Père</h4>
+                                        <div class="text-base font-black text-gray-900">{{ act.father_name || 'Non renseigné' }}</div>
+                                        <div v-if="act.parents_metadata?.father_date_of_birth" class="text-xs text-gray-600 font-medium">Né le {{ formatDate(act.parents_metadata.father_date_of_birth) }}<span v-if="act.parents_metadata.father_place_of_birth"> — {{ act.parents_metadata.father_place_of_birth }}</span></div>
+                                        <div v-if="act.parents_metadata?.father_domicile" class="text-xs text-gray-600 font-medium">Domicile : {{ act.parents_metadata.father_domicile }}</div>
+                                        <div v-if="act.parents_metadata?.father_profession" class="text-xs text-gray-600 font-medium">Profession : {{ act.parents_metadata.father_profession }}</div>
+                                    </div>
+
+                                    <div class="p-5 bg-pink-50/20 rounded-2xl border border-pink-100/40 space-y-2">
+                                        <h4 class="text-[10px] font-black text-pink-900 uppercase tracking-widest">Mère</h4>
+                                        <div class="text-base font-black text-gray-900">{{ act.mother_name || 'Non renseignée' }}</div>
+                                        <div v-if="act.parents_metadata?.mother_date_of_birth" class="text-xs text-gray-600 font-medium">Née le {{ formatDate(act.parents_metadata.mother_date_of_birth) }}<span v-if="act.parents_metadata.mother_place_of_birth"> — {{ act.parents_metadata.mother_place_of_birth }}</span></div>
+                                        <div v-if="act.parents_metadata?.mother_domicile" class="text-xs text-gray-600 font-medium">Domicile : {{ act.parents_metadata.mother_domicile }}</div>
+                                        <div v-if="act.parents_metadata?.mother_profession" class="text-xs text-gray-600 font-medium">Profession : {{ act.parents_metadata.mother_profession }}</div>
+                                    </div>
+                                </div>
+
                                 <!-- Déclarant -->
-                                <div v-if="effectiveDeclarant" class="pt-4 border-t border-gray-50">
-                                    <div class="flex items-center gap-3 mb-3">
-                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Déclarant</h4>
-                                        <span v-if="effectiveDeclarant.isDefault" class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-wider border border-blue-100">
+                                <div v-if="effectiveDeclarant" class="p-5 bg-gray-50/70 rounded-2xl border border-gray-100 space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Déclarant de la Naissance</h4>
+                                        <span v-if="effectiveDeclarant.isDefault" class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full text-[9px] font-black uppercase tracking-wider border border-blue-100">
                                             Père (par défaut)
                                         </span>
-                                        <span v-else class="px-2 py-0.5 bg-purple-50 text-purple-600 rounded-full text-[9px] font-black uppercase tracking-wider border border-purple-100">
+                                        <span v-else class="px-2.5 py-1 bg-purple-50 text-purple-700 rounded-full text-[9px] font-black uppercase tracking-wider border border-purple-100">
                                             Tiers déclarant
                                         </span>
                                     </div>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                                        <div><span class="text-gray-400">Nom :</span> <span class="font-bold text-gray-900">{{ effectiveDeclarant.name }}</span></div>
-                                        <div v-if="effectiveDeclarant.profession"><span class="text-gray-400">Profession :</span> <span class="font-bold text-gray-900">{{ effectiveDeclarant.profession }}</span></div>
-                                        <div v-if="effectiveDeclarant.address"><span class="text-gray-400">Adresse :</span> <span class="font-bold text-gray-900">{{ effectiveDeclarant.address }}</span></div>
-                                        <div v-if="effectiveDeclarant.id_number"><span class="text-gray-400">ID :</span> <span class="font-bold text-gray-900">{{ effectiveDeclarant.id_number }}</span></div>
-                                        <div v-if="effectiveDeclarant.date"><span class="text-gray-400">Déclaration le :</span> <span class="font-bold text-gray-900">{{ formatDate(effectiveDeclarant.date) }}</span></div>
-                                        <div v-if="effectiveDeclarant.judgment_ref"><span class="text-gray-400">Réf. Jugement :</span> <span class="font-bold text-gray-900">{{ effectiveDeclarant.judgment_ref }}</span></div>
-                                    </div>
-                                </div>
-                                <!-- Témoins -->
-                                <div v-if="act.parents_metadata?.witnesses && act.parents_metadata.witnesses.length > 0" class="pt-4 border-t border-gray-50">
-                                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Témoins de l'acte</h4>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div v-for="(witness, index) in act.parents_metadata.witnesses" :key="index" class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100/50 text-xs">
-                                            <div class="font-black text-[#1E690F] uppercase tracking-wider mb-2">Témoin {{ index + 1 }}</div>
-                                            <div class="space-y-1.5">
-                                                <div><span class="text-gray-400">Nom :</span> <span class="font-bold text-gray-900">{{ witness.first_name }} {{ witness.last_name }}</span></div>
-                                                <div><span class="text-gray-400">Né(e) le :</span> <span class="font-bold text-gray-900">{{ formatDate(witness.date_of_birth) }}<span v-if="witness.place_of_birth"> à {{ witness.place_of_birth }}</span></span></div>
-                                                <div><span class="text-gray-400">Profession :</span> <span class="font-bold text-gray-900">{{ witness.profession }}</span></div>
-                                                <div><span class="text-gray-400">Adresse :</span> <span class="font-bold text-gray-900">{{ witness.address }}</span></div>
-                                                <div><span class="text-gray-400">N° ID :</span> <span class="font-bold text-gray-900">{{ witness.id_number }}</span></div>
-                                            </div>
-                                        </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-medium">
+                                        <div><span class="text-gray-400">Nom :</span> <span class="font-black text-gray-900">{{ effectiveDeclarant.name }}</span></div>
+                                        <div v-if="effectiveDeclarant.profession"><span class="text-gray-400">Profession :</span> <span class="font-black text-gray-900">{{ effectiveDeclarant.profession }}</span></div>
+                                        <div v-if="effectiveDeclarant.address"><span class="text-gray-400">Adresse :</span> <span class="font-black text-gray-900">{{ effectiveDeclarant.address }}</span></div>
+                                        <div v-if="effectiveDeclarant.id_number"><span class="text-gray-400">ID / CNI :</span> <span class="font-black text-gray-900">{{ effectiveDeclarant.id_number }}</span></div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Mariage Context -->
                             <div v-if="type === 'mariage'" class="space-y-8">
-                                <!-- Époux Informations Détaillées -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <!-- Époux (Mari) -->
                                     <div class="p-6 bg-blue-50/30 rounded-2xl border border-blue-100/50 space-y-4">
                                         <div class="flex items-center gap-2 border-b border-blue-100 pb-2">
                                             <div class="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                            <h4 class="text-xs font-black text-blue-900 uppercase tracking-widest">Épou (Mari)</h4>
+                                            <h4 class="text-xs font-black text-blue-900 uppercase tracking-widest">Époux (Mari)</h4>
                                         </div>
                                         <div class="space-y-2">
                                             <div class="text-xl font-black text-gray-900">{{ act.husband_first_name }} {{ act.husband_last_name }}</div>
@@ -302,10 +412,6 @@ const getStatusModalIcon = () => {
                                                     <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Résidence</span>
                                                     <span class="text-gray-800 font-bold">{{ act.spouses_metadata?.husband_residence || 'Non renseigné' }}</span>
                                                 </div>
-                                            </div>
-                                            <div class="text-xs pt-2 border-t border-blue-100/50">
-                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Marié à (épouses existantes)</span>
-                                                <span class="text-blue-700 font-black">{{ act.spouses_metadata?.husband_married_to || 'Aucune autre épouse' }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -347,86 +453,25 @@ const getStatusModalIcon = () => {
                                 </div>
 
                                 <!-- Célébration & Régimes -->
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 pt-4 border-t border-gray-100">
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 p-6 bg-gray-50 rounded-2xl border border-gray-100">
                                     <div>
-                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Célébration</h4>
+                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Célébration</h4>
                                         <div class="text-sm font-black text-gray-900">{{ formatDate(act.marriage_date) }}</div>
                                     </div>
                                     <div>
-                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Lieu</h4>
+                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Lieu</h4>
                                         <div class="text-sm font-bold text-gray-700 italic">{{ act.marriage_place }}</div>
                                     </div>
                                     <div>
-                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Option Matrimoniale</h4>
-                                        <div class="text-sm font-black text-gray-900 uppercase tracking-tight">
+                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Option Matrimoniale</h4>
+                                        <div class="text-sm font-black text-gray-900 uppercase">
                                             {{ act.marriage_option === 'monogamie' ? 'Monogamie' : (act.marriage_option === 'limitation_polygamie' ? 'Limitation de polygamie' : (act.marriage_option === 'polygamie' ? 'Polygamie' : act.marriage_option || 'Polygamie')) }}
-                                            <span v-if="act.spouses_metadata?.max_wives" class="text-xs text-yellow-700 font-black block">({{ act.spouses_metadata.max_wives }} épouses max)</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Régime Matrimonial</h4>
-                                        <div class="text-sm font-black text-[#1E690F] uppercase tracking-tight">
-                                            {{ act.matrimonial_regime === 'separation_biens' ? 'Séparation des biens' : (act.matrimonial_regime === 'regime_dotal' ? 'Régime dotal' : (act.matrimonial_regime === 'participation_meubles_acquets' ? 'Participation aux meubles et acquêts' : act.matrimonial_regime || 'Séparation des biens')) }}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Jugement d'autorisation -->
-                                <div v-if="act.is_judgment || act.judgment_number" class="p-5 bg-gray-50 rounded-2xl border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                    <div class="space-y-1">
-                                        <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Déclaration sur Jugement</div>
-                                        <div class="text-sm font-black text-gray-900">Jugement d'autorisation N° {{ act.judgment_number }}</div>
-                                        <div class="text-xs text-gray-500 font-bold">Rendu le {{ formatDate(act.judgment_date) }}</div>
-                                    </div>
-                                    <div v-if="act.doc_jugement_path" class="flex">
-                                        <a :href="act.doc_jugement_path" target="_blank" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-black text-[#1E690F] uppercase tracking-widest shadow-sm hover:bg-gray-50 transition-all flex items-center gap-1.5">
-                                            <DocumentIcon class="w-4 h-4 text-[#1E690F]" />
-                                            Copie du Jugement
-                                        </a>
-                                    </div>
-                                </div>
-
-                                <!-- Parents des Époux -->
-                                <div class="pt-6 border-t border-gray-100 space-y-6">
-                                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">Parents des Époux</h4>
-                                    
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <!-- Parents Époux -->
-                                        <div class="space-y-4 p-5 bg-blue-50/10 rounded-2xl border border-blue-100/30">
-                                            <h5 class="text-[10px] font-black text-blue-900 uppercase tracking-widest border-b border-blue-100/50 pb-1">De l'Époux</h5>
-                                            <!-- Père -->
-                                            <div class="text-xs">
-                                                <span class="text-gray-400 uppercase font-bold text-[9px] block">Père</span>
-                                                <span class="text-gray-800 font-black block">{{ act.spouses_metadata?.husband_father_first_name }} {{ act.spouses_metadata?.husband_father_last_name }}</span>
-                                                <span class="text-gray-500 block">Né le : {{ formatDate(act.spouses_metadata?.husband_father_date_of_birth) || 'Non renseigné' }} | Profession : {{ act.spouses_metadata?.husband_father_profession || 'Non renseigné' }}</span>
-                                                <span class="text-gray-500 block italic">Domicile : {{ act.spouses_metadata?.husband_father_domicile || 'Non renseigné' }}</span>
-                                            </div>
-                                            <!-- Mère -->
-                                            <div class="text-xs pt-2 border-t border-blue-100/30">
-                                                <span class="text-gray-400 uppercase font-bold text-[9px] block">Mère</span>
-                                                <span class="text-gray-800 font-black block">{{ act.spouses_metadata?.husband_mother_first_name }} {{ act.spouses_metadata?.husband_mother_last_name }}</span>
-                                                <span class="text-gray-500 block">Née le : {{ formatDate(act.spouses_metadata?.husband_mother_date_of_birth) || 'Non renseigné' }} | Profession : {{ act.spouses_metadata?.husband_mother_profession || 'Non renseigné' }}</span>
-                                                <span class="text-gray-500 block italic">Domicile : {{ act.spouses_metadata?.husband_mother_domicile || 'Non renseigné' }}</span>
-                                            </div>
-                                        </div>
-
-                                        <!-- Parents Épouse -->
-                                        <div class="space-y-4 p-5 bg-pink-50/10 rounded-2xl border border-pink-100/30">
-                                            <h5 class="text-[10px] font-black text-pink-900 uppercase tracking-widest border-b border-pink-100/50 pb-1">De l'Épouse</h5>
-                                            <!-- Père -->
-                                            <div class="text-xs">
-                                                <span class="text-gray-400 uppercase font-bold text-[9px] block">Père</span>
-                                                <span class="text-gray-800 font-black block">{{ act.spouses_metadata?.wife_father_first_name }} {{ act.spouses_metadata?.wife_father_last_name }}</span>
-                                                <span class="text-gray-500 block">Né le : {{ formatDate(act.spouses_metadata?.wife_father_date_of_birth) || 'Non renseigné' }} | Profession : {{ act.spouses_metadata?.wife_father_profession || 'Non renseigné' }}</span>
-                                                <span class="text-gray-500 block italic">Domicile : {{ act.spouses_metadata?.wife_father_domicile || 'Non renseigné' }}</span>
-                                            </div>
-                                            <!-- Mère -->
-                                            <div class="text-xs pt-2 border-t border-pink-100/30">
-                                                <span class="text-gray-400 uppercase font-bold text-[9px] block">Mère</span>
-                                                <span class="text-gray-800 font-black block">{{ act.spouses_metadata?.wife_mother_first_name }} {{ act.spouses_metadata?.wife_mother_last_name }}</span>
-                                                <span class="text-gray-500 block">Née le : {{ formatDate(act.spouses_metadata?.wife_mother_date_of_birth) || 'Non renseigné' }} | Profession : {{ act.spouses_metadata?.wife_mother_profession || 'Non renseigné' }}</span>
-                                                <span class="text-gray-500 block italic">Domicile : {{ act.spouses_metadata?.wife_mother_domicile || 'Non renseigné' }}</span>
-                                            </div>
+                                        <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Régime Matrimonial</h4>
+                                        <div class="text-sm font-black text-[#1E690F] uppercase">
+                                            {{ act.matrimonial_regime === 'separation_biens' ? 'Séparation des biens' : (act.matrimonial_regime === 'regime_dotal' ? 'Régime dotal' : (act.matrimonial_regime === 'participation_meubles_acquets' ? 'Participation aux acquêts' : act.matrimonial_regime || 'Séparation des biens')) }}
                                         </div>
                                     </div>
                                 </div>
@@ -434,347 +479,156 @@ const getStatusModalIcon = () => {
 
                             <!-- Deces Context -->
                             <div v-if="type === 'deces'" class="space-y-8">
-                                <!-- Acte & Défunt Details -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <!-- Informations de l'Acte de Décès -->
-                                    <div class="p-6 bg-gray-50/50 rounded-2xl border border-gray-150 space-y-4">
-                                        <div class="flex items-center gap-2 border-b border-gray-250 pb-2">
-                                            <div class="w-2 h-2 bg-[#1E690F] rounded-full"></div>
-                                            <h4 class="text-xs font-black text-gray-900 uppercase tracking-widest">Acte de Décès</h4>
-                                        </div>
-                                        <div class="space-y-3 text-xs">
+                                    <div class="p-6 bg-gray-50/80 rounded-2xl border border-gray-200/70 space-y-3">
+                                        <h4 class="text-xs font-black text-gray-900 uppercase tracking-widest border-b border-gray-200 pb-2">Décès</h4>
+                                        <div class="space-y-2 text-xs">
                                             <div>
-                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Date du Décès</span>
-                                                <span class="text-gray-900 font-black text-sm">{{ formatDate(act.date_of_death) }}<span v-if="act.time_of_death" class="text-gray-500 font-medium ml-2">à {{ formatTime(act.time_of_death) }}</span></span>
+                                                <span class="text-gray-400 font-bold block uppercase text-[9px]">Date & Heure</span>
+                                                <span class="text-gray-900 font-black text-sm">{{ formatDate(act.date_of_death) }}<span v-if="act.time_of_death" class="text-gray-500 font-bold ml-2">à {{ formatTime(act.time_of_death) }}</span></span>
                                             </div>
                                             <div>
-                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Lieu du Décès</span>
+                                                <span class="text-gray-400 font-bold block uppercase text-[9px]">Lieu du Décès</span>
                                                 <span class="text-gray-800 font-bold">{{ act.place_of_death }}</span>
                                             </div>
                                             <div v-if="act.health_facility">
-                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Formation Sanitaire</span>
+                                                <span class="text-gray-400 font-bold block uppercase text-[9px]">Formation Sanitaire</span>
                                                 <span class="text-green-700 font-bold">{{ act.health_facility }}</span>
                                             </div>
-                                            <div v-if="act.act_registration_date">
-                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Date d'Inscription</span>
-                                                <span class="text-gray-800 font-bold">Fait à Enampore, le {{ formatDate(act.act_registration_date) }}</span>
-                                            </div>
                                         </div>
                                     </div>
 
-                                    <!-- Informations du Défunt -->
-                                    <div class="p-6 bg-red-50/10 rounded-2xl border border-red-100/30 space-y-4">
-                                        <div class="flex items-center gap-2 border-b border-red-100/50 pb-2">
-                                            <div class="w-2 h-2 bg-red-600 rounded-full"></div>
-                                            <h4 class="text-xs font-black text-red-900 uppercase tracking-widest">Le Défunt</h4>
-                                        </div>
-                                        <div class="space-y-3 text-xs">
+                                    <div class="p-6 bg-red-50/20 rounded-2xl border border-red-100/50 space-y-3">
+                                        <h4 class="text-xs font-black text-red-900 uppercase tracking-widest border-b border-red-100/50 pb-2">Le Défunt</h4>
+                                        <div class="space-y-2 text-xs">
                                             <div>
-                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Identité</span>
-                                                <span class="text-gray-900 font-black text-base block">{{ act.deceased_first_name }} {{ act.deceased_last_name }}</span>
-                                                <span class="text-xs font-bold text-red-600">{{ act.gender === 'M' ? 'Masculin' : 'Féminin' }}</span>
+                                                <span class="text-gray-400 font-bold block uppercase text-[9px]">Identité</span>
+                                                <span class="text-gray-900 font-black text-lg block">{{ act.deceased_first_name }} {{ act.deceased_last_name }}</span>
                                             </div>
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div class="grid grid-cols-2 gap-4">
                                                 <div>
-                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Né(e) le</span>
-                                                    <span class="text-gray-850 font-bold">{{ formatDate(act.date_of_birth) }}<span v-if="act.death_metadata?.time_of_birth" class="text-gray-500 font-medium ml-1">à {{ formatTime(act.death_metadata.time_of_birth) }}</span></span>
+                                                    <span class="text-gray-400 font-bold block uppercase text-[9px]">Né(e) le</span>
+                                                    <span class="text-gray-800 font-bold">{{ formatDate(act.date_of_birth) }}</span>
                                                 </div>
                                                 <div>
-                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">À</span>
-                                                    <span class="text-gray-850 font-bold italic">{{ act.death_metadata?.place_of_birth || '-' }}</span>
+                                                    <span class="text-gray-400 font-bold block uppercase text-[9px]">Sexe</span>
+                                                    <span class="text-gray-800 font-bold">{{ act.gender === 'M' ? 'Masculin' : 'Féminin' }}</span>
                                                 </div>
-                                            </div>
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div>
-                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Profession</span>
-                                                    <span class="text-gray-850 font-bold">{{ act.death_metadata?.profession || '-' }}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Domicile</span>
-                                                    <span class="text-gray-850 font-bold">{{ act.death_metadata?.domicile || '-' }}</span>
-                                                </div>
-                                            </div>
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1 border-t border-red-100/50">
-                                                <div>
-                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Situation Matrimoniale</span>
-                                                    <span class="text-gray-850 font-bold">{{ act.death_metadata?.marital_status || '-' }}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Précédemment marié à</span>
-                                                    <span class="text-gray-850 font-bold">{{ act.death_metadata?.previously_married_to || '-' }}</span>
-                                                </div>
-                                            </div>
-                                            <div v-if="act.cause_of_death">
-                                                <span class="text-gray-400 font-bold block uppercase tracking-wider text-[9px]">Cause du Décès (Optionnel)</span>
-                                                <span class="text-gray-850 font-medium italic">"{{ act.cause_of_death }}"</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Jugement d'autorisation -->
-                                <div v-if="act.is_judgment || act.judgment_number" class="p-5 bg-gray-50 rounded-2xl border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                    <div class="space-y-1">
-                                        <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Déclaration sur Jugement</div>
-                                        <div class="text-sm font-black text-gray-900">Jugement d'autorisation N° {{ act.judgment_number }}</div>
-                                        <div class="text-xs text-gray-500 font-bold">Rendu le {{ formatDate(act.judgment_date) }} par la juridiction : {{ act.judgment_court }}</div>
-                                    </div>
-                                    <div v-if="act.doc_jugement_path" class="flex">
-                                        <a :href="act.doc_jugement_path" target="_blank" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-black text-[#1E690F] uppercase tracking-widest shadow-sm hover:bg-gray-50 transition-all flex items-center gap-1.5">
-                                            <DocumentIcon class="w-4 h-4 text-[#1E690F]" />
-                                            Copie du Jugement
-                                        </a>
-                                    </div>
-                                </div>
-
-                                <!-- Parents du Défunt -->
-                                <div class="pt-6 border-t border-gray-100 space-y-6">
-                                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">Parents du Défunt</h4>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <!-- Père -->
-                                        <div class="p-5 bg-blue-50/10 rounded-2xl border border-blue-100/30 text-xs space-y-2">
-                                            <span class="text-gray-400 uppercase font-bold text-[9px] block">Père du Défunt</span>
-                                            <span class="text-gray-800 font-black block text-sm">{{ act.death_metadata?.father_first_name }} {{ act.death_metadata?.father_last_name }}</span>
-                                            <div v-if="act.death_metadata?.father_date_of_birth" class="text-gray-500 font-medium">Né le : {{ formatDate(act.death_metadata.father_date_of_birth) }}</div>
-                                            <div v-if="act.death_metadata?.father_profession" class="text-gray-500 font-medium">Profession : {{ act.death_metadata.father_profession }}</div>
-                                            <div v-if="act.death_metadata?.father_domicile" class="text-gray-500 font-medium italic">Domicile : {{ act.death_metadata.father_domicile }}</div>
-                                        </div>
-                                        <!-- Mère -->
-                                        <div class="p-5 bg-pink-50/10 rounded-2xl border border-pink-100/30 text-xs space-y-2">
-                                            <span class="text-gray-400 uppercase font-bold text-[9px] block">Mère du Défunt</span>
-                                            <span class="text-gray-800 font-black block text-sm">{{ act.death_metadata?.mother_first_name }} {{ act.death_metadata?.mother_last_name }}</span>
-                                            <div v-if="act.death_metadata?.mother_date_of_birth" class="text-gray-500 font-medium">Née le : {{ formatDate(act.death_metadata.mother_date_of_birth) }}</div>
-                                            <div v-if="act.death_metadata?.mother_profession" class="text-gray-500 font-medium">Profession : {{ act.death_metadata.mother_profession }}</div>
-                                            <div v-if="act.death_metadata?.mother_domicile" class="text-gray-500 font-medium italic">Domicile : {{ act.death_metadata.mother_domicile }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Déclarant -->
-                                <div v-if="act.death_metadata?.declarant_first_name || act.death_metadata?.declarant_last_name" class="pt-6 border-t border-gray-100">
-                                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Déclarant du Décès</h4>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs p-5 bg-gray-50/50 rounded-2xl border border-gray-100">
-                                        <div><span class="text-gray-400">Nom complet :</span> <span class="font-bold text-gray-900">{{ act.death_metadata.declarant_first_name }} {{ act.death_metadata.declarant_last_name }}</span></div>
-                                        <div v-if="act.death_metadata.declarant_relationship"><span class="text-gray-400">Degré de parenté / Relation :</span> <span class="font-bold text-gray-900">{{ act.death_metadata.declarant_relationship }}</span></div>
-                                        <div v-if="act.death_metadata.declarant_profession"><span class="text-gray-400">Profession :</span> <span class="font-bold text-gray-900">{{ act.death_metadata.declarant_profession }}</span></div>
-                                        <div v-if="act.death_metadata.declarant_address"><span class="text-gray-400">Adresse :</span> <span class="font-bold text-gray-900">{{ act.death_metadata.declarant_address }}</span></div>
-                                        <div v-if="act.death_metadata.declarant_id_number"><span class="text-gray-400">N° Identification (CNI) :</span> <span class="font-bold text-gray-900">{{ act.death_metadata.declarant_id_number }}</span></div>
-                                        <div v-if="act.death_metadata.declarant_date_time"><span class="text-gray-400">Déclaré le :</span> <span class="font-bold text-gray-900">{{ formatDate(act.death_metadata.declarant_date_time) }}</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Versions / Historic -->
-                    <div v-if="versions && versions.length > 1" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-                        <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                            <ClockIcon class="h-4 w-4" />
-                            Historique des Rectifications
-                        </h3>
-                        <div class="space-y-4">
-                            <div v-for="version in versions" :key="version.id" 
-                                 class="flex items-center justify-between p-4 rounded-2xl border border-gray-50 hover:bg-gray-50 transition-colors">
-                                <div class="flex items-center gap-4">
-                                    <div class="h-8 w-8 bg-blue-50 rounded-lg flex items-center justify-center text-[10px] font-black text-blue-600">V{{ version.version_number }}</div>
-                                    <div>
-                                        <div class="text-xs font-black text-gray-900">{{ formatDate(version.created_at) }}</div>
-                                        <div v-if="version.rectification_reason" class="text-[10px] font-bold text-gray-400">{{ version.rectification_reason }}</div>
-                                    </div>
-                                </div>
-                                <Link :href="`/acts/${type}/${version.id}`" class="text-[10px] font-black text-blue-600 uppercase">Consulter</Link>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Additional Information / Comments -->
-                    <div v-if="act.officer_comments || act.parents_metadata || act.witnesses_metadata" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-                         <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                            <PlusCircleIcon class="h-4 w-4" />
-                            Informations Complémentaires
-                        </h3>
-                        
-                        <div class="space-y-6">
-                            <div v-if="act.officer_comments" class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                <h4 class="text-[9px] font-black text-gray-400 uppercase mb-2">{{ ['naissance', 'mariage', 'deces'].includes(type) ? 'Mentions marginales' : "Observations de l'officier" }}</h4>
-                                <p class="text-sm text-gray-700 italic">"{{ act.officer_comments }}"</p>
                             </div>
 
-                            <div v-if="type === 'naissance' && act.parents_metadata" class="space-y-4">
-                                <div v-if="act.act_registration_date" class="p-4 bg-green-50/50 rounded-2xl border border-green-100">
-                                    <h4 class="text-[9px] font-black text-gray-400 uppercase mb-1">Date d'Inscription</h4>
-                                    <p class="text-sm font-black text-gray-900">Fait à Enampore, le {{ formatDate(act.act_registration_date) }}</p>
-                                </div>
-                                <!-- Pièces justificatives -->
-                                <div v-if="act.doc_cni_pere_path || act.doc_cni_mere_path || act.doc_acte_naissance_path || act.doc_cni_declarant_path || act.doc_autres_path || act.doc_jugement_path" class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                    <h4 class="text-[9px] font-black text-gray-400 uppercase mb-3">Pièces Justificatives</h4>
-                                    <div class="space-y-2">
-                                        <a v-if="act.doc_cni_pere_path" :href="act.doc_cni_pere_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">CNI Père :</span> Visualiser le PDF</a>
-                                        <a v-if="act.doc_cni_mere_path" :href="act.doc_cni_mere_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">CNI Mère :</span> Visualiser le PDF</a>
-                                        <a v-if="act.doc_acte_naissance_path" :href="act.doc_acte_naissance_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">Acte/Attestation :</span> Visualiser le PDF</a>
-                                        <a v-if="act.doc_cni_declarant_path" :href="act.doc_cni_declarant_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">CNI Déclarant :</span> Visualiser le PDF</a>
-                                        <a v-if="act.doc_jugement_path" :href="act.doc_jugement_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">Copie du Jugement :</span> Visualiser le PDF</a>
-                                        <a v-if="act.doc_autres_path" :href="act.doc_autres_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline"><span class="text-gray-500">Autres pièces :</span> Visualiser le PDF</a>
-                                    </div>
+                            <!-- Mentions Marginales & Observations -->
+                            <div v-if="act.officer_comments" class="mt-8 p-6 bg-amber-50/70 rounded-3xl border border-amber-200/80 shadow-sm space-y-3">
+                                <h4 class="text-xs font-black text-amber-900 uppercase tracking-widest flex items-center gap-2 border-b border-amber-200/60 pb-3">
+                                    <DocumentTextIcon class="h-4 w-4 text-amber-700" />
+                                    Mentions Marginales &amp; Observations
+                                </h4>
+                                <div class="text-xs font-bold text-amber-950 leading-relaxed bg-white/70 p-4 rounded-2xl border border-amber-200/40 whitespace-pre-line">
+                                    {{ act.officer_comments }}
                                 </div>
                             </div>
 
-                            <!-- Témoins du Mariage / Décès -->
-                            <div v-if="['mariage', 'deces'].includes(type) && act.witnesses_metadata && act.witnesses_metadata.length > 0" class="space-y-4">
-                                <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">{{ type === 'mariage' ? 'Témoins du Mariage' : 'Témoins du Décès' }}</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div v-for="(witness, idx) in act.witnesses_metadata" :key="idx" class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100 space-y-2">
-                                        <div class="flex items-center justify-between border-b border-gray-100 pb-1">
-                                            <h5 class="text-[9px] font-black text-[#1E690F] uppercase tracking-wider">Témoin {{ idx + 1 }}</h5>
-                                            <a v-if="witness.doc_cni_path" :href="witness.doc_cni_path" target="_blank" class="text-[9px] font-black text-[#1E690F] hover:underline flex items-center gap-1">
-                                                <DocumentIcon class="w-3 h-3" />
-                                                Voir CNI (PDF)
-                                            </a>
-                                        </div>
-                                        <p class="text-sm font-black text-gray-900">{{ witness.first_name }} {{ witness.last_name }}</p>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-500 font-medium">
-                                            <div>CNI : {{ witness.id_number || 'Non renseigné' }}</div>
-                                            <div>Profession : {{ witness.profession || 'Non renseignée' }}</div>
-                                        </div>
-                                        <div class="text-xs text-gray-500 italic">Adresse : {{ witness.address || 'Non renseignée' }}</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Pièces Justificatives Mariage (9 catégories) -->
-                            <div v-if="type === 'mariage' && (act.doc_cni_husband_path || act.doc_cni_wife_path || act.doc_birth_husband_path || act.doc_birth_wife_path || act.doc_domicile_path || act.doc_medical_path || act.doc_parental_auth_path || act.doc_jugement_path || act.doc_autres_path)" class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                <h4 class="text-[9px] font-black text-gray-400 uppercase mb-3">Pièces Justificatives</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                    <a v-if="act.doc_cni_husband_path" :href="act.doc_cni_husband_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
-                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
-                                        <span class="text-gray-500">CNI Époux :</span> Visualiser
-                                    </a>
-                                    <a v-if="act.doc_cni_wife_path" :href="act.doc_cni_wife_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
-                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
-                                        <span class="text-gray-500">CNI Épouse :</span> Visualiser
-                                    </a>
-                                    <a v-if="act.doc_birth_husband_path" :href="act.doc_birth_husband_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
-                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
-                                        <span class="text-gray-500">Acte Naissance Époux :</span> Visualiser
-                                    </a>
-                                    <a v-if="act.doc_birth_wife_path" :href="act.doc_birth_wife_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
-                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
-                                        <span class="text-gray-500">Acte Naissance Épouse :</span> Visualiser
-                                    </a>
-                                    <a v-if="act.doc_domicile_path" :href="act.doc_domicile_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
-                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
-                                        <span class="text-gray-500">Certif. Domicile :</span> Visualiser
-                                    </a>
-                                    <a v-if="act.doc_medical_path" :href="act.doc_medical_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
-                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
-                                        <span class="text-gray-500">Certif. Médical :</span> Visualiser
-                                    </a>
-                                    <a v-if="act.doc_parental_auth_path" :href="act.doc_parental_auth_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
-                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
-                                        <span class="text-gray-500">Autorisation Parentale :</span> Visualiser
-                                    </a>
-                                    <a v-if="act.doc_jugement_path" :href="act.doc_jugement_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
-                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
-                                        <span class="text-gray-500">Jugement :</span> Visualiser
-                                    </a>
-                                    <a v-if="act.doc_autres_path" :href="act.doc_autres_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline col-span-2">
-                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
-                                        <span class="text-gray-500">Autres pièces :</span> Visualiser
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Pièces Justificatives Décès (5 catégories) -->
-                            <div v-if="type === 'deces' && (act.doc_death_cert_path || act.doc_deceased_id_path || act.doc_declarant_id_path || act.doc_jugement_path || act.doc_autres_path)" class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                <h4 class="text-[9px] font-black text-gray-400 uppercase mb-3">Pièces Justificatives</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                    <a v-if="act.doc_death_cert_path" :href="act.doc_death_cert_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
-                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
-                                        <span class="text-gray-500">Certificat de Décès :</span> Visualiser
-                                    </a>
-                                    <a v-if="act.doc_deceased_id_path" :href="act.doc_deceased_id_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
-                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
-                                        <span class="text-gray-500">Identité du Défunt :</span> Visualiser
-                                    </a>
-                                    <a v-if="act.doc_declarant_id_path" :href="act.doc_declarant_id_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
-                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
-                                        <span class="text-gray-500">CNI du Déclarant :</span> Visualiser
-                                    </a>
-                                    <a v-if="act.doc_jugement_path" :href="act.doc_jugement_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline">
-                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
-                                        <span class="text-gray-500">Copie du Jugement :</span> Visualiser
-                                    </a>
-                                    <a v-if="act.doc_autres_path" :href="act.doc_autres_path" target="_blank" class="flex items-center gap-2 text-xs font-bold text-[#1E690F] hover:underline col-span-2">
-                                        <DocumentIcon class="w-3.5 h-3.5 text-[#1E690F]" />
-                                        <span class="text-gray-500">Autres pièces :</span> Visualiser
-                                    </a>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Right Column: Meta & Actions -->
                 <div class="space-y-8">
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-                        <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                            <CheckBadgeIcon class="h-4 w-4" />
-                            Statut de l'acte
+                    <!-- Status Card -->
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
+                        <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            <ShieldCheckIcon class="h-4 w-4 text-[#1E690F]" />
+                            Statut Officiel
                         </h3>
-                        <div class="flex items-center gap-3">
-                            <span class="px-4 py-2 bg-blue-50 text-blue-700 rounded-2xl text-xs font-black uppercase tracking-widest">
-                                {{ act.status }}
+                        
+                        <div class="p-4 rounded-2xl border flex items-center justify-between" :class="getStatusBadge(act.status).bg">
+                            <span class="font-black text-xs uppercase tracking-wider">
+                                {{ getStatusBadge(act.status).label }}
                             </span>
+                            <CheckCircleIcon class="w-5 h-5 stroke-[2.5]" />
                         </div>
                         
-                        <div class="mt-8 space-y-4 pt-8 border-t border-gray-50">
-                            <div class="flex justify-between items-center text-[10px] font-bold">
-                                <span class="text-gray-400 uppercase">Enregistré le</span>
-                                <span class="text-gray-900">{{ formatDate(act.created_at) }}</span>
+                        <div class="space-y-3 pt-4 border-t border-gray-100 text-xs">
+                            <div class="flex justify-between items-center font-semibold">
+                                <span class="text-gray-400">Date d'enregistrement</span>
+                                <span class="text-gray-900 font-bold">{{ formatDate(act.created_at) }}</span>
                             </div>
-                            <div class="flex justify-between items-center text-[10px] font-bold">
-                                <span class="text-gray-400 uppercase">Centre</span>
-                                <span class="text-gray-900">{{ act.registry?.name || 'CENTRE PRINCIPAL' }}</span>
+                            <div class="flex justify-between items-center font-semibold">
+                                <span class="text-gray-400">Centre d'État-Civil</span>
+                                <span class="text-gray-900 font-bold">{{ act.registry?.name || 'CENTRE PRINCIPAL' }}</span>
                             </div>
                         </div>
                     </div>
-                    
-                    <div v-if="['brouillon', 'a_corriger'].includes(act.status)" class="space-y-4">
-                        <Link :href="`/acts/${type}/${act.id}/edit`" class="w-full py-4 bg-white border-2 border-dashed border-gray-200 rounded-3xl text-gray-400 hover:border-blue-400 hover:text-blue-600 transition-all font-black text-xs uppercase flex items-center justify-center gap-2 group">
-                             <PencilSquareIcon class="h-4 w-4 group-hover:scale-110 transition-transform" />
-                             Modifier l'acte
-                        </Link>
-                    </div>
 
-                    <!-- CONTROL PANEL FOR VALIDATION -->
-                    <div v-if="act.status !== 'signe'" class="space-y-3 mt-4">
+                    <!-- Actions Panel -->
+                    <div v-if="act.status !== 'signe'" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 space-y-3">
+                        <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Actions Administratifs</h3>
+
                         <!-- Officier / Superviseur Actions -->
                         <template v-if="hasRole(`Officier d'état-civil`) || hasRole('Superviseur') || hasRole('Administrateur technique')">
-                            <button v-if="['brouillon', 'a_corriger'].includes(act.status)" @click="openStatusModal('valide')" class="w-full py-4 bg-green-50 text-green-600 hover:bg-green-100 rounded-3xl transition-all font-black text-xs uppercase flex items-center justify-center gap-2">
+                            <button v-if="['brouillon', 'a_corriger'].includes(act.status)" @click="openStatusModal('valide')" 
+                                    class="w-full py-4 bg-green-50 text-green-700 hover:bg-green-100 rounded-2xl transition-all font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer">
+                                <CheckCircleIcon class="w-4 h-4" />
                                 Valider et Approuver
                             </button>
-                            <button v-if="['brouillon', 'valide'].includes(act.status)" @click="openStatusModal('a_corriger')" class="w-full py-4 bg-yellow-50 text-yellow-600 hover:bg-yellow-100 rounded-3xl transition-all font-black text-xs uppercase flex items-center justify-center gap-2">
+                            <button v-if="['brouillon', 'valide'].includes(act.status)" @click="openStatusModal('a_corriger')" 
+                                    class="w-full py-4 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-2xl transition-all font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer">
+                                <ArrowPathIcon class="w-4 h-4" />
                                 Renvoyer à la correction
                             </button>
-                            <button v-if="['brouillon', 'valide', 'a_corriger'].includes(act.status)" @click="openStatusModal('rejete')" class="w-full py-4 bg-red-50 text-red-600 hover:bg-red-100 rounded-3xl transition-all font-black text-xs uppercase flex items-center justify-center gap-2">
+                            <button v-if="['brouillon', 'valide', 'a_corriger'].includes(act.status)" @click="openStatusModal('rejete')" 
+                                    class="w-full py-4 bg-red-50 text-red-700 hover:bg-red-100 rounded-2xl transition-all font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer">
+                                <ExclamationTriangleIcon class="w-4 h-4" />
                                 Rejeter Définitivement
                             </button>
                         </template>
 
                         <!-- Maire Actions -->
                         <template v-if="hasRole('Maire ou Délégué') || hasRole('Administrateur technique')">
-                            <button v-if="act.status === 'valide'" @click="openStatusModal('signe')" class="w-full py-4 bg-blue-600 text-white shadow-xl shadow-blue-600/20 hover:scale-[1.02] active:scale-95 rounded-3xl transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                            <button v-if="act.status === 'valide'" @click="openStatusModal('signe')" 
+                                    class="w-full py-4 bg-gradient-to-r from-emerald-600 to-green-700 text-white shadow-xl shadow-green-900/20 hover:scale-[1.02] active:scale-95 rounded-2xl transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer">
+                                <CheckBadgeIcon class="w-5 h-5 stroke-[2.5]" />
                                 Signer et Sceller
                             </button>
                         </template>
                     </div>
 
-                    <!-- EXTRACT DOWNLOAD (Only for Signed/Sealed Acts) -->
-                    <div v-if="act.status === 'signe'" class="space-y-3 mt-4">
-                        <a :href="`/verify/${type}/${act.uuid}/download`" target="_blank" class="w-full py-4 bg-[#1E690F] text-white hover:bg-[#154d0a] hover:scale-[1.02] active:scale-95 rounded-3xl transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-[#1E690F]/20">
-                            <ArrowDownTrayIcon class="h-4 w-4 shrink-0" />
-                            Télécharger l'Extrait PDF
-                        </a>
+                    <!-- PDF Download for Signed Acts -->
+                    <div v-if="act.status === 'signe'" class="bg-gradient-to-br from-green-900 via-[#1E690F] to-slate-900 rounded-3xl p-6 text-white shadow-xl space-y-4">
+                        <div class="flex items-center gap-3">
+                            <SparklesIcon class="h-6 w-6 text-green-300" />
+                            <div>
+                                <h4 class="font-black text-sm uppercase tracking-wide">Acte Validé & Scellé</h4>
+                                <p class="text-[10px] text-green-200 font-medium mt-0.5">Le document comporte le QR code et la signature électronique.</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 pt-2">
+                            <!-- Bouton 1 : Télécharger l'Extrait PDF (Main White Pill) -->
+                            <a :href="`/verify/${type}/${act.uuid}/download`" target="_blank" 
+                               class="w-full py-3.5 bg-white text-[#1E690F] hover:bg-green-50 active:scale-95 rounded-2xl transition-all font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg cursor-pointer">
+                                <ArrowDownTrayIcon class="h-4 w-4 stroke-[2.5]" />
+                                <span>Télécharger l'Extrait PDF</span>
+                            </a>
+                            
+                            <!-- Groupe collé Côte à Côte : Volet 1 & Volet 2 -->
+                            <div class="grid grid-cols-2 rounded-2xl overflow-hidden shadow-lg border border-white/20 divide-x divide-white/20">
+                                <a :href="`/verify/${type}/${act.uuid}/download?volet=1`" target="_blank" 
+                                   title="Exemplaire conservé au Centre d'État Civil (Mairie)"
+                                   class="py-3 bg-emerald-950/80 hover:bg-emerald-900 text-emerald-100 hover:text-white active:scale-95 transition-all font-black text-[11px] uppercase tracking-tight flex items-center justify-center gap-1 cursor-pointer text-center px-1">
+                                    <ArrowDownTrayIcon class="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                                    <span>Volet 1 (Mairie)</span>
+                                </a>
+                                <a :href="`/verify/${type}/${act.uuid}/download?volet=2`" target="_blank" 
+                                   title="Exemplaire transmis au Greffe du Tribunal d'Instance"
+                                   class="py-3 bg-slate-900/90 hover:bg-slate-800 text-slate-100 hover:text-white active:scale-95 transition-all font-black text-[11px] uppercase tracking-tight flex items-center justify-center gap-1 cursor-pointer text-center px-1">
+                                    <ArrowDownTrayIcon class="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                                    <span>Volet 2 (Greffe)</span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -790,14 +644,11 @@ const getStatusModalIcon = () => {
                 leave-to-class="opacity-0"
               >
                 <div v-if="showStatusModal" class="fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-                  <div 
-                    class="bg-white rounded-3xl overflow-hidden shadow-2xl transform transition-all max-w-lg w-full border border-gray-100"
-                  >
-                    <!-- Top border colored decorator -->
+                  <div class="bg-white rounded-3xl overflow-hidden shadow-2xl transform transition-all max-w-lg w-full border border-gray-100">
                     <div class="h-2 w-full" :class="{
                       'bg-green-600': pendingStatus === 'valide',
-                      'bg-blue-600': pendingStatus === 'signe',
-                      'bg-yellow-500': pendingStatus === 'a_corriger',
+                      'bg-emerald-600': pendingStatus === 'signe',
+                      'bg-amber-500': pendingStatus === 'a_corriger',
                       'bg-red-600': pendingStatus === 'rejete'
                     }"></div>
 
@@ -805,8 +656,8 @@ const getStatusModalIcon = () => {
                       <div class="flex items-start gap-4">
                         <div class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-2xl" :class="{
                           'bg-green-50 text-green-600': pendingStatus === 'valide',
-                          'bg-blue-50 text-blue-600': pendingStatus === 'signe',
-                          'bg-yellow-50 text-yellow-600': pendingStatus === 'a_corriger',
+                          'bg-emerald-50 text-emerald-600': pendingStatus === 'signe',
+                          'bg-amber-50 text-amber-600': pendingStatus === 'a_corriger',
                           'bg-red-50 text-red-600': pendingStatus === 'rejete'
                         }">
                           <component :is="getStatusModalIcon()" class="h-6 w-6" />
@@ -822,19 +673,18 @@ const getStatusModalIcon = () => {
                         </div>
                       </div>
 
-                      <!-- Footer Action Buttons -->
                       <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-gray-50">
                         <button 
                           type="button" 
                           @click="showStatusModal = false" 
-                          class="px-6 py-3 bg-white border border-gray-200 rounded-2xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 transition-all focus:outline-none"
+                          class="px-6 py-3 bg-white border border-gray-200 rounded-2xl text-xs font-black text-gray-500 uppercase tracking-widest hover:bg-gray-50 transition-all cursor-pointer"
                         >
                           Annuler
                         </button>
                         <button 
                           type="button" 
                           @click="confirmStatusChange" 
-                          class="px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center gap-2"
+                          class="px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                           :class="statusModalConfirmClass"
                         >
                           {{ statusModalConfirmText }}

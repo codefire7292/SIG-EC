@@ -38,7 +38,7 @@ const title = computed(() => {
 
 // Affichage conditionnel de la section Déclarant
 const hasDeclarant = ref(
-    !!(props.act?.parents_metadata?.declarant_first_name || props.act?.parents_metadata?.declarant_last_name)
+    !!(props.act?.parents_metadata?.declarant_first_name || props.act?.parents_metadata?.declarant_last_name || props.act?.parents_metadata?.declarant_relationship)
     || !!(props.act?.parents_metadata?.is_foundling)
 );
 
@@ -1055,12 +1055,24 @@ const submit = () => {
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Qualité du Déclarant <span class="text-red-500">*</span></label>
                                 <select v-model="form.parents_metadata.declarant_relationship" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="hasDeclarant">
                                     <option value="">-- Sélectionner --</option>
+                                    <option value="Père">Père</option>
+                                    <option value="Mère">Mère</option>
+                                    <option value="Grand-père">Grand-père</option>
+                                    <option value="Grand-mère">Grand-mère</option>
+                                    <option value="Oncle">Oncle</option>
+                                    <option value="Tante">Tante</option>
+                                    <option value="Frère">Frère</option>
+                                    <option value="Sœur">Sœur</option>
+                                    <option value="Tuteur">Tuteur / Représentant légal</option>
                                     <option value="Médecin">Médecin</option>
                                     <option value="Sage-femme">Sage-femme</option>
                                     <option value="Personne ayant assisté à l'accouchement">Personne ayant assisté à l'accouchement</option>
                                     <option value="Chef de village">Chef de village</option>
                                     <option value="Délégué de quartier">Délégué de quartier</option>
                                     <option value="Autre">Autre</option>
+                                    <option v-if="form.parents_metadata.declarant_relationship && !['Père', 'Mère', 'Grand-père', 'Grand-mère', 'Oncle', 'Tante', 'Frère', 'Sœur', 'Tuteur / Représentant légal', 'Tuteur', 'Médecin', 'Sage-femme', 'Personne ayant assisté à l\'accouchement', 'Chef de village', 'Délégué de quartier', 'Autre'].includes(form.parents_metadata.declarant_relationship)" :value="form.parents_metadata.declarant_relationship">
+                                        {{ form.parents_metadata.declarant_relationship }}
+                                    </option>
                                 </select>
                             </div>
                             <div>

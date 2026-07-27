@@ -12,16 +12,43 @@ import {
     ShieldCheckIcon,
     ArrowUpTrayIcon,
     ArrowDownTrayIcon,
-    DocumentTextIcon
+    DocumentTextIcon,
+    XMarkIcon
 } from '@heroicons/vue/24/outline';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     acts: Object,
     type: String,
     activeRegistry: Object,   // set when filtered by a specific registry
+    filters: Object,
 });
+
+const search = ref(props.filters?.search || '');
+
+let searchTimeout = null;
+watch(search, (newValue) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        const queryParams = {};
+        if (newValue) {
+            queryParams.search = newValue;
+        }
+        if (props.activeRegistry?.id) {
+            queryParams.registry_id = props.activeRegistry.id;
+        }
+        router.get(`/acts/${props.type}/list`, queryParams, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    }, 300);
+});
+
+const clearSearch = () => {
+    search.value = '';
+};
 
 const canImportExcel = computed(() => {
     const role = usePage().props.auth.user?.role;
@@ -183,11 +210,24 @@ const cancelImport = () => {
         </template>
 
         <div class="space-y-6">
-            <!-- Stats/Highlights (Optional) -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <div class="flex items-center gap-4 text-sm font-bold text-gray-500">
-                    <MagnifyingGlassIcon class="h-5 w-5" />
-                    <span>Aperçu du registre actuel</span>
+            <!-- Search Input Bar -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                <div class="relative flex items-center">
+                    <MagnifyingGlassIcon class="absolute left-4 h-5 w-5 text-gray-400 pointer-events-none stroke-[2]" />
+                    <input
+                        v-model="search"
+                        type="text"
+                        placeholder="Rechercher un acte par nom, prénom ou numéro de référence..."
+                        class="w-full pl-12 pr-10 py-3 bg-gray-50/70 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all shadow-inner"
+                    />
+                    <button
+                        v-if="search"
+                        @click="clearSearch"
+                        type="button"
+                        class="absolute right-4 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                    >
+                        <XMarkIcon class="h-4 w-4 stroke-[2]" />
+                    </button>
                 </div>
             </div>
 

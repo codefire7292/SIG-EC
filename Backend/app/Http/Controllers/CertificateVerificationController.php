@@ -126,8 +126,13 @@ class CertificateVerificationController extends Controller
     /**
      * Download the PDF extract of a civil act (Public/Internal).
      */
-    public function downloadExtract(string $type, string $uuid, \App\Services\DocumentGenerationService $documentService)
+    public function downloadExtract(\Illuminate\Http\Request $request, string $type, string $uuid, \App\Services\DocumentGenerationService $documentService)
     {
+        $volet = $request->has('volet') ? (int) $request->query('volet') : null;
+        if ($volet !== null && !in_array($volet, [1, 2, 3])) {
+            $volet = null;
+        }
+
         $act = match ($type) {
             'naissance' => BirthAct::with('registry')->where('uuid', $uuid)
                 ->where('status', 'signe')
@@ -141,11 +146,13 @@ class CertificateVerificationController extends Controller
             default     => abort(404),
         };
 
-        $pdfContent = $documentService->generateActExtractPdf($act, $type);
+        $pdfContent = $documentService->generateActExtractPdf($act, $type, $volet);
+
+        $filename = $volet ? 'extrait_volet' . $volet . '_' . $type . '_' . $act->reference_number . '.pdf' : 'extrait_' . $type . '_' . $act->reference_number . '.pdf';
 
         return response($pdfContent, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="extrait_' . $type . '_' . $act->reference_number . '.pdf"',
+            'Content-Disposition' => 'inline; filename="' . $filename . '"',
         ]);
     }
 }

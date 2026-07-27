@@ -38,6 +38,12 @@ class CivilCertificateController extends Controller
             'births_count' => BirthAct::where('is_current', true)->count(),
             'marriages_count' => MarriageAct::where('is_current', true)->count(),
             'deaths_count' => DeathAct::where('is_current', true)->count(),
+            'total_acts' => BirthAct::where('is_current', true)->count() +
+                            MarriageAct::where('is_current', true)->count() +
+                            DeathAct::where('is_current', true)->count(),
+            'judgments_count' => BirthAct::where('is_current', true)->where('is_judgment', true)->count() +
+                                 MarriageAct::where('is_current', true)->where('is_judgment', true)->count() +
+                                 DeathAct::where('is_current', true)->where('is_judgment', true)->count(),
             
             // Actes par statut
             'acts_draft' => BirthAct::where('status', 'draft')->where('is_current', true)->count() +
@@ -65,9 +71,23 @@ class CivilCertificateController extends Controller
 
         $recent = CivilCertificate::latest()->limit(5)->get();
 
+        $recentActs = BirthAct::where('is_current', true)
+            ->latest('created_at')
+            ->limit(5)
+            ->get()
+            ->map(fn($act) => [
+                'id' => $act->id,
+                'type' => 'naissance',
+                'name' => trim(($act->first_name ?? '') . ' ' . ($act->last_name ?? '')),
+                'ref' => 'N° ' . $act->act_number,
+                'date' => $act->created_at ? $act->created_at->format('d/m/Y') : '',
+                'status' => $act->status ?? 'signe',
+            ]);
+
         return Inertia::render('Dashboard', [
             'stats' => $stats,
             'recent' => $recent,
+            'recent_acts' => $recentActs,
             'can' => [
                 'view_registries' => Auth::user()->hasPermissionTo('view-registries'),
                 'manage_users' => Auth::user()->hasPermissionTo('manage-users'),
@@ -80,18 +100,40 @@ class CivilCertificateController extends Controller
         Gate::authorize('viewAny', CivilCertificate::class);
 
         $type = $request->query('type');
+        $search = $request->query('search');
+
         $query = CivilCertificate::orderBy('created_at', 'desc');
-        
+
         if ($type && CivilCertificateType::tryFrom($type)) {
             $query->where('type', $type);
         }
 
-        $certificates = $query->paginate(20);
+        if ($search) {
+            $searchTerm = '%' . mb_strtolower(trim($search), 'UTF-8') . '%';
+            $query->where(function ($q) use ($searchTerm) {
+                $q->whereRaw('LOWER(reference_number) LIKE ?', [$searchTerm])
+                  ->orWhereRaw('LOWER(applicant_first_name) LIKE ?', [$searchTerm])
+                  ->orWhereRaw('LOWER(applicant_last_name) LIKE ?', [$searchTerm]);
+            });
+        }
+
+        $certificates = $query->paginate(15)->withQueryString();
+
+        $stats = [
+            'total' => CivilCertificate::count(),
+            'signed' => CivilCertificate::where('status', 'signe')->count(),
+            'pending' => CivilCertificate::whereIn('status', ['brouillon', 'observation', 'a_corriger', 'valide_hierarchie'])->count(),
+        ];
 
         return Inertia::render('CivilCertificates/Index', [
             'certificates' => $certificates,
             'types' => array_column(CivilCertificateType::cases(), 'value'),
             'can_create' => Auth::user()->can('create', CivilCertificate::class),
+            'filters' => [
+                'type' => $type ?? '',
+                'search' => $search ?? '',
+            ],
+            'stats' => $stats,
         ]);
     }
 

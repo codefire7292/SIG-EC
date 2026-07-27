@@ -57,7 +57,7 @@ class DocumentGenerationService
     /**
      * Generate a secure PDF extract for a civil act including a verification QR code.
      */
-    public function generateActExtractPdf($act, string $type): string
+    public function generateActExtractPdf($act, string $type, ?int $volet = null): string
     {
         // 1. Generate QR Code pointing to the public verification URL
         $verificationUrl = route('acts.verify.show', ['type' => $type, 'uuid' => $act->uuid, 't' => time()]);
@@ -89,20 +89,22 @@ class DocumentGenerationService
             'qrCode'    => $qrCodeBase64,
             'logo'      => base64_encode(file_get_contents(public_path('images/logo.png'))),
             'timestamp' => now()->format('d/m/Y H:i:s'),
+            'volet'     => $volet,
         ];
 
-        // 3. Render PDF
-        $pdf = Pdf::loadView('pdf.act', $data);
+        // 3. Render PDF (Use pdf.volet when a volet is requested)
+        $viewName = ($volet !== null && view()->exists('pdf.volet')) ? 'pdf.volet' : 'pdf.act';
+        $pdf = Pdf::loadView($viewName, $data);
         
         // Finalize PDF settings
         $pdf->setPaper('a4', 'portrait');
         $pdf->setOptions([
             'isHtml5ParserEnabled' => true,
             'isRemoteEnabled'      => true,
-            'margin_top'           => 15,
-            'margin_right'         => 14,
-            'margin_bottom'        => 15,
-            'margin_left'          => 14,
+            'margin_top'           => $volet ? 6 : 15,
+            'margin_right'         => $volet ? 10 : 14,
+            'margin_bottom'        => $volet ? 6 : 15,
+            'margin_left'          => $volet ? 10 : 14,
         ]);
 
         return $pdf->output();

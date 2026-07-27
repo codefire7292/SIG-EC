@@ -34,6 +34,15 @@ class CivilActController extends Controller
             ->whereYear('created_at', $year)
             ->count();
 
+        $pendingActs = $model->where('is_current', true)
+            ->where('status', '!=', 'signe')
+            ->count();
+
+        $pendingActsThisYear = $model->where('is_current', true)
+            ->where('status', '!=', 'signe')
+            ->whereYear('created_at', $year)
+            ->count();
+
         $openRegistries = \App\Models\Registry::where('type', $type)
             ->where('status', 'open')
             ->count();
@@ -47,11 +56,13 @@ class CivilActController extends Controller
         return Inertia::render('CivilActs/Hub', [
             'type'  => $type,
             'stats' => [
-                'total_acts'           => $totalActs,
-                'acts_this_year'       => $actsThisYear,
-                'open_registries'      => $openRegistries,
-                'total_registries'     => $totalRegistries,
-                'total_certificates'   => $totalCertificates,
+                'total_acts'             => $totalActs,
+                'acts_this_year'         => $actsThisYear,
+                'pending_acts'           => $pendingActs,
+                'pending_acts_this_year' => $pendingActsThisYear,
+                'open_registries'        => $openRegistries,
+                'total_registries'       => $totalRegistries,
+                'total_certificates'     => $totalCertificates,
                 'certificates_this_year' => $certificatesThisYear,
             ],
         ]);
@@ -68,7 +79,9 @@ class CivilActController extends Controller
             ->orderBy('number', 'asc')
             ->get()
             ->map(function ($registry) use ($model) {
-                $registry->acts_count = $model->where('registry_id', $registry->id)->count();
+                $registry->acts_count = $model->where('registry_id', $registry->id)
+                    ->where('status', 'signe')
+                    ->count();
                 return $registry;
             });
 
@@ -92,7 +105,32 @@ class CivilActController extends Controller
         $activeRegistry = null;
         if ($registryId = $request->query('registry_id')) {
             $query->where('registry_id', $registryId);
+            // Inside the registry volume, only signed acts can be shown
+            $query->where('status', '=', 'signe');
             $activeRegistry = \App\Models\Registry::find($registryId);
+        } else {
+            // Once signed, an act goes to the registry and is no longer shown in the general list of declarations/drafts
+            $query->where('status', '!=', 'signe');
+        }
+
+        $search = $request->query('search');
+        if ($search) {
+            $searchTerm = '%' . mb_strtolower(trim($search), 'UTF-8') . '%';
+            $query->where(function ($q) use ($searchTerm, $type) {
+                $q->whereRaw('LOWER(reference_number) LIKE ?', [$searchTerm]);
+                if ($type === 'naissance') {
+                    $q->orWhereRaw('LOWER(first_name) LIKE ?', [$searchTerm])
+                      ->orWhereRaw('LOWER(last_name) LIKE ?', [$searchTerm]);
+                } elseif ($type === 'mariage') {
+                    $q->orWhereRaw('LOWER(husband_first_name) LIKE ?', [$searchTerm])
+                      ->orWhereRaw('LOWER(husband_last_name) LIKE ?', [$searchTerm])
+                      ->orWhereRaw('LOWER(wife_first_name) LIKE ?', [$searchTerm])
+                      ->orWhereRaw('LOWER(wife_last_name) LIKE ?', [$searchTerm]);
+                } elseif ($type === 'deces') {
+                    $q->orWhereRaw('LOWER(deceased_first_name) LIKE ?', [$searchTerm])
+                      ->orWhereRaw('LOWER(deceased_last_name) LIKE ?', [$searchTerm]);
+                }
+            });
         }
 
         $acts = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
@@ -101,6 +139,9 @@ class CivilActController extends Controller
             'acts'           => $acts,
             'type'           => $type,
             'activeRegistry' => $activeRegistry,
+            'filters'        => [
+                'search' => $search ?? '',
+            ],
         ]);
     }
 

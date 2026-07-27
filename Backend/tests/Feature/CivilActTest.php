@@ -338,6 +338,27 @@ class CivilActTest extends TestCase
         $responseSigne->assertStatus(200);
     }
 
+    public function test_act_extract_download_requires_authentication(): void
+    {
+        // 1. Create a BirthAct with status 'signe'
+        $actSigne = BirthAct::forceCreate([
+            'registry_id' => $this->registry->id,
+            'reference_number' => '2024/NAI/777',
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'date_of_birth' => '2024-01-01',
+            'place_of_birth' => 'Dakar',
+            'gender' => 'F',
+            'status' => 'signe'
+        ]);
+        $actSigne->refresh();
+
+        // 2. Try downloading without being authenticated (should redirect/302)
+        $response = $this->get("/verify/naissance/{$actSigne->uuid}/download");
+        $response->assertStatus(302);
+        $response->assertRedirect('/login');
+    }
+
     public function test_reference_number_incrementation_ignores_non_sequential_references(): void
     {
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
@@ -469,6 +490,80 @@ class CivilActTest extends TestCase
         $this->assertNotNull($newAct);
         $this->assertNull($newAct->time_of_birth);
         $this->assertNull($newAct->health_facility);
+    }
+
+    public function test_index_filtering_rules_for_signed_and_unsigned_acts(): void
+    {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole(\App\Enums\UserRole::ADMIN->value);
+        $this->actingAs($user);
+
+        // Create a signed act
+        $signedAct = BirthAct::forceCreate([
+            'registry_id' => $this->registry->id,
+            'reference_number' => '2024/NAI/111',
+            'first_name' => 'Signedchild',
+            'last_name' => 'Doe',
+            'date_of_birth' => '2024-01-01',
+            'place_of_birth' => 'Dakar',
+            'gender' => 'M',
+            'status' => 'signe'
+        ]);
+
+        // Create a draft act
+        $draftAct = BirthAct::forceCreate([
+            'registry_id' => $this->registry->id,
+            'reference_number' => '2024/NAI/222',
+            'first_name' => 'Draftchild',
+            'last_name' => 'Doe',
+            'date_of_birth' => '2024-01-01',
+            'place_of_birth' => 'Dakar',
+            'gender' => 'M',
+            'status' => 'brouillon'
+        ]);
+
+        // Fetch general index (should exclude Signedchild, include Draftchild)
+        $responseGeneral = $this->get('/acts/naissance/list');
+        $responseGeneral->assertStatus(200);
+        $generalActs = $responseGeneral->original->getData()['page']['props']['acts']['data'];
+        $generalNames = collect($generalActs)->pluck('first_name')->toArray();
+        $this->assertContains('Draftchild', $generalNames);
+        $this->assertNotContains('Signedchild', $generalNames);
+
+        // Fetch registry-filtered index (should include Signedchild, exclude Draftchild)
+        $responseFiltered = $this->get('/acts/naissance/list?registry_id=' . $this->registry->id);
+        $responseFiltered->assertStatus(200);
+        $filteredActs = $responseFiltered->original->getData()['page']['props']['acts']['data'];
+        $filteredNames = collect($filteredActs)->pluck('first_name')->toArray();
+        $this->assertNotContains('Draftchild', $filteredNames);
+        $this->assertContains('Signedchild', $filteredNames);
+    }
+
+    public function test_index_search_filter(): void
+    {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole(\App\Enums\UserRole::ADMIN->value);
+        $this->actingAs($user);
+
+        BirthAct::forceCreate([
+            'registry_id' => $this->registry->id,
+            'reference_number' => '2024/NAI/999',
+            'first_name' => 'UniqueSearchFirst',
+            'last_name' => 'UniqueSearchLast',
+            'date_of_birth' => '2024-01-01',
+            'place_of_birth' => 'Dakar',
+            'gender' => 'M',
+            'status' => 'brouillon'
+        ]);
+
+        // Case-insensitive search test (searching for lowercase 'uniquesearchfirst')
+        $response = $this->get('/acts/naissance/list?search=uniquesearchfirst');
+        $response->assertStatus(200);
+        $acts = $response->original->getData()['page']['props']['acts']['data'];
+        $this->assertCount(1, $acts);
+        $this->assertEquals('UniqueSearchFirst', $acts[0]['first_name']);
     }
 }
 

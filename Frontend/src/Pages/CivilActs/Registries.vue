@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {
@@ -9,17 +9,32 @@ import {
     ArchiveBoxIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
+    ChevronDownIcon,
     LockClosedIcon,
     LockOpenIcon,
     CalendarIcon,
     DocumentTextIcon,
     RectangleStackIcon,
     FolderOpenIcon,
+    FunnelIcon,
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     type: String,
     registries: Array,   // [{id, year, number, status, reference_prefix, opening_date, closing_date, acts_count}]
+});
+
+// ─── Year Filtering ────────────────────────────────────────────────────────────
+const selectedYear = ref('all');
+
+const availableYears = computed(() => {
+    const years = new Set(props.registries.map(r => r.year));
+    return Array.from(years).sort((a, b) => b - a);
+});
+
+const filteredRegistries = computed(() => {
+    if (selectedYear.value === 'all') return props.registries;
+    return props.registries.filter(r => Number(r.year) === Number(selectedYear.value));
 });
 
 // ─── Type config ──────────────────────────────────────────────────────────────
@@ -77,7 +92,7 @@ const pageTitle = computed(() => `Registres — ${typeConfig.value.label}`);
 // Group registries by year
 const byYear = computed(() => {
     const map = {};
-    props.registries.forEach(r => {
+    filteredRegistries.value.forEach(r => {
         if (!map[r.year]) map[r.year] = [];
         map[r.year].push(r);
     });
@@ -165,6 +180,37 @@ const formatDate = (d) => {
                             <div class="text-2xl font-black">{{ registries.length - openCount }}</div>
                             <div class="text-[10px] font-bold uppercase tracking-wider text-white/70">Clôturés</div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Year Filter Bar ──────────────────────────────────────── -->
+            <div v-if="availableYears.length > 0" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl border border-gray-100 p-5 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 rounded-2xl flex items-center justify-center bg-blue-50 text-blue-600">
+                        <FunnelIcon class="h-5 w-5 stroke-[2]" />
+                    </div>
+                    <div>
+                        <span class="text-xs font-black uppercase tracking-wider text-gray-800">Filtrer par année</span>
+                        <p class="text-[11px] text-gray-400 font-medium">Sélectionnez une année dans la liste déroulante</p>
+                    </div>
+                </div>
+
+                <div class="relative min-w-[220px]">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                        <CalendarIcon class="h-4 w-4" />
+                    </div>
+                    <select
+                        v-model="selectedYear"
+                        class="w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-black uppercase tracking-wider text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all cursor-pointer appearance-none shadow-sm"
+                    >
+                        <option value="all">Toutes les années ({{ registries.length }})</option>
+                        <option v-for="yr in availableYears" :key="yr" :value="yr">
+                            Année {{ yr }}
+                        </option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-gray-400">
+                        <ChevronDownIcon class="h-4 w-4 stroke-[2]" />
                     </div>
                 </div>
             </div>
