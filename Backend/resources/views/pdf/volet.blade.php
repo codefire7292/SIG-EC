@@ -226,11 +226,11 @@
             <td style="width: 45%;">
                 <div class="header-title">REPUBLIQUE DU SENEGAL</div>
                 <div style="font-size: 11px; margin-top: 2px; line-height: 1.4;">
-                    <strong>REGION :</strong> <span class="dotted-line" style="min-width: 110px;">{{ strtoupper($centerObj->region ?? 'KOLDA') }}</span><br>
-                    <strong>DEPARTEMENT :</strong> <span class="dotted-line" style="min-width: 90px;">{{ strtoupper($centerObj->departement ?? 'KOLDA') }}</span><br>
+                    <strong>REGION :</strong> <span class="dotted-line" style="min-width: 110px;">{{ strtoupper($centerObj->region ?? 'ZIGUINCHOR') }}</span><br>
+                    <strong>DEPARTEMENT :</strong> <span class="dotted-line" style="min-width: 90px;">{{ strtoupper($centerObj->departement ?? $centerObj->region ?? 'ZIGUINCHOR') }}</span><br>
                     <strong>ARRONDISSEMENT :</strong> <span class="dotted-line" style="min-width: 80px;">{{ strtoupper($centerObj->arrondissement ?? '') }}</span><br>
-                    <strong>COMMUNE DE :</strong> <span class="dotted-line" style="min-width: 100px;">{{ strtoupper($centerObj->commune ?? $centerObj->name ?? 'KOLDA') }}</span><br>
-                    <strong>CENTRE :</strong> <span class="dotted-line" style="min-width: 80px;">{{ strtoupper($centerObj->name ?? 'PRINCIPAL') }}</span>
+                    <strong>COMMUNE DE :</strong> <span class="dotted-line" style="min-width: 100px;">{{ strtoupper($centerObj->commune ?? 'ENAMPORE') }}</span><br>
+                    <strong>CENTRE :</strong> <span class="dotted-line" style="min-width: 80px;">{{ strtoupper($centerObj->name ?? 'CENTRE PRINCIPAL DE ENAMPORE') }}</span>
                 </div>
             </td>
             <td style="width: 30%; text-align: center;">
