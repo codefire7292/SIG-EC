@@ -127,10 +127,10 @@
             font-weight: bold;
             padding-left: 4px;
             padding-right: 4px;
-            padding-bottom: 0px;
-            min-height: 14px;
-            line-height: 1.15;
-            vertical-align: bottom;
+            padding-bottom: 1px;
+            margin-bottom: -2px;
+            line-height: 1;
+            vertical-align: baseline;
         }
 
         .field-label {
