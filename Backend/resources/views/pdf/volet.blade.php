@@ -125,6 +125,7 @@
             border-bottom: 1px dotted #000;
             display: inline-block;
             font-weight: bold;
+            text-align: center;
             padding-left: 4px;
             padding-right: 4px;
             padding-bottom: 1px;
