@@ -229,11 +229,11 @@
             <td style="width: 45%;">
                 <div class="header-title">REPUBLIQUE DU SENEGAL</div>
                 <div style="font-size: 11px; margin-top: 2px; line-height: 1.4;">
-                    <strong>REGION :</strong> <span class="dotted-line" style="min-width: 110px;">{{ strtoupper($centerObj->region ?? 'ZIGUINCHOR') }}</span><br>
-                    <strong>DEPARTEMENT :</strong> <span class="dotted-line" style="min-width: 90px;">{{ strtoupper($centerObj->departement ?? $centerObj->region ?? 'ZIGUINCHOR') }}</span><br>
-                    <strong>ARRONDISSEMENT :</strong> <span class="dotted-line" style="min-width: 80px;">{{ strtoupper($centerObj->arrondissement ?? 'NYASSIA') }}</span><br>
-                    <strong>COMMUNE DE :</strong> <span class="dotted-line" style="min-width: 100px;">{{ strtoupper($centerObj->commune ?? 'ENAMPORE') }}</span><br>
-                    <strong>CENTRE :</strong> <span class="dotted-line" style="min-width: 80px;">{{ strtoupper($centerObj->name ?? 'CENTRE PRINCIPAL DE ENAMPORE') }}</span>
+                    <strong>REGION :</strong> <span style="font-weight: bold; margin-left: 3px;">{{ strtoupper($centerObj->region ?? 'ZIGUINCHOR') }}</span><br>
+                    <strong>DEPARTEMENT :</strong> <span style="font-weight: bold; margin-left: 3px;">{{ strtoupper($centerObj->departement ?? $centerObj->region ?? 'ZIGUINCHOR') }}</span><br>
+                    <strong>ARRONDISSEMENT :</strong> <span style="font-weight: bold; margin-left: 3px;">{{ strtoupper($centerObj->arrondissement ?? 'NYASSIA') }}</span><br>
+                    <strong>COMMUNE DE :</strong> <span style="font-weight: bold; margin-left: 3px;">{{ strtoupper($centerObj->commune ?? 'ENAMPORE') }}</span><br>
+                    <strong>CENTRE :</strong> <span style="font-weight: bold; margin-left: 3px;">{{ strtoupper($centerObj->name ?? 'CENTRE PRINCIPAL DE ENAMPORE') }}</span>
                 </div>
             </td>
             <td style="width: 30%; text-align: center;">
