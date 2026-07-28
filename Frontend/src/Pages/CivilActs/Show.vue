@@ -617,21 +617,30 @@ const goBack = () => {
                             <div class="grid grid-cols-3 rounded-2xl overflow-hidden shadow-lg border border-white/20 divide-x divide-white/20">
                                 <a :href="`/verify/${type}/${act.uuid}/download?volet=1`" target="_blank" 
                                    title="Exemplaire conservé au Centre d'État Civil (Mairie)"
-                                   class="py-3 bg-emerald-950/80 hover:bg-emerald-900 text-emerald-100 hover:text-white active:scale-95 transition-all font-black text-[10px] uppercase tracking-tight flex items-center justify-center gap-1 cursor-pointer text-center px-1">
-                                    <ArrowDownTrayIcon class="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                                    <span>Volet 1</span>
+                                   class="py-2.5 bg-emerald-950/80 hover:bg-emerald-900 text-emerald-100 hover:text-white active:scale-95 transition-all flex flex-col items-center justify-center cursor-pointer text-center px-1">
+                                    <div class="flex items-center gap-1">
+                                        <ArrowDownTrayIcon class="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                                        <span class="font-black text-[11px] uppercase tracking-tight">Volet 1</span>
+                                    </div>
+                                    <span class="text-[9px] text-emerald-300/80 font-bold uppercase tracking-wider mt-0.5">Mairie</span>
                                 </a>
                                 <a :href="`/verify/${type}/${act.uuid}/download?volet=2`" target="_blank" 
                                    title="Exemplaire transmis au Greffe du Tribunal d'Instance"
-                                   class="py-3 bg-slate-900/90 hover:bg-slate-800 text-slate-100 hover:text-white active:scale-95 transition-all font-black text-[10px] uppercase tracking-tight flex items-center justify-center gap-1 cursor-pointer text-center px-1">
-                                    <ArrowDownTrayIcon class="h-3.5 w-3.5 text-amber-400 shrink-0" />
-                                    <span>Volet 2</span>
+                                   class="py-2.5 bg-slate-900/90 hover:bg-slate-800 text-slate-100 hover:text-white active:scale-95 transition-all flex flex-col items-center justify-center cursor-pointer text-center px-1">
+                                    <div class="flex items-center gap-1">
+                                        <ArrowDownTrayIcon class="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                                        <span class="font-black text-[11px] uppercase tracking-tight">Volet 2</span>
+                                    </div>
+                                    <span class="text-[9px] text-amber-300/80 font-bold uppercase tracking-wider mt-0.5">Tribunal</span>
                                 </a>
                                 <a :href="`/verify/${type}/${act.uuid}/download?volet=3`" target="_blank" 
                                    title="Exemplaire remis au Titulaire / Déclarant"
-                                   class="py-3 bg-indigo-950/90 hover:bg-indigo-900 text-indigo-100 hover:text-white active:scale-95 transition-all font-black text-[10px] uppercase tracking-tight flex items-center justify-center gap-1 cursor-pointer text-center px-1">
-                                    <ArrowDownTrayIcon class="h-3.5 w-3.5 text-indigo-300 shrink-0" />
-                                    <span>Volet 3</span>
+                                   class="py-2.5 bg-indigo-950/90 hover:bg-indigo-900 text-indigo-100 hover:text-white active:scale-95 transition-all flex flex-col items-center justify-center cursor-pointer text-center px-1">
+                                    <div class="flex items-center gap-1">
+                                        <ArrowDownTrayIcon class="h-3.5 w-3.5 text-indigo-300 shrink-0" />
+                                        <span class="font-black text-[11px] uppercase tracking-tight">Volet 3</span>
+                                    </div>
+                                    <span class="text-[9px] text-indigo-300/80 font-bold uppercase tracking-wider mt-0.5">Titulaire</span>
                                 </a>
                             </div>
                         </div>
