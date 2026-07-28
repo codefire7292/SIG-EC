@@ -180,8 +180,8 @@
     <table class="header-table">
         <tr>
             <td class="header-left">
-                <p>REGION DE <strong>{{ strtoupper($center?->region ?? 'ZIGUINCHOR') }}</strong></p>
-                <p>DEPARTEMENT DE <strong>{{ strtoupper($center?->region ?? 'ZIGUINCHOR') }}</strong></p>
+                <p>REGION DE {{ strtoupper($center?->region ?? 'ZIGUINCHOR') }}<</p>
+                <p>DEPARTEMENT DE {{ strtoupper($center?->region ?? 'ZIGUINCHOR') }}<</p>
                 <img src="data:image/png;base64,{{ $logo }}" class="header-logo" alt="Logo">
                 <p class="commune-label">COMMUNE DE <strong>{{ strtoupper($center?->commune ?? 'ENNAMPORE') }}</strong></p>
             </td>
@@ -192,7 +192,7 @@
                 <p class="etat-civil-title">ETAT-CIVIL</p>
                 <p class="centre-label">
                     {{ strtoupper($center?->name ?? 'CENTRE PRINCIPAL (1) ENAMPORE1') }}<br>
-                    ENAMPORE CENTRE PRINCIPAL
+                    CENTRE PRINCIPAL DE ENAMPORE
                 </p>
             </td>
         </tr>
@@ -407,7 +407,7 @@
             @if(!empty(trim($act->officer_comments ?? '')))
                 {!! nl2br(e(trim($act->officer_comments))) !!}
             @else
-                <span style="font-weight: normal; font-style: italic; color: #888;">Néant</span>
+                <span style="font-weight: normal; font-style: italic; color: #888;"> </span>
             @endif
         </div>
     </div>
@@ -429,7 +429,7 @@
             <td class="footer-signature-cell">
                 <div class="signature-content" style="top: {{ $hasMention ? '-5px' : '-50px' }};">
                     POUR EXTRAIT CERTIFIE CONFORME<br>
-                    <strong>Fait à {{ strtoupper($center?->commune ?? 'ENAMPORE') }} le, {{ \Carbon\Carbon::parse($act->validated_at ?? now())->locale('fr')->isoFormat('D MMMM YYYY') }}</strong><br>
+                    <strong>Fait à {{ strtoupper($center?->commune ?? 'ENAMPORE') }}, le {{ \Carbon\Carbon::parse($act->validated_at ?? now())->locale('fr')->isoFormat('D MMMM YYYY') }}</strong><br>
                     <br><br><br>
                     <em>L'officier d'Etat-civil soussigné</em>
                 </div>
