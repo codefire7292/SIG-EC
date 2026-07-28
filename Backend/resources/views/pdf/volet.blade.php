@@ -123,7 +123,6 @@
 
         .dotted-line {
             display: inline-block;
-            font-weight: bold;
             text-align: center;
             line-height: 1;
             vertical-align: baseline;
@@ -197,16 +196,18 @@
         function dotField($val, int $targetLen = 30): string {
             $str = trim((string)$val);
             if ($str === '') {
-                return str_repeat('.', $targetLen);
+                return '<span style="font-weight: normal; color: #555;">' . str_repeat('.', $targetLen) . '</span>';
             }
             $valLen = mb_strlen($str);
             if ($valLen >= $targetLen) {
-                return $str;
+                return '<span style="font-weight: bold;">' . e($str) . '</span>';
             }
             $rem = $targetLen - $valLen;
             $left = (int)floor($rem / 2);
             $right = (int)ceil($rem / 2);
-            return str_repeat('.', $left) . ' ' . $str . ' ' . str_repeat('.', $right);
+            return '<span style="font-weight: normal; color: #555;">' . str_repeat('.', $left) . '</span> ' 
+                 . '<span style="font-weight: bold;">' . e($str) . '</span> ' 
+                 . '<span style="font-weight: normal; color: #555;">' . str_repeat('.', $right) . '</span>';
         }
     }
 
