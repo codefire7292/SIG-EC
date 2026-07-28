@@ -125,13 +125,16 @@
             border-bottom: 1px dotted #000;
             display: inline-block;
             font-weight: bold;
-            text-align: center;
-            padding-left: 4px;
-            padding-right: 4px;
             padding-bottom: 1px;
             margin-bottom: -2px;
             line-height: 1;
             vertical-align: baseline;
+        }
+
+        .dotted-text {
+            display: block;
+            text-align: center;
+            width: 100%;
         }
 
         .field-label {
@@ -275,22 +278,22 @@
     {{-- ===== RENSEIGNEMENTS SUR L'ENFANT ===== --}}
     <div class="section-header">RENSEIGNEMENTS SUR L'ENFANT</div>
     <div class="field-row">
-        <strong>Prénoms :</strong> <span class="dotted-line" style="width: 230px;">{!! $act->first_name ?: '&nbsp;' !!}</span>
-        <strong style="margin-left: 15px;">NOM :</strong> <span class="dotted-line" style="width: 180px;">{!! strtoupper($act->last_name) ?: '&nbsp;' !!}</span>
+        <strong>Prénoms :</strong> <span class="dotted-line" style="width: 230px;"><span class="dotted-text">{!! $act->first_name ?: '&nbsp;' !!}</span></span>
+        <strong style="margin-left: 15px;">NOM :</strong> <span class="dotted-line" style="width: 180px;"><span class="dotted-text">{!! strtoupper($act->last_name) ?: '&nbsp;' !!}</span></span>
     </div>
     <div class="field-row">
-        <strong>Sexe :</strong> <span class="dotted-line" style="width: 140px;">{!! (in_array(strtoupper($act->gender ?? ''), ['F', 'FEMININ']) ? 'Féminin' : 'Masculin') ?: '&nbsp;' !!}</span>
+        <strong>Sexe :</strong> <span class="dotted-line" style="width: 140px;"><span class="dotted-text">{!! (in_array(strtoupper($act->gender ?? ''), ['F', 'FEMININ']) ? 'Féminin' : 'Masculin') ?: '&nbsp;' !!}</span></span>
         <strong style="margin-left: 20px;">Date de Naissance :</strong> 
         @foreach($birthDayDigits as $d)<span class="box-digit">{!! $d !!}</span>@endforeach JJ
         @foreach($birthMonthDigits as $d)<span class="box-digit">{!! $d !!}</span>@endforeach MM
         @foreach($birthYearDigits as $d)<span class="box-digit">{!! $d !!}</span>@endforeach ANNEE
     </div>
     <div class="field-row">
-        <strong>Heure :</strong> <span class="dotted-line" style="width: 90px;">{!! $act->time_of_birth ?: '&nbsp;' !!}</span>
-        <strong style="margin-left: 15px;">Lieu de Naissance :</strong> <span class="dotted-line" style="width: 260px;">{!! $act->place_of_birth ?: '&nbsp;' !!}</span>
+        <strong>Heure :</strong> <span class="dotted-line" style="width: 90px;"><span class="dotted-text">{!! $act->time_of_birth ?: '&nbsp;' !!}</span></span>
+        <strong style="margin-left: 15px;">Lieu de Naissance :</strong> <span class="dotted-line" style="width: 260px;"><span class="dotted-text">{!! $act->place_of_birth ?: '&nbsp;' !!}</span></span>
     </div>
     <div class="field-row">
-        <strong>Formation Sanitaire :</strong> <span class="dotted-line" style="width: 320px;">{!! $act->health_facility ?: 'Né à domicile / Centre de santé' !!}</span>
+        <strong>Formation Sanitaire :</strong> <span class="dotted-line" style="width: 320px;"><span class="dotted-text">{!! $act->health_facility ?: 'Né à domicile / Centre de santé' !!}</span></span>
         <span style="float: right;"><span class="box-code"></span> FS</span>
     </div>
 
@@ -324,8 +327,8 @@
     @endphp
     <div class="section-header">RENSEIGNEMENTS SUR LE PERE</div>
     <div class="field-row">
-        <strong>Prénoms :</strong> <span class="dotted-line" style="width: 230px;">{!! $fatherFirstName ?: '&nbsp;' !!}</span>
-        <strong style="margin-left: 15px;">NOM :</strong> <span class="dotted-line" style="width: 180px;">{!! strtoupper($fatherLastName) ?: '&nbsp;' !!}</span>
+        <strong>Prénoms :</strong> <span class="dotted-line" style="width: 230px;"><span class="dotted-text">{!! $fatherFirstName ?: '&nbsp;' !!}</span></span>
+        <strong style="margin-left: 15px;">NOM :</strong> <span class="dotted-line" style="width: 180px;"><span class="dotted-text">{!! strtoupper($fatherLastName) ?: '&nbsp;' !!}</span></span>
     </div>
     <div class="field-row">
         <strong>Date de Naissance :</strong> 
@@ -334,11 +337,11 @@
         @foreach($fYear as $d)<span class="box-digit">{!! $d !!}</span>@endforeach ANNEE
     </div>
     <div class="field-row">
-        <strong>Lieu de naissance :</strong> <span class="dotted-line" style="width: 320px;">{!! $fatherPlace ?: '&nbsp;' !!}</span>
+        <strong>Lieu de naissance :</strong> <span class="dotted-line" style="width: 320px;"><span class="dotted-text">{!! $fatherPlace ?: '&nbsp;' !!}</span></span>
     </div>
     <div class="field-row">
-        <strong>Profession :</strong> <span class="dotted-line" style="width: 220px;">{!! $fatherJob ?: '&nbsp;' !!}</span>
-        <strong style="margin-left: 15px;">Domicile :</strong> <span class="dotted-line" style="width: 180px;">{!! $fatherAddress ?: '&nbsp;' !!}</span>
+        <strong>Profession :</strong> <span class="dotted-line" style="width: 220px;"><span class="dotted-text">{!! $fatherJob ?: '&nbsp;' !!}</span></span>
+        <strong style="margin-left: 15px;">Domicile :</strong> <span class="dotted-line" style="width: 180px;"><span class="dotted-text">{!! $fatherAddress ?: '&nbsp;' !!}</span></span>
     </div>
 
     {{-- ===== RENSEIGNEMENTS SUR LA MERE ===== --}}
@@ -365,8 +368,8 @@
     @endphp
     <div class="section-header">RENSEIGNEMENTS SUR LA MERE</div>
     <div class="field-row">
-        <strong>Prénoms :</strong> <span class="dotted-line" style="width: 230px;">{!! $motherFirstName ?: '&nbsp;' !!}</span>
-        <strong style="margin-left: 15px;">NOM :</strong> <span class="dotted-line" style="width: 180px;">{!! strtoupper($motherLastName) ?: '&nbsp;' !!}</span>
+        <strong>Prénoms :</strong> <span class="dotted-line" style="width: 230px;"><span class="dotted-text">{!! $motherFirstName ?: '&nbsp;' !!}</span></span>
+        <strong style="margin-left: 15px;">NOM :</strong> <span class="dotted-line" style="width: 180px;"><span class="dotted-text">{!! strtoupper($motherLastName) ?: '&nbsp;' !!}</span></span>
     </div>
     <div class="field-row">
         <strong>Date de Naissance :</strong> 
@@ -375,11 +378,11 @@
         @foreach($mYear as $d)<span class="box-digit">{!! $d !!}</span>@endforeach ANNEE
     </div>
     <div class="field-row">
-        <strong>Lieu de naissance :</strong> <span class="dotted-line" style="width: 320px;">{!! $motherPlace ?: '&nbsp;' !!}</span>
+        <strong>Lieu de naissance :</strong> <span class="dotted-line" style="width: 320px;"><span class="dotted-text">{!! $motherPlace ?: '&nbsp;' !!}</span></span>
     </div>
     <div class="field-row">
-        <strong>Profession :</strong> <span class="dotted-line" style="width: 220px;">{!! $motherJob ?: '&nbsp;' !!}</span>
-        <strong style="margin-left: 15px;">Domicile :</strong> <span class="dotted-line" style="width: 180px;">{!! $motherAddress ?: '&nbsp;' !!}</span>
+        <strong>Profession :</strong> <span class="dotted-line" style="width: 220px;"><span class="dotted-text">{!! $motherJob ?: '&nbsp;' !!}</span></span>
+        <strong style="margin-left: 15px;">Domicile :</strong> <span class="dotted-line" style="width: 180px;"><span class="dotted-text">{!! $motherAddress ?: '&nbsp;' !!}</span></span>
     </div>
 
     {{-- ===== SUR LA DECLARATION DE ===== --}}
@@ -400,11 +403,11 @@
     @endphp
     <div class="section-header">SUR LA DECLARATION DE</div>
     <div class="field-row">
-        <strong>SUR LA DECLARATION DE :</strong> <span class="dotted-line" style="width: 140px;">{!! $declLabel ?: '&nbsp;' !!}</span>
-        <strong style="margin-left: 10px;">OU DE :</strong> <span class="dotted-line" style="width: 200px;">{!! $declarantFull ?: '&nbsp;' !!}</span>
+        <strong>SUR LA DECLARATION DE :</strong> <span class="dotted-line" style="width: 140px;"><span class="dotted-text">{!! $declLabel ?: '&nbsp;' !!}</span></span>
+        <strong style="margin-left: 10px;">OU DE :</strong> <span class="dotted-line" style="width: 200px;"><span class="dotted-text">{!! $declarantFull ?: '&nbsp;' !!}</span></span>
     </div>
     <div class="field-row">
-        <strong>Numéro d'identification / Référence :</strong> <span class="dotted-line" style="width: 310px;">{!! ($getMeta('marriage_cert', 'declarant', 'marriage_cert') ?: ($getMeta('declarant_id_number', 'declarant', 'id_number') ?: ('Acte N° ' . $act->reference_number))) ?: '&nbsp;' !!}</span>
+        <strong>Numéro d'identification / Référence :</strong> <span class="dotted-line" style="width: 310px;"><span class="dotted-text">{!! ($getMeta('marriage_cert', 'declarant', 'marriage_cert') ?: ($getMeta('declarant_id_number', 'declarant', 'id_number') ?: ('Acte N° ' . $act->reference_number))) ?: '&nbsp;' !!}</span></span>
     </div>
     <div class="field-row">
         <strong>Date et Heure de la Déclaration :</strong> 
@@ -414,9 +417,9 @@
     </div>
     @if($act->is_judgment)
     <div class="field-row">
-        <strong>Jugement d'Autorisation N° :</strong> <span class="dotted-line" style="width: 120px;">{!! $act->judgment_number ?: '&nbsp;' !!}</span>
-        <strong style="margin-left: 10px;">du :</strong> <span class="dotted-line" style="width: 120px;">{!! optional($act->judgment_date)->format('d/m/Y') ?: '&nbsp;' !!}</span>
-        <strong style="margin-left: 10px;">par :</strong> <span class="dotted-line" style="width: 130px;">{!! $act->judgment_court ?: 'Tribunal' !!}</span>
+        <strong>Jugement d'Autorisation N° :</strong> <span class="dotted-line" style="width: 120px;"><span class="dotted-text">{!! $act->judgment_number ?: '&nbsp;' !!}</span></span>
+        <strong style="margin-left: 10px;">du :</strong> <span class="dotted-line" style="width: 120px;"><span class="dotted-text">{!! optional($act->judgment_date)->format('d/m/Y') ?: '&nbsp;' !!}</span></span>
+        <strong style="margin-left: 10px;">par :</strong> <span class="dotted-line" style="width: 130px;"><span class="dotted-text">{!! $act->judgment_court ?: 'Tribunal' !!}</span></span>
     </div>
     @endif
 
@@ -424,10 +427,10 @@
     {{-- Generic / Other Act Types --}}
     <div class="section-header">RENSEIGNEMENTS GENERAUX</div>
     <div class="field-row">
-        <strong>Nom & Prénoms :</strong> <span class="dotted-line" style="width: 380px;">{!! $act->first_name !!} {!! strtoupper($act->last_name) !!}</span>
+        <strong>Nom & Prénoms :</strong> <span class="dotted-line" style="width: 380px;"><span class="dotted-text">{!! $act->first_name !!} {!! strtoupper($act->last_name) !!}</span></span>
     </div>
     <div class="field-row">
-        <strong>Date et Lieu :</strong> <span class="dotted-line" style="width: 380px;">{!! optional($act->date_of_birth ?? $act->marriage_date ?? $act->date_of_death)->format('d/m/Y') !!} à {!! $act->place_of_birth ?? $act->marriage_place ?? $act->place_of_death !!}</span>
+        <strong>Date et Lieu :</strong> <span class="dotted-line" style="width: 380px;"><span class="dotted-text">{!! optional($act->date_of_birth ?? $act->marriage_date ?? $act->date_of_death)->format('d/m/Y') !!} à {!! $act->place_of_birth ?? $act->marriage_place ?? $act->place_of_death !!}</span></span>
     </div>
     @endif
 
@@ -435,8 +438,8 @@
     <div class="signatures-table">
         <div style="margin-bottom: 6px;">
             <strong>EN FOI DE QUOI, NOUS AVONS REDIGE LE PRESENT ACTE</strong><br>
-            Fait à <span class="dotted-line" style="min-width: 130px;">{!! strtoupper($centerObj->commune ?? $centerObj->name ?? 'ENAMPORE') !!}</span>, le 
-            <span class="dotted-line" style="min-width: 120px;">{!! $declDate->format('d / m / Y') !!}</span>
+            Fait à <span class="dotted-line" style="min-width: 130px;"><span class="dotted-text">{!! strtoupper($centerObj->commune ?? $centerObj->name ?? 'ENAMPORE') !!}</span></span>, le 
+            <span class="dotted-line" style="min-width: 120px;"><span class="dotted-text">{!! $declDate->format('d / m / Y') !!}</span></span>
         </div>
         <table>
             <tr>
