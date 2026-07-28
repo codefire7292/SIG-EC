@@ -221,36 +221,7 @@ const goBack = () => {
                             <PencilSquareIcon class="h-4 w-4 mr-2 text-gray-500" />
                             Modifier
                         </Link>
-                        <template v-if="act.status === 'signe'">
-                            <!-- Bouton 1 : Télécharger l'Extrait PDF (Original) -->
-                            <a :href="`/verify/${type}/${act.uuid}/download`" target="_blank" 
-                               title="Extrait d'acte d'état civil officiel"
-                               class="inline-flex items-center px-5 py-3 bg-[#1E690F] hover:bg-[#185709] text-white rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg shadow-green-900/10 transition-all active:scale-95">
-                                <ArrowDownTrayIcon class="h-4 w-4 mr-2" />
-                                Télécharger l'Extrait PDF
-                            </a>
-                            <!-- Groupe collé : Volet 1, Volet 2 & Volet 3 (Côte à côte) -->
-                            <div class="inline-flex rounded-2xl shadow-lg overflow-hidden border border-[#185709] divide-x divide-white/20">
-                                <a :href="`/verify/${type}/${act.uuid}/download?volet=1`" target="_blank" 
-                                   title="Exemplaire conservé au Centre d'État Civil (Mairie)"
-                                   class="inline-flex items-center px-4 py-3 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-black uppercase tracking-wider transition-all active:scale-95">
-                                    <ArrowDownTrayIcon class="h-4 w-4 mr-1.5" />
-                                    Volet 1 (Mairie)
-                                </a>
-                                <a :href="`/verify/${type}/${act.uuid}/download?volet=2`" target="_blank" 
-                                   title="Exemplaire transmis au Greffe du Tribunal"
-                                   class="inline-flex items-center px-4 py-3 bg-slate-800 hover:bg-slate-900 text-white text-xs font-black uppercase tracking-wider transition-all active:scale-95">
-                                    <ArrowDownTrayIcon class="h-4 w-4 mr-1.5 text-amber-400" />
-                                    Volet 2 (Tribunal)
-                                </a>
-                                <a :href="`/verify/${type}/${act.uuid}/download?volet=3`" target="_blank" 
-                                   title="Exemplaire remis au Titulaire / Déclarant"
-                                   class="inline-flex items-center px-4 py-3 bg-indigo-800 hover:bg-indigo-900 text-white text-xs font-black uppercase tracking-wider transition-all active:scale-95">
-                                    <ArrowDownTrayIcon class="h-4 w-4 mr-1.5 text-indigo-300" />
-                                    Volet 3 (Titulaire)
-                                </a>
-                            </div>
-                        </template>
+
                     </div>
                 </div>
             </div>
