@@ -261,7 +261,7 @@
             <td style="width: 25%; text-align: right;">
                 <div class="volet-badge">VOLET {{ $volet ?? 1 }}</div>
                 <div class="sub-badge">
-                    ({{ ($volet ?? 1) == 2 ? "GREFFE DU TRIBUNAL D'INSTANCE" : (($volet ?? 1) == 3 ? "TITULAIRE DE L'ACTE" : "CENTRE D'ÉTAT CIVIL - MAIRIE") }})
+                    ({{ ($volet ?? 1) == 2 ? "GREFFE DU TRIBUNAL D'INSTANCE" : (($volet ?? 1) == 3 ? "CENTRE D'ÉTAT CIVIL - MAIRIE" : "DECLARANT DE L'ACTE") }})
                 </div>
                 @if(!empty($qrCode))
                 <div style="margin-top: 4px;">
