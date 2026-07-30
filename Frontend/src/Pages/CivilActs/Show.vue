@@ -115,9 +115,9 @@ const openStatusModal = (newStatus) => {
     pendingStatus.value = newStatus;
     
     if (newStatus === 'valide') {
-        statusModalTitle.value = 'Valider et Approuver';
-        statusModalDescription.value = "Confirmez-vous le passage au statut: VALIDÉ ? L'acte sera approuvé et disponible pour la signature finale du Maire.";
-        statusModalConfirmText.value = 'Valider et Approuver';
+        statusModalTitle.value = 'Vérifié et validé';
+        statusModalDescription.value = "Confirmez-vous le passage au statut: VALIDÉ ? L'acte sera vérifié et validé, puis disponible pour la signature finale du Maire.";
+        statusModalConfirmText.value = 'Vérifié et validé';
         statusModalConfirmClass.value = 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500';
     } else if (newStatus === 'a_corriger') {
         statusModalTitle.value = 'Renvoyer à la correction';
@@ -543,7 +543,7 @@ const goBack = () => {
                             <button v-if="['brouillon', 'a_corriger'].includes(act.status)" @click="openStatusModal('valide')" 
                                     class="w-full py-4 bg-green-50 text-green-700 hover:bg-green-100 rounded-2xl transition-all font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer">
                                 <CheckCircleIcon class="w-4 h-4" />
-                                Valider et Approuver
+                                Vérifié et validé
                             </button>
                             <button v-if="['brouillon', 'valide'].includes(act.status)" @click="openStatusModal('a_corriger')" 
                                     class="w-full py-4 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-2xl transition-all font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer">
