@@ -588,6 +588,7 @@ class CivilActController extends Controller
     {
         $isOldRegistry = request()->boolean('is_old_registry');
         $docRule = ($id || $isOldRegistry) ? 'nullable' : 'required';
+        $judgmentRule = ($id || $isOldRegistry) ? 'nullable' : 'nullable|required_if:is_judgment,true';
 
         $common = [
             'officer_comments' => 'nullable|string',
@@ -613,9 +614,9 @@ class CivilActController extends Controller
                 'act_registration_date'                   => 'required|date',
                 'gender'                                  => 'required|in:M,F',
                 'is_judgment'                             => 'nullable|boolean',
-                'judgment_number'                         => 'nullable|required_if:is_judgment,true|string',
-                'judgment_date'                           => 'nullable|required_if:is_judgment,true|date',
-                'judgment_court'                          => 'nullable|required_if:is_judgment,true|string',
+                'judgment_number'                         => $judgmentRule . '|string',
+                'judgment_date'                           => $judgmentRule . '|date',
+                'judgment_court'                          => $judgmentRule . '|string',
                 'father_name'                             => $fatherRule . '|string',
                 'mother_name'                             => $parentRule . '|string',
                 'parents_metadata'                        => 'required|array',
@@ -684,7 +685,7 @@ class CivilActController extends Controller
                 'doc_acte_naissance'                      => $docRule . '|file|mimes:pdf|max:500',
                 'doc_cni_declarant'                       => $docRule . '|file|mimes:pdf|max:500',
                 'doc_autres'                              => 'nullable|file|mimes:pdf|max:500',
-                'doc_jugement'                            => ($id || $isOldRegistry ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:500',
+                'doc_jugement'                            => $judgmentRule . '|file|mimes:pdf|max:500',
             ]);
         }
 
@@ -699,8 +700,8 @@ class CivilActController extends Controller
                 'marriage_option'                              => 'nullable|string',
                 'matrimonial_regime'                           => 'nullable|string',
                 'is_judgment'                                  => 'nullable|boolean',
-                'judgment_number'                              => 'nullable|required_if:is_judgment,true|string',
-                'judgment_date'                                => 'nullable|required_if:is_judgment,true|date',
+                'judgment_number'                              => $judgmentRule . '|string',
+                'judgment_date'                                => $judgmentRule . '|date',
                 // Spouses Metadata JSON
                 'spouses_metadata'                             => 'required|array',
                 'spouses_metadata.husband_date_of_birth'       => 'required|date',
@@ -755,7 +756,7 @@ class CivilActController extends Controller
                 'doc_domicile'                                 => $docRule . '|file|mimes:pdf|max:500',
                 'doc_medical'                                  => $docRule . '|file|mimes:pdf|max:500',
                 'doc_parental_auth'                            => 'nullable|file|mimes:pdf|max:500',
-                'doc_jugement'                                 => ($id || $isOldRegistry ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:500',
+                'doc_jugement'                                 => $judgmentRule . '|file|mimes:pdf|max:500',
                 'doc_autres'                                   => 'nullable|file|mimes:pdf|max:500',
             ]);
         }
@@ -773,9 +774,9 @@ class CivilActController extends Controller
                 'act_registration_date'                     => 'required|date',
                 'cause_of_death'                            => 'nullable|string',
                 'is_judgment'                               => 'nullable|boolean',
-                'judgment_number'                           => 'nullable|required_if:is_judgment,true|string',
-                'judgment_date'                             => 'nullable|required_if:is_judgment,true|date',
-                'judgment_court'                            => 'nullable|required_if:is_judgment,true|string',
+                'judgment_number'                           => $judgmentRule . '|string',
+                'judgment_date'                             => $judgmentRule . '|date',
+                'judgment_court'                            => $judgmentRule . '|string',
                 // Death Metadata JSON
                 'death_metadata'                            => 'required|array',
                 'death_metadata.time_of_birth'              => 'nullable|string',
@@ -815,7 +816,7 @@ class CivilActController extends Controller
                 'doc_death_cert'                            => $docRule . '|file|mimes:pdf|max:500',
                 'doc_deceased_id'                           => $docRule . '|file|mimes:pdf|max:500',
                 'doc_declarant_id'                          => $docRule . '|file|mimes:pdf|max:500',
-                'doc_jugement'                              => ($id || $isOldRegistry ? 'nullable' : 'nullable|required_if:is_judgment,true') . '|file|mimes:pdf|max:500',
+                'doc_jugement'                              => $judgmentRule . '|file|mimes:pdf|max:500',
                 'doc_autres'                                => 'nullable|file|mimes:pdf|max:500',
             ]);
         }

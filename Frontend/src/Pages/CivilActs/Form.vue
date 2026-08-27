@@ -646,11 +646,11 @@ const submit = () => {
                                 <div v-if="form.is_judgment" class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
                                     <div>
                                         <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Numéro du Jugement</label>
-                                        <input v-model="form.judgment_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
+                                        <input v-model="form.judgment_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment && !form.is_old_registry" />
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date du Jugement</label>
-                                        <input v-model="form.judgment_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
+                                        <input v-model="form.judgment_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment && !form.is_old_registry" />
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Copie du Jugement (PDF, max. 500 Ko)</label>
@@ -777,15 +777,15 @@ const submit = () => {
                                 <div v-if="form.is_judgment" class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
                                     <div>
                                         <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Numéro du Jugement</label>
-                                        <input v-model="form.judgment_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
+                                        <input v-model="form.judgment_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment && !form.is_old_registry" />
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date du Jugement</label>
-                                        <input v-model="form.judgment_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
+                                        <input v-model="form.judgment_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment && !form.is_old_registry" />
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Juridiction</label>
-                                        <input v-model="form.judgment_court" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" placeholder="Ex : Tribunal de Kolda" />
+                                        <input v-model="form.judgment_court" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment && !form.is_old_registry" placeholder="Ex : Tribunal de Kolda" />
                                     </div>
                                 </div>
                             </div>
@@ -1119,15 +1119,15 @@ const submit = () => {
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Numéro du Jugement</label>
-                                <input v-model="form.judgment_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
+                                <input v-model="form.judgment_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment && !form.is_old_registry" />
                             </div>
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date du Jugement</label>
-                                <input v-model="form.judgment_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" />
+                                <input v-model="form.judgment_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment && !form.is_old_registry" />
                             </div>
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Juridiction (Tribunal)</label>
-                                <input v-model="form.judgment_court" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment" placeholder="Tribunal d'Instance" />
+                                <input v-model="form.judgment_court" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="form.is_judgment && !form.is_old_registry" placeholder="Tribunal d'Instance" />
                             </div>
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de l'Autorisation (si distincte)</label>
