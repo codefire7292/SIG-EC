@@ -589,6 +589,7 @@ class CivilActController extends Controller
         $isOldRegistry = request()->boolean('is_old_registry');
         $docRule = ($id || $isOldRegistry) ? 'nullable' : 'required';
         $judgmentRule = ($id || $isOldRegistry) ? 'nullable' : 'nullable|required_if:is_judgment,true';
+        $oldRegistryMetaRule = ($id || $isOldRegistry) ? 'nullable' : 'required';
 
         $common = [
             'officer_comments' => 'nullable|string',
@@ -599,8 +600,8 @@ class CivilActController extends Controller
         if ($type === 'naissance') {
             $isFoundling = filter_var(request()->input('parents_metadata.is_foundling', false), FILTER_VALIDATE_BOOLEAN);
             $isFatherUnrecognized = filter_var(request()->input('parents_metadata.is_father_unrecognized', false), FILTER_VALIDATE_BOOLEAN);
-            $fatherOptional = $isFoundling || $isFatherUnrecognized;
-            $motherOptional = $isFoundling;
+            $fatherOptional = $isFoundling || $isFatherUnrecognized || $isOldRegistry || $id;
+            $motherOptional = $isFoundling || $isOldRegistry || $id;
             $fatherRule = $fatherOptional ? 'nullable' : 'required';
             $parentRule  = $motherOptional ? 'nullable' : 'required';
 
@@ -644,8 +645,8 @@ class CivilActController extends Controller
                 'parents_metadata.mother_date_of_birth'   => [
                     $parentRule,
                     'date',
-                    function ($attribute, $value, $fail) use ($isFoundling) {
-                        if ($isFoundling || empty($value)) return;
+                    function ($attribute, $value, $fail) use ($isFoundling, $isOldRegistry, $id) {
+                        if ($isFoundling || $isOldRegistry || $id || empty($value)) return;
                         $childDob = request()->input('date_of_birth');
                         if ($childDob) {
                             $childDate = \Carbon\Carbon::parse($childDob);
@@ -704,39 +705,39 @@ class CivilActController extends Controller
                 'judgment_date'                                => $judgmentRule . '|date',
                 // Spouses Metadata JSON
                 'spouses_metadata'                             => 'required|array',
-                'spouses_metadata.husband_date_of_birth'       => 'required|date',
-                'spouses_metadata.husband_place_of_birth'      => 'required|string',
-                'spouses_metadata.husband_profession'          => 'required|string',
-                'spouses_metadata.husband_domicile'            => 'required|string',
-                'spouses_metadata.husband_residence'           => 'required|string',
+                'spouses_metadata.husband_date_of_birth'       => $oldRegistryMetaRule . '|date',
+                'spouses_metadata.husband_place_of_birth'      => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.husband_profession'          => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.husband_domicile'            => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.husband_residence'           => $oldRegistryMetaRule . '|string',
                 'spouses_metadata.husband_married_to'          => 'nullable|string',
-                'spouses_metadata.wife_date_of_birth'          => 'required|date',
-                'spouses_metadata.wife_place_of_birth'         => 'required|string',
-                'spouses_metadata.wife_profession'             => 'required|string',
-                'spouses_metadata.wife_domicile'               => 'required|string',
-                'spouses_metadata.wife_residence'              => 'required|string',
+                'spouses_metadata.wife_date_of_birth'          => $oldRegistryMetaRule . '|date',
+                'spouses_metadata.wife_place_of_birth'         => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.wife_profession'             => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.wife_domicile'               => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.wife_residence'              => $oldRegistryMetaRule . '|string',
                 // Husband Parents
-                'spouses_metadata.husband_father_first_name'   => 'required|string',
-                'spouses_metadata.husband_father_last_name'    => 'required|string',
-                'spouses_metadata.husband_father_date_of_birth'=> 'required|date',
-                'spouses_metadata.husband_father_profession'   => 'required|string',
-                'spouses_metadata.husband_father_domicile'     => 'required|string',
-                'spouses_metadata.husband_mother_first_name'   => 'required|string',
-                'spouses_metadata.husband_mother_last_name'    => 'required|string',
-                'spouses_metadata.husband_mother_date_of_birth'=> 'required|date',
-                'spouses_metadata.husband_mother_profession'   => 'required|string',
-                'spouses_metadata.husband_mother_domicile'     => 'required|string',
+                'spouses_metadata.husband_father_first_name'   => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.husband_father_last_name'    => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.husband_father_date_of_birth'=> $oldRegistryMetaRule . '|date',
+                'spouses_metadata.husband_father_profession'   => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.husband_father_domicile'     => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.husband_mother_first_name'   => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.husband_mother_last_name'    => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.husband_mother_date_of_birth'=> $oldRegistryMetaRule . '|date',
+                'spouses_metadata.husband_mother_profession'   => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.husband_mother_domicile'     => $oldRegistryMetaRule . '|string',
                 // Wife Parents
-                'spouses_metadata.wife_father_first_name'      => 'required|string',
-                'spouses_metadata.wife_father_last_name'       => 'required|string',
-                'spouses_metadata.wife_father_date_of_birth'   => 'required|date',
-                'spouses_metadata.wife_father_profession'      => 'required|string',
-                'spouses_metadata.wife_father_domicile'        => 'required|string',
-                'spouses_metadata.wife_mother_first_name'      => 'required|string',
-                'spouses_metadata.wife_mother_last_name'       => 'required|string',
-                'spouses_metadata.wife_mother_date_of_birth'   => 'required|date',
-                'spouses_metadata.wife_mother_profession'      => 'required|string',
-                'spouses_metadata.wife_mother_domicile'        => 'required|string',
+                'spouses_metadata.wife_father_first_name'      => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.wife_father_last_name'       => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.wife_father_date_of_birth'   => $oldRegistryMetaRule . '|date',
+                'spouses_metadata.wife_father_profession'      => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.wife_father_domicile'        => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.wife_mother_first_name'      => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.wife_mother_last_name'       => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.wife_mother_date_of_birth'   => $oldRegistryMetaRule . '|date',
+                'spouses_metadata.wife_mother_profession'      => $oldRegistryMetaRule . '|string',
+                'spouses_metadata.wife_mother_domicile'        => $oldRegistryMetaRule . '|string',
                 // Max wives limit
                 'spouses_metadata.max_wives'                   => 'nullable|string',
                 // Witnesses (dynamic)
@@ -780,30 +781,30 @@ class CivilActController extends Controller
                 // Death Metadata JSON
                 'death_metadata'                            => 'required|array',
                 'death_metadata.time_of_birth'              => 'nullable|string',
-                'death_metadata.place_of_birth'             => 'required|string',
-                'death_metadata.profession'                 => 'required|string',
-                'death_metadata.domicile'                   => 'required|string',
-                'death_metadata.marital_status'             => 'required|string',
+                'death_metadata.place_of_birth'             => $oldRegistryMetaRule . '|string',
+                'death_metadata.profession'                 => $oldRegistryMetaRule . '|string',
+                'death_metadata.domicile'                   => $oldRegistryMetaRule . '|string',
+                'death_metadata.marital_status'             => $oldRegistryMetaRule . '|string',
                 'death_metadata.previously_married_to'      => 'nullable|string',
                 // Parents of deceased
-                'death_metadata.father_first_name'          => 'required|string',
-                'death_metadata.father_last_name'           => 'required|string',
-                'death_metadata.father_date_of_birth'       => 'required|date',
-                'death_metadata.father_profession'          => 'required|string',
-                'death_metadata.father_domicile'            => 'required|string',
-                'death_metadata.mother_first_name'          => 'required|string',
-                'death_metadata.mother_last_name'           => 'required|string',
-                'death_metadata.mother_date_of_birth'       => 'required|date',
-                'death_metadata.mother_profession'          => 'required|string',
-                'death_metadata.mother_domicile'            => 'required|string',
+                'death_metadata.father_first_name'          => $oldRegistryMetaRule . '|string',
+                'death_metadata.father_last_name'           => $oldRegistryMetaRule . '|string',
+                'death_metadata.father_date_of_birth'       => $oldRegistryMetaRule . '|date',
+                'death_metadata.father_profession'          => $oldRegistryMetaRule . '|string',
+                'death_metadata.father_domicile'            => $oldRegistryMetaRule . '|string',
+                'death_metadata.mother_first_name'          => $oldRegistryMetaRule . '|string',
+                'death_metadata.mother_last_name'           => $oldRegistryMetaRule . '|string',
+                'death_metadata.mother_date_of_birth'       => $oldRegistryMetaRule . '|date',
+                'death_metadata.mother_profession'          => $oldRegistryMetaRule . '|string',
+                'death_metadata.mother_domicile'            => $oldRegistryMetaRule . '|string',
                 // Declarant
-                'death_metadata.declarant_first_name'       => 'required|string',
-                'death_metadata.declarant_last_name'        => 'required|string',
-                'death_metadata.declarant_profession'       => 'required|string',
-                'death_metadata.declarant_address'          => 'required|string',
-                'death_metadata.declarant_relationship'     => 'required|string',
-                'death_metadata.declarant_id_number'        => 'required|string',
-                'death_metadata.declarant_date_time'        => 'required|string',
+                'death_metadata.declarant_first_name'       => $oldRegistryMetaRule . '|string',
+                'death_metadata.declarant_last_name'        => $oldRegistryMetaRule . '|string',
+                'death_metadata.declarant_profession'       => $oldRegistryMetaRule . '|string',
+                'death_metadata.declarant_address'          => $oldRegistryMetaRule . '|string',
+                'death_metadata.declarant_relationship'     => $oldRegistryMetaRule . '|string',
+                'death_metadata.declarant_id_number'        => $oldRegistryMetaRule . '|string',
+                'death_metadata.declarant_date_time'        => $oldRegistryMetaRule . '|string',
                 // Witnesses (dynamic)
                 'witnesses_metadata'                        => 'nullable|array',
                 'witnesses_metadata.*.first_name'           => 'nullable|string',

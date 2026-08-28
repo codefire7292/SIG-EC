@@ -521,26 +521,26 @@ const submit = () => {
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Date de naissance <span class="text-red-500">*</span></label>
-                                            <input v-model="form.spouses_metadata.husband_date_of_birth" type="date" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Date de naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                            <input v-model="form.spouses_metadata.husband_date_of_birth" type="date" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                         </div>
                                         <div>
-                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Lieu de naissance <span class="text-red-500">*</span></label>
-                                            <input v-model="form.spouses_metadata.husband_place_of_birth" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Lieu de naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                            <input v-model="form.spouses_metadata.husband_place_of_birth" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Profession <span class="text-red-500">*</span></label>
-                                        <input v-model="form.spouses_metadata.husband_profession" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                        <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Profession <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                        <input v-model="form.spouses_metadata.husband_profession" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Domicile <span class="text-red-500">*</span></label>
-                                            <input v-model="form.spouses_metadata.husband_domicile" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Domicile <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                            <input v-model="form.spouses_metadata.husband_domicile" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                         </div>
                                         <div>
-                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Résidence <span class="text-red-500">*</span></label>
-                                            <input v-model="form.spouses_metadata.husband_residence" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Résidence <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                            <input v-model="form.spouses_metadata.husband_residence" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                         </div>
                                     </div>
                                     <div>
@@ -567,26 +567,26 @@ const submit = () => {
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Date de naissance <span class="text-red-500">*</span></label>
-                                            <input v-model="form.spouses_metadata.wife_date_of_birth" type="date" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Date de naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                            <input v-model="form.spouses_metadata.wife_date_of_birth" type="date" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                         </div>
                                         <div>
-                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Lieu de naissance <span class="text-red-500">*</span></label>
-                                            <input v-model="form.spouses_metadata.wife_place_of_birth" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Lieu de naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                            <input v-model="form.spouses_metadata.wife_place_of_birth" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Profession <span class="text-red-500">*</span></label>
-                                        <input v-model="form.spouses_metadata.wife_profession" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                        <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Profession <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                        <input v-model="form.spouses_metadata.wife_profession" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Domicile <span class="text-red-500">*</span></label>
-                                            <input v-model="form.spouses_metadata.wife_domicile" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Domicile <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                            <input v-model="form.spouses_metadata.wife_domicile" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                         </div>
                                         <div>
-                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Résidence <span class="text-red-500">*</span></label>
-                                            <input v-model="form.spouses_metadata.wife_residence" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                            <label class="block text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Résidence <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                            <input v-model="form.spouses_metadata.wife_residence" type="text" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                         </div>
                                     </div>
                                 </div>
@@ -734,22 +734,22 @@ const submit = () => {
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div>
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de Naissance <span class="text-red-500">*</span></label>
-                                        <input v-model="form.death_metadata.place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de Naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                        <input v-model="form.death_metadata.place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                     </div>
                                     <div>
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession du défunt <span class="text-red-500">*</span></label>
-                                        <input v-model="form.death_metadata.profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession du défunt <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                        <input v-model="form.death_metadata.profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                     </div>
                                     <div>
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile du défunt <span class="text-red-500">*</span></label>
-                                        <input v-model="form.death_metadata.domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile du défunt <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                        <input v-model="form.death_metadata.domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Situation Matrimoniale <span class="text-red-500">*</span></label>
-                                        <select v-model="form.death_metadata.marital_status" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Situation Matrimoniale <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                        <select v-model="form.death_metadata.marital_status" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit">
                                             <option value="Célibataire">Célibataire</option>
                                             <option value="Marié(e)">Marié(e)</option>
                                             <option value="Divorcé(e)">Divorcé(e)</option>
@@ -824,26 +824,26 @@ const submit = () => {
                             </div>
                             <template v-if="!form.parents_metadata.is_father_unrecognized">
                             <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms &amp; Nom du Père <span class="text-red-500">*</span></label>
-                                <input v-model="form.father_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms &amp; Nom du Père <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                <input v-model="form.father_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span class="text-red-500">*</span></label>
-                                <input v-model="form.parents_metadata.father_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                <input v-model="form.parents_metadata.father_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance <span class="text-red-500">*</span></label>
-                                    <input v-model="form.parents_metadata.father_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                    <input v-model="form.parents_metadata.father_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de naissance <span class="text-red-500">*</span></label>
-                                    <input v-model="form.parents_metadata.father_place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                    <input v-model="form.parents_metadata.father_place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile <span class="text-red-500">*</span></label>
-                                <input v-model="form.parents_metadata.father_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                <input v-model="form.parents_metadata.father_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                             </div>
                             </template>
                         </div>
@@ -854,26 +854,26 @@ const submit = () => {
                                 Mère
                             </h4>
                             <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms &amp; Nom de la Mère <span class="text-red-500">*</span></label>
-                                <input v-model="form.mother_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms &amp; Nom de la Mère <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                <input v-model="form.mother_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span class="text-red-500">*</span></label>
-                                <input v-model="form.parents_metadata.mother_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                <input v-model="form.parents_metadata.mother_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance <span class="text-red-500">*</span></label>
-                                    <input v-model="form.parents_metadata.mother_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                    <input v-model="form.parents_metadata.mother_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de naissance <span class="text-red-500">*</span></label>
-                                    <input v-model="form.parents_metadata.mother_place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                    <input v-model="form.parents_metadata.mother_place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile <span class="text-red-500">*</span></label>
-                                <input v-model="form.parents_metadata.mother_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                <input v-model="form.parents_metadata.mother_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                             </div>
                         </div>
                     </div>
@@ -894,27 +894,27 @@ const submit = () => {
                             </h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénom du Père <span class="text-red-500">*</span></label>
-                                    <input v-model="form.death_metadata.father_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénom du Père <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                    <input v-model="form.death_metadata.father_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom du Père <span class="text-red-500">*</span></label>
-                                    <input v-model="form.death_metadata.father_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom du Père <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                    <input v-model="form.death_metadata.father_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance <span class="text-red-500">*</span></label>
-                                    <input v-model="form.death_metadata.father_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                    <input v-model="form.death_metadata.father_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span class="text-red-500">*</span></label>
-                                    <input v-model="form.death_metadata.father_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                    <input v-model="form.death_metadata.father_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile <span class="text-red-500">*</span></label>
-                                <input v-model="form.death_metadata.father_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                <input v-model="form.death_metadata.father_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                             </div>
                         </div>
 
@@ -926,27 +926,27 @@ const submit = () => {
                             </h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénom de la Mère <span class="text-red-500">*</span></label>
-                                    <input v-model="form.death_metadata.mother_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénom de la Mère <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                    <input v-model="form.death_metadata.mother_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom de la Mère <span class="text-red-500">*</span></label>
-                                    <input v-model="form.death_metadata.mother_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom de la Mère <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                    <input v-model="form.death_metadata.mother_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance <span class="text-red-500">*</span></label>
-                                    <input v-model="form.death_metadata.mother_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date de naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                    <input v-model="form.death_metadata.mother_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span class="text-red-500">*</span></label>
-                                    <input v-model="form.death_metadata.mother_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                    <input v-model="form.death_metadata.mother_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile <span class="text-red-500">*</span></label>
-                                <input v-model="form.death_metadata.mother_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                <input v-model="form.death_metadata.mother_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                             </div>
                         </div>
                     </div>
@@ -965,30 +965,30 @@ const submit = () => {
                             <h4 class="text-xs font-black text-blue-900 uppercase tracking-widest border-b border-blue-100 pb-2">Parents de l'Époux</h4>
                             <!-- Père de l'époux -->
                             <div class="space-y-3">
-                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Père <span class="text-red-500">*</span></span>
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Père <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></span>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <input v-model="form.spouses_metadata.husband_father_first_name" placeholder="Prénoms *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
-                                    <input v-model="form.spouses_metadata.husband_father_last_name" placeholder="Nom *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                    <input v-model="form.spouses_metadata.husband_father_first_name" placeholder="Prénoms *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
+                                    <input v-model="form.spouses_metadata.husband_father_last_name" placeholder="Nom *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <input v-model="form.spouses_metadata.husband_father_date_of_birth" type="date" placeholder="Date de naissance *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
-                                    <input v-model="form.spouses_metadata.husband_father_profession" placeholder="Profession *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                    <input v-model="form.spouses_metadata.husband_father_date_of_birth" type="date" placeholder="Date de naissance *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
+                                    <input v-model="form.spouses_metadata.husband_father_profession" placeholder="Profession *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                 </div>
-                                <input v-model="form.spouses_metadata.husband_father_domicile" placeholder="Domicile *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                <input v-model="form.spouses_metadata.husband_father_domicile" placeholder="Domicile *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                             </div>
                             
                             <!-- Mère de l'époux -->
                             <div class="space-y-3 pt-4 border-t border-blue-100/50">
-                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Mère <span class="text-red-500">*</span></span>
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Mère <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></span>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <input v-model="form.spouses_metadata.husband_mother_first_name" placeholder="Prénoms *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
-                                    <input v-model="form.spouses_metadata.husband_mother_last_name" placeholder="Nom *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                    <input v-model="form.spouses_metadata.husband_mother_first_name" placeholder="Prénoms *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
+                                    <input v-model="form.spouses_metadata.husband_mother_last_name" placeholder="Nom *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <input v-model="form.spouses_metadata.husband_mother_date_of_birth" type="date" placeholder="Date de naissance *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
-                                    <input v-model="form.spouses_metadata.husband_mother_profession" placeholder="Profession *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                    <input v-model="form.spouses_metadata.husband_mother_date_of_birth" type="date" placeholder="Date de naissance *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
+                                    <input v-model="form.spouses_metadata.husband_mother_profession" placeholder="Profession *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                 </div>
-                                <input v-model="form.spouses_metadata.husband_mother_domicile" placeholder="Domicile *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                <input v-model="form.spouses_metadata.husband_mother_domicile" placeholder="Domicile *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                             </div>
                         </div>
 
@@ -997,30 +997,30 @@ const submit = () => {
                             <h4 class="text-xs font-black text-pink-900 uppercase tracking-widest border-b border-pink-100 pb-2">Parents de l'Épouse</h4>
                             <!-- Père de l'épouse -->
                             <div class="space-y-3">
-                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Père <span class="text-red-500">*</span></span>
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Père <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></span>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <input v-model="form.spouses_metadata.wife_father_first_name" placeholder="Prénoms *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
-                                    <input v-model="form.spouses_metadata.wife_father_last_name" placeholder="Nom *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                    <input v-model="form.spouses_metadata.wife_father_first_name" placeholder="Prénoms *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
+                                    <input v-model="form.spouses_metadata.wife_father_last_name" placeholder="Nom *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <input v-model="form.spouses_metadata.wife_father_date_of_birth" type="date" placeholder="Date de naissance *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
-                                    <input v-model="form.spouses_metadata.wife_father_profession" placeholder="Profession *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                    <input v-model="form.spouses_metadata.wife_father_date_of_birth" type="date" placeholder="Date de naissance *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
+                                    <input v-model="form.spouses_metadata.wife_father_profession" placeholder="Profession *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                 </div>
-                                <input v-model="form.spouses_metadata.wife_father_domicile" placeholder="Domicile *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                <input v-model="form.spouses_metadata.wife_father_domicile" placeholder="Domicile *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                             </div>
                             
                             <!-- Mère de l'épouse -->
                             <div class="space-y-3 pt-4 border-t border-pink-100/50">
-                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Mère <span class="text-red-500">*</span></span>
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Mère <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></span>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <input v-model="form.spouses_metadata.wife_mother_first_name" placeholder="Prénoms *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
-                                    <input v-model="form.spouses_metadata.wife_mother_last_name" placeholder="Nom *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                    <input v-model="form.spouses_metadata.wife_mother_first_name" placeholder="Prénoms *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
+                                    <input v-model="form.spouses_metadata.wife_mother_last_name" placeholder="Nom *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <input v-model="form.spouses_metadata.wife_mother_date_of_birth" type="date" placeholder="Date de naissance *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
-                                    <input v-model="form.spouses_metadata.wife_mother_profession" placeholder="Profession *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                    <input v-model="form.spouses_metadata.wife_mother_date_of_birth" type="date" placeholder="Date de naissance *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
+                                    <input v-model="form.spouses_metadata.wife_mother_profession" placeholder="Profession *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                                 </div>
-                                <input v-model="form.spouses_metadata.wife_mother_domicile" placeholder="Domicile *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" required />
+                                <input v-model="form.spouses_metadata.wife_mother_domicile" placeholder="Domicile *" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-sm" :required="!form.is_old_registry && !is_edit" />
                             </div>
                         </div>
                     </div>
@@ -1159,37 +1159,37 @@ const submit = () => {
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms du Déclarant <span class="text-red-500">*</span></label>
-                            <input v-model="form.death_metadata.declarant_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms du Déclarant <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                            <input v-model="form.death_metadata.declarant_first_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom du Déclarant <span class="text-red-500">*</span></label>
-                            <input v-model="form.death_metadata.declarant_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span class="text-red-500">*</span></label>
-                            <input v-model="form.death_metadata.declarant_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Numéro d'Identification (CNI) <span class="text-red-500">*</span></label>
-                            <input v-model="form.death_metadata.declarant_id_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Nom du Déclarant <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                            <input v-model="form.death_metadata.declarant_last_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Adresse du Déclarant <span class="text-red-500">*</span></label>
-                            <input v-model="form.death_metadata.declarant_address" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                            <input v-model="form.death_metadata.declarant_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Degré de parenté / Relation avec le défunt <span class="text-red-500">*</span></label>
-                            <input v-model="form.death_metadata.declarant_relationship" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Ex : Fils, Conjoint, Voisin..." required />
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Numéro d'Identification (CNI) <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                            <input v-model="form.death_metadata.declarant_id_number" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Adresse du Déclarant <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                            <input v-model="form.death_metadata.declarant_address" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Degré de parenté / Relation avec le défunt <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                            <input v-model="form.death_metadata.declarant_relationship" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" placeholder="Ex : Fils, Conjoint, Voisin..." :required="!form.is_old_registry && !is_edit" />
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date et heure de la déclaration <span class="text-red-500">*</span></label>
-                        <input v-model="form.death_metadata.declarant_date_time" type="datetime-local" class="w-full md:w-72 px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date et heure de la déclaration <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                        <input v-model="form.death_metadata.declarant_date_time" type="datetime-local" class="w-full md:w-72 px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                     </div>
                 </div>
 
