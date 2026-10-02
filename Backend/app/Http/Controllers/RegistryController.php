@@ -10,12 +10,83 @@ use Illuminate\Validation\Rule;
 
 class RegistryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $registries = Registry::with(['center'])->paginate(15);
+        $query = Registry::with(['center'])
+            ->withCount(['birthActs', 'marriageActs', 'deathActs']);
+
+        $type = $request->query('type');
+        if ($type && $type !== 'all') {
+            $query->where('type', $type);
+        }
+
+        $year = $request->query('year');
+        if ($year && $year !== 'all') {
+            $query->where('year', $year);
+        }
+
+        $number = $request->query('number');
+        if ($number && $number !== 'all') {
+            $query->where('number', $number);
+        }
+
+        $status = $request->query('status');
+        if ($status && $status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        $search = $request->query('search');
+        if ($search) {
+            $searchTerm = '%' . mb_strtolower(trim($search), 'UTF-8') . '%';
+            $query->where(function ($q) use ($searchTerm) {
+                $q->whereRaw('LOWER(reference_prefix) LIKE ?', [$searchTerm])
+                  ->orWhereHas('center', function ($cq) use ($searchTerm) {
+                      $cq->whereRaw('LOWER(name) LIKE ?', [$searchTerm])
+                        ->orWhereRaw('LOWER(code) LIKE ?', [$searchTerm]);
+                  });
+            });
+        }
+
+        $sortBy = $request->query('sort_by', 'year');
+        $sortOrder = strtolower($request->query('sort_order', 'desc'));
+        if (!in_array($sortOrder, ['asc', 'desc'])) {
+            $sortOrder = ($sortBy === 'number') ? 'asc' : 'desc';
+        }
+
+        switch ($sortBy) {
+            case 'number':
+                $query->orderBy('number', $sortOrder)->orderBy('year', 'desc');
+                break;
+            case 'status':
+                $query->orderBy('status', $sortOrder);
+                break;
+            case 'type':
+                $query->orderBy('type', $sortOrder);
+                break;
+            case 'year':
+            default:
+                $query->orderBy('year', $sortOrder)->orderBy('number', 'asc');
+                break;
+        }
+
+        $registries = $query->paginate(15)->withQueryString();
+
+        $availableYears = Registry::distinct()->orderBy('year', 'desc')->pluck('year');
+        $availableNumbers = Registry::distinct()->orderBy('number', 'asc')->pluck('number');
 
         return Inertia::render('Admin/Registries/Index', [
             'registries' => $registries,
+            'availableYears' => $availableYears,
+            'availableNumbers' => $availableNumbers,
+            'filters' => [
+                'type' => $type ?? 'all',
+                'year' => $year ?? 'all',
+                'number' => $number ?? 'all',
+                'status' => $status ?? 'all',
+                'search' => $search ?? '',
+                'sort_by' => $sortBy,
+                'sort_order' => $sortOrder,
+            ],
         ]);
     }
 

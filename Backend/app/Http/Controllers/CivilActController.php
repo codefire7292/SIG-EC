@@ -100,19 +100,63 @@ class CivilActController extends Controller
         $type = $request->route('type') ?? $request->route()->getAction('type');
         $model = $this->getModel($type);
 
-        $query = $model->where('is_current', true)->with(['registry']);
+        $query = $model->where('is_current', true)->with(['registry.center']);
 
         $activeRegistry = null;
-        if ($registryId = $request->query('registry_id')) {
+        $registryId = $request->query('registry_id');
+        $year = $request->query('year');
+        $volumeNumber = $request->query('volume_number');
+        $actNumber = $request->query('act_number');
+        $status = $request->query('status');
+        $sortBy = $request->query('sort_by');
+        $sortOrder = strtolower($request->query('sort_order', ''));
+
+        // Handle Active Registry
+        if ($registryId) {
             $query->where('registry_id', $registryId);
-            // Inside the registry volume, only signed acts can be shown
-            $query->where('status', '=', 'signe');
-            $activeRegistry = \App\Models\Registry::find($registryId);
+            $activeRegistry = \App\Models\Registry::with('center')->find($registryId);
+
+            // In register volume view, signed acts are displayed by default unless another status is chosen
+            if ($status && $status !== 'all') {
+                $query->where('status', $status);
+            } elseif (!$status) {
+                $query->where('status', '=', 'signe');
+            }
         } else {
-            // Once signed, an act goes to the registry and is no longer shown in the general list of declarations/drafts
-            $query->where('status', '!=', 'signe');
+            // Filter by year if given
+            if ($year && $year !== 'all') {
+                $query->whereHas('registry', function ($q) use ($year) {
+                    $q->where('year', $year);
+                });
+            }
+
+            // Filter by volume number if given
+            if ($volumeNumber && $volumeNumber !== 'all') {
+                $query->whereHas('registry', function ($q) use ($volumeNumber) {
+                    $q->where('number', $volumeNumber);
+                });
+            }
+
+            // Status handling when outside specific registry
+            if ($status && $status !== 'all') {
+                $query->where('status', $status);
+            } elseif (!$status) {
+                // Default: non-signed acts in declarations list
+                $query->where('status', '!=', 'signe');
+            }
         }
 
+        // Search by act number specifically ("numéro par numéro")
+        if ($actNumber) {
+            $cleanActNum = trim($actNumber);
+            $padded = str_pad($cleanActNum, 4, '0', STR_PAD_LEFT);
+            $query->where(function ($q) use ($cleanActNum, $padded) {
+                $q->where('reference_number', 'LIKE', '%' . $padded)
+                  ->orWhere('reference_number', 'LIKE', '%-' . $cleanActNum);
+            });
+        }
+
+        // Global search (text or reference)
         $search = $request->query('search');
         if ($search) {
             $searchTerm = '%' . mb_strtolower(trim($search), 'UTF-8') . '%';
@@ -133,14 +177,85 @@ class CivilActController extends Controller
             });
         }
 
-        $acts = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+        // Sorting system
+        if (!$sortBy) {
+            // Default sort: when checking a registry volume, sort by number ascending to verify act-by-act
+            $sortBy = $activeRegistry ? 'number' : 'created_at';
+            if (empty($sortOrder)) {
+                $sortOrder = $activeRegistry ? 'asc' : 'desc';
+            }
+        }
+
+        if (!in_array($sortOrder, ['asc', 'desc'])) {
+            $sortOrder = ($sortBy === 'number' || $sortBy === 'reference') ? 'asc' : 'desc';
+        }
+
+        switch ($sortBy) {
+            case 'number':
+            case 'reference':
+                $query->orderBy('reference_number', $sortOrder);
+                break;
+            case 'date':
+                $dateCol = match ($type) {
+                    'naissance' => 'date_of_birth',
+                    'mariage' => 'marriage_date',
+                    'deces' => 'date_of_death',
+                    default => 'created_at',
+                };
+                $query->orderBy($dateCol, $sortOrder);
+                break;
+            case 'name':
+                if ($type === 'naissance') {
+                    $query->orderBy('last_name', $sortOrder)->orderBy('first_name', $sortOrder);
+                } elseif ($type === 'mariage') {
+                    $query->orderBy('husband_last_name', $sortOrder);
+                } elseif ($type === 'deces') {
+                    $query->orderBy('deceased_last_name', $sortOrder);
+                }
+                break;
+            case 'created_at':
+            default:
+                $query->orderBy('created_at', $sortOrder);
+                break;
+        }
+
+        $acts = $query->paginate(15)->withQueryString();
+
+        // Metadata for fast navigation and filtering in UI
+        $availableYears = \App\Models\Registry::where('type', $type)
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        $availableRegistries = \App\Models\Registry::where('type', $type)
+            ->orderBy('year', 'desc')
+            ->orderBy('number', 'asc')
+            ->get(['id', 'year', 'number', 'reference_prefix', 'status']);
+
+        $siblingRegistries = [];
+        if ($activeRegistry) {
+            $siblingRegistries = \App\Models\Registry::where('type', $type)
+                ->where('year', $activeRegistry->year)
+                ->orderBy('number', 'asc')
+                ->get(['id', 'year', 'number', 'reference_prefix', 'status']);
+        }
 
         return Inertia::render('CivilActs/Index', [
-            'acts'           => $acts,
-            'type'           => $type,
-            'activeRegistry' => $activeRegistry,
-            'filters'        => [
-                'search' => $search ?? '',
+            'acts'                => $acts,
+            'type'                => $type,
+            'activeRegistry'      => $activeRegistry,
+            'availableYears'      => $availableYears,
+            'availableRegistries' => $availableRegistries,
+            'siblingRegistries'   => $siblingRegistries,
+            'filters'             => [
+                'search'         => $search ?? '',
+                'year'           => $year ?? '',
+                'volume_number'  => $volumeNumber ?? '',
+                'act_number'     => $actNumber ?? '',
+                'status'         => $status ?? ($activeRegistry ? 'signe' : 'brouillon'),
+                'sort_by'        => $sortBy,
+                'sort_order'     => $sortOrder,
+                'registry_id'    => $registryId ?? '',
             ],
         ]);
     }
