@@ -12,6 +12,7 @@ import {
     CheckBadgeIcon,
     PencilSquareIcon,
     PlusCircleIcon,
+    PlusIcon,
     DocumentIcon,
     CheckCircleIcon,
     ArrowPathIcon,
@@ -103,6 +104,17 @@ const hasRole = (role) => {
     if (authUser.roles && Array.isArray(authUser.roles) && authUser.roles.map(r => r.name).includes(role)) return true;
     return false;
 };
+
+const canCreateAct = computed(() => {
+    if (!authUser) return false;
+    const permissions = authUser.permissions || [];
+    return permissions.includes('create-drafts') ||
+           hasRole('Administrateur technique') ||
+           hasRole('Agent d\'état-civil') ||
+           hasRole('Officier d\'état-civil') ||
+           hasRole('Superviseur / Chef de centre') ||
+           hasRole('Superviseur');
+});
 
 const showStatusModal = ref(false);
 const pendingStatus = ref('');
@@ -214,7 +226,7 @@ const goBack = () => {
                         </div>
                     </div>
 
-                    <!-- Quick Print / Edit Action -->
+                    <!-- Quick Print / Edit / Create Action -->
                     <div class="flex flex-wrap items-center gap-2 sm:gap-3">
                         <Link v-if="['brouillon', 'a_corriger'].includes(act.status)" :href="`/acts/${type}/${act.id}/edit`" 
                               class="inline-flex items-center px-5 py-3 bg-white border border-gray-200 text-gray-700 rounded-2xl text-xs font-black uppercase tracking-wider shadow-sm hover:bg-gray-50 transition-all active:scale-95">
@@ -222,6 +234,11 @@ const goBack = () => {
                             Modifier
                         </Link>
 
+                        <Link v-if="canCreateAct" :href="`/acts/${type}/create`"
+                              class="inline-flex items-center px-5 py-3 bg-[#1E690F] hover:bg-[#16500B] text-white rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg shadow-green-900/15 transition-all active:scale-95">
+                            <PlusIcon class="h-4 w-4 mr-2 stroke-[3]" />
+                            Créer un autre acte
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -565,6 +582,15 @@ const goBack = () => {
                                 Signer et Sceller
                             </button>
                         </template>
+
+                        <!-- Créer un autre acte -->
+                        <div v-if="canCreateAct" class="pt-3 border-t border-gray-100">
+                            <Link :href="`/acts/${type}/create`" 
+                                  class="w-full py-3.5 px-4 bg-gray-50 hover:bg-[#1E690F] text-gray-700 hover:text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 group cursor-pointer shadow-xs active:scale-95">
+                                <PlusIcon class="w-4 h-4 stroke-[2.5] text-[#1E690F] group-hover:text-white transition-colors" />
+                                <span>Créer un autre acte</span>
+                            </Link>
+                        </div>
                     </div>
 
                     <!-- PDF Download for Signed Acts -->
@@ -615,6 +641,15 @@ const goBack = () => {
                                 </a>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Pour les actes signés : Action Créer un autre acte -->
+                    <div v-if="act.status === 'signe' && canCreateAct" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-5">
+                        <Link :href="`/acts/${type}/create`" 
+                              class="w-full py-3.5 px-4 bg-[#1E690F] hover:bg-[#16500B] text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-green-900/10 active:scale-95 cursor-pointer">
+                            <PlusIcon class="w-4 h-4 stroke-[3]" />
+                            <span>Créer un autre acte</span>
+                        </Link>
                     </div>
                 </div>
             </div>
