@@ -225,9 +225,13 @@
     $refDigits = toDigitArray(preg_replace('/[^0-9]/', '', $act->reference_number ?? '0'), 6);
     $yearDigits = toDigitArray($yearStr, 4);
 
-    $birthDayDigits = $act->date_of_birth ? toDigitArray($act->date_of_birth->format('d'), 2) : ['0','0'];
-    $birthMonthDigits = $act->date_of_birth ? toDigitArray($act->date_of_birth->format('m'), 2) : ['0','0'];
-    $birthYearDigits = $act->date_of_birth ? toDigitArray($act->date_of_birth->format('Y'), 4) : ['0','0','0','0'];
+    $birthDateType = $act->birth_date_type ?? 'exact';
+    $isApprox = in_array($birthDateType, ['vers', 'annee', 'age']);
+    $birthYearStr = $act->birth_year ? (string)$act->birth_year : (!empty($act->date_of_birth) ? $act->date_of_birth->format('Y') : '0000');
+
+    $birthDayDigits = (!$isApprox && $act->date_of_birth) ? toDigitArray($act->date_of_birth->format('d'), 2) : ['-','-'];
+    $birthMonthDigits = (!$isApprox && $act->date_of_birth) ? toDigitArray($act->date_of_birth->format('m'), 2) : ['-','-'];
+    $birthYearDigits = toDigitArray($birthYearStr, 4);
 
     $declDate = $act->act_registration_date ?? now();
     $declDayDigits = toDigitArray($declDate->format('d'), 2);
@@ -295,6 +299,9 @@
     <div class="field-row">
         <strong>Sexe :</strong> <span class="dotted-line" style="width: 140px;">{!! dotField(in_array(strtoupper($act->gender ?? ''), ['F', 'FEMININ']) ? 'Féminin' : 'Masculin', 16) !!}</span>
         <strong style="margin-left: 20px;">Date de Naissance :</strong> 
+        @if($isApprox)
+            <span style="font-weight: bold; margin-right: 4px;">({{ $birthDateType === 'vers' ? 'Né vers' : ($birthDateType === 'age' ? 'Âgé de ' . ($act->presumed_age ?? '') . ' ans' : 'Année') }})</span>
+        @endif
         @foreach($birthDayDigits as $d)<span class="box-digit">{!! $d !!}</span>@endforeach JJ
         @foreach($birthMonthDigits as $d)<span class="box-digit">{!! $d !!}</span>@endforeach MM
         @foreach($birthYearDigits as $d)<span class="box-digit">{!! $d !!}</span>@endforeach ANNEE
@@ -327,10 +334,13 @@
         $fatherFirstName = count($fatherParts) > 0 ? implode(' ', $fatherParts) : $fatherName;
 
         $fatherBirthDate = $getMeta('father_date_of_birth', 'father', 'birth_date', '');
+        $fatherBirthType = $getMeta('father_birth_type', 'father', 'birth_type', 'exact');
+        $isFApprox = in_array($fatherBirthType, ['vers', 'annee', 'age']);
         $hasFBirth = !empty($fatherBirthDate) && strtotime($fatherBirthDate);
-        $fDay = $hasFBirth ? toDigitArray(date('d', strtotime($fatherBirthDate)), 2) : ['&nbsp;','&nbsp;'];
-        $fMonth = $hasFBirth ? toDigitArray(date('m', strtotime($fatherBirthDate)), 2) : ['&nbsp;','&nbsp;'];
-        $fYear = $hasFBirth ? toDigitArray(date('Y', strtotime($fatherBirthDate)), 4) : ['&nbsp;','&nbsp;','&nbsp;','&nbsp;'];
+        $fDay = ($hasFBirth && !$isFApprox) ? toDigitArray(date('d', strtotime($fatherBirthDate)), 2) : ($isFApprox ? ['-','-'] : ['&nbsp;','&nbsp;']);
+        $fMonth = ($hasFBirth && !$isFApprox) ? toDigitArray(date('m', strtotime($fatherBirthDate)), 2) : ($isFApprox ? ['-','-'] : ['&nbsp;','&nbsp;']);
+        $fYearStr = $getMeta('father_birth_year', 'father', 'birth_year', ($hasFBirth ? date('Y', strtotime($fatherBirthDate)) : ''));
+        $fYear = $fYearStr ? toDigitArray($fYearStr, 4) : ['&nbsp;','&nbsp;','&nbsp;','&nbsp;'];
         
         $fatherPlace = $getMeta('father_place_of_birth', 'father', 'birth_place', '');
         $fatherJob = $getMeta('father_profession', 'father', 'profession', '');
@@ -343,6 +353,9 @@
     </div>
     <div class="field-row">
         <strong>Date de Naissance :</strong> 
+        @if($isFApprox)
+            <span style="font-weight: bold; margin-right: 4px;">({{ $fatherBirthType === 'vers' ? 'Né vers' : ($fatherBirthType === 'age' ? 'Âgé de ' . $getMeta('father_age', 'father', 'age', '') . ' ans' : 'Année') }})</span>
+        @endif
         @foreach($fDay as $d)<span class="box-digit">{!! $d !!}</span>@endforeach JJ
         @foreach($fMonth as $d)<span class="box-digit">{!! $d !!}</span>@endforeach MM
         @foreach($fYear as $d)<span class="box-digit">{!! $d !!}</span>@endforeach ANNEE
@@ -368,10 +381,13 @@
         }
 
         $motherBirthDate = $getMeta('mother_date_of_birth', 'mother', 'birth_date', '');
+        $motherBirthType = $getMeta('mother_birth_type', 'mother', 'birth_type', 'exact');
+        $isMApprox = in_array($motherBirthType, ['vers', 'annee', 'age']);
         $hasMBirth = !empty($motherBirthDate) && strtotime($motherBirthDate);
-        $mDay = $hasMBirth ? toDigitArray(date('d', strtotime($motherBirthDate)), 2) : ['&nbsp;','&nbsp;'];
-        $mMonth = $hasMBirth ? toDigitArray(date('m', strtotime($motherBirthDate)), 2) : ['&nbsp;','&nbsp;'];
-        $mYear = $hasMBirth ? toDigitArray(date('Y', strtotime($motherBirthDate)), 4) : ['&nbsp;','&nbsp;','&nbsp;','&nbsp;'];
+        $mDay = ($hasMBirth && !$isMApprox) ? toDigitArray(date('d', strtotime($motherBirthDate)), 2) : ($isMApprox ? ['-','-'] : ['&nbsp;','&nbsp;']);
+        $mMonth = ($hasMBirth && !$isMApprox) ? toDigitArray(date('m', strtotime($motherBirthDate)), 2) : ($isMApprox ? ['-','-'] : ['&nbsp;','&nbsp;']);
+        $mYearStr = $getMeta('mother_birth_year', 'mother', 'birth_year', ($hasMBirth ? date('Y', strtotime($motherBirthDate)) : ''));
+        $mYear = $mYearStr ? toDigitArray($mYearStr, 4) : ['&nbsp;','&nbsp;','&nbsp;','&nbsp;'];
 
         $motherPlace = $getMeta('mother_place_of_birth', 'mother', 'birth_place', '');
         $motherJob = $getMeta('mother_profession', 'mother', 'profession', '');
@@ -384,6 +400,9 @@
     </div>
     <div class="field-row">
         <strong>Date de Naissance :</strong> 
+        @if($isMApprox)
+            <span style="font-weight: bold; margin-right: 4px;">({{ $motherBirthType === 'vers' ? 'Née vers' : ($motherBirthType === 'age' ? 'Âgée de ' . $getMeta('mother_age', 'mother', 'age', '') . ' ans' : 'Année') }})</span>
+        @endif
         @foreach($mDay as $d)<span class="box-digit">{!! $d !!}</span>@endforeach JJ
         @foreach($mMonth as $d)<span class="box-digit">{!! $d !!}</span>@endforeach MM
         @foreach($mYear as $d)<span class="box-digit">{!! $d !!}</span>@endforeach ANNEE

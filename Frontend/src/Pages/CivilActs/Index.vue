@@ -300,11 +300,11 @@ const cancelImport = () => {
                             Importer Excel
                         </button>
                         <Link
-                            :href="`/acts/${type}/create?old_registry=1`"
+                            :href="activeRegistry ? `/acts/${type}/create?old_registry=1&registry_id=${activeRegistry.id}` : `/acts/${type}/create?old_registry=1`"
                             class="inline-flex items-center justify-center px-4 py-2.5 bg-white border border-gray-200 rounded-xl font-black text-xs text-amber-600 uppercase tracking-widest hover:bg-amber-50 shadow-sm transition-all active:scale-95"
                         >
                             <DocumentTextIcon class="w-4 h-4 mr-1.5" />
-                            Saisir Ancien Registre
+                            <span>{{ activeRegistry ? `Saisir (Vol. ${activeRegistry.number} - ${activeRegistry.year})` : 'Saisir Ancien Registre' }}</span>
                         </Link>
                         <Link
                             :href="`/acts/${type}/create`"

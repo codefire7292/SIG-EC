@@ -284,11 +284,7 @@ class CivilActController extends Controller
         }
 
         $type = $request->route('type');
-        $registries = \App\Models\Registry::where('type', $type)
-            ->where('status', 'open')
-            ->orderBy('year', 'desc')
-            ->orderBy('number', 'asc')
-            ->get();
+        $registries = $this->getRegistriesWithUsedNumbers($type);
 
         return Inertia::render('CivilActs/Form', [
             'type' => $type,
@@ -307,11 +303,7 @@ class CivilActController extends Controller
         $model = $this->getModel($type);
         $act = $model->findOrFail($id);
         
-        $registries = \App\Models\Registry::where('type', $type)
-            ->where('status', 'open')
-            ->orderBy('year', 'desc')
-            ->orderBy('number', 'asc')
-            ->get();
+        $registries = $this->getRegistriesWithUsedNumbers($type, $act->id, $act->registry_id);
 
         return Inertia::render('CivilActs/Form', [
             'act' => $act,
@@ -321,6 +313,129 @@ class CivilActController extends Controller
         ]);
     }
 
+    private function getRegistriesWithUsedNumbers(string $type, $excludeActId = null, $includeRegistryId = null)
+    {
+        $model = $this->getModel($type);
+        $registries = \App\Models\Registry::where('type', $type)
+            ->where(function ($q) use ($includeRegistryId) {
+                $q->where('status', 'open');
+                if ($includeRegistryId) {
+                    $q->orWhere('id', $includeRegistryId);
+                }
+            })
+            ->orderBy('year', 'desc')
+            ->orderBy('number', 'asc')
+            ->get();
+
+        $registryIds = $registries->pluck('id');
+        $existingActs = $model->whereIn('registry_id', $registryIds)
+            ->select('id', 'registry_id', 'reference_number')
+            ->get()
+            ->groupBy('registry_id');
+
+        return $registries->map(function ($registry) use ($existingActs, $excludeActId) {
+            $acts = $existingActs->get($registry->id, collect());
+            if ($excludeActId) {
+                $acts = $acts->where('id', '!=', $excludeActId);
+            }
+            $refNumbers = $acts->pluck('reference_number')->filter()->values()->all();
+            $usedNumbers = [];
+            foreach ($refNumbers as $ref) {
+                if (preg_match('/(?:^|-| )0*(\d+)$/', trim($ref), $matches)) {
+                    $usedNumbers[] = (int) $matches[1];
+                }
+            }
+            $data = $registry->toArray();
+            $data['existing_reference_numbers'] = $refNumbers;
+            $data['used_act_numbers'] = array_values(array_unique($usedNumbers));
+            return $data;
+        });
+    }
+
+    protected function prepareBirthDateInputs(Request $request, string $type): void
+    {
+        $birthDateType = $request->input('birth_date_type', 'exact');
+        if (!in_array($birthDateType, ['exact', 'vers', 'annee', 'age'])) {
+            $birthDateType = 'exact';
+        }
+
+        if ($type === 'naissance' || $type === 'deces') {
+            if ($birthDateType === 'vers' || $birthDateType === 'annee') {
+                $year = (int) $request->input('birth_year');
+                if ($year > 0) {
+                    $request->merge([
+                        'birth_year' => $year,
+                        'date_of_birth' => sprintf('%04d-01-01', $year),
+                    ]);
+                }
+            } elseif ($birthDateType === 'age') {
+                $age = (int) $request->input('presumed_age');
+                $refDate = $type === 'deces'
+                    ? ($request->input('date_of_death') ?: $request->input('act_registration_date'))
+                    : $request->input('act_registration_date');
+                $refYear = $refDate ? (int) date('Y', strtotime($refDate)) : (int) date('Y');
+                $year = max(1850, $refYear - $age);
+                $request->merge([
+                    'presumed_age' => $age,
+                    'birth_year' => $year,
+                    'date_of_birth' => sprintf('%04d-01-01', $year),
+                ]);
+            } elseif ($birthDateType === 'exact') {
+                if ($request->filled('date_of_birth')) {
+                    $year = (int) date('Y', strtotime($request->input('date_of_birth')));
+                    $request->merge(['birth_year' => $year]);
+                }
+            }
+        }
+
+        // Handle parents_metadata in naissance
+        if ($type === 'naissance' && $request->has('parents_metadata')) {
+            $parentsMeta = $request->input('parents_metadata', []);
+            if (is_array($parentsMeta)) {
+                $childYear = (int) ($request->input('birth_year') ?: date('Y'));
+                // Father
+                $fType = $parentsMeta['father_birth_type'] ?? 'exact';
+                if ($fType === 'vers' && !empty($parentsMeta['father_birth_year'])) {
+                    $parentsMeta['father_date_of_birth'] = sprintf('%04d-01-01', (int) $parentsMeta['father_birth_year']);
+                } elseif ($fType === 'age' && !empty($parentsMeta['father_age'])) {
+                    $parentsMeta['father_birth_year'] = max(1850, $childYear - (int) $parentsMeta['father_age']);
+                    $parentsMeta['father_date_of_birth'] = sprintf('%04d-01-01', $parentsMeta['father_birth_year']);
+                }
+                // Mother
+                $mType = $parentsMeta['mother_birth_type'] ?? 'exact';
+                if ($mType === 'vers' && !empty($parentsMeta['mother_birth_year'])) {
+                    $parentsMeta['mother_date_of_birth'] = sprintf('%04d-01-01', (int) $parentsMeta['mother_birth_year']);
+                } elseif ($mType === 'age' && !empty($parentsMeta['mother_age'])) {
+                    $parentsMeta['mother_birth_year'] = max(1850, $childYear - (int) $parentsMeta['mother_age']);
+                    $parentsMeta['mother_date_of_birth'] = sprintf('%04d-01-01', $parentsMeta['mother_birth_year']);
+                }
+                $request->merge(['parents_metadata' => $parentsMeta]);
+            }
+        }
+
+        // Handle spouses_metadata in mariage
+        if ($type === 'mariage' && $request->has('spouses_metadata')) {
+            $spousesMeta = $request->input('spouses_metadata', []);
+            if (is_array($spousesMeta)) {
+                $mDate = $request->input('marriage_date');
+                $mYear = $mDate ? (int) date('Y', strtotime($mDate)) : (int) date('Y');
+                if (($spousesMeta['husband_birth_type'] ?? 'exact') === 'vers' && !empty($spousesMeta['husband_birth_year'])) {
+                    $spousesMeta['husband_date_of_birth'] = sprintf('%04d-01-01', (int) $spousesMeta['husband_birth_year']);
+                } elseif (($spousesMeta['husband_birth_type'] ?? 'exact') === 'age' && !empty($spousesMeta['husband_age'])) {
+                    $spousesMeta['husband_birth_year'] = max(1850, $mYear - (int) $spousesMeta['husband_age']);
+                    $spousesMeta['husband_date_of_birth'] = sprintf('%04d-01-01', $spousesMeta['husband_birth_year']);
+                }
+                if (($spousesMeta['wife_birth_type'] ?? 'exact') === 'vers' && !empty($spousesMeta['wife_birth_year'])) {
+                    $spousesMeta['wife_date_of_birth'] = sprintf('%04d-01-01', (int) $spousesMeta['wife_birth_year']);
+                } elseif (($spousesMeta['wife_birth_type'] ?? 'exact') === 'age' && !empty($spousesMeta['wife_age'])) {
+                    $spousesMeta['wife_birth_year'] = max(1850, $mYear - (int) $spousesMeta['wife_age']);
+                    $spousesMeta['wife_date_of_birth'] = sprintf('%04d-01-01', $spousesMeta['wife_birth_year']);
+                }
+                $request->merge(['spouses_metadata' => $spousesMeta]);
+            }
+        }
+    }
+
     public function store(Request $request)
     {
         if (!$request->user()->hasPermissionTo('create-drafts')) {
@@ -328,6 +443,7 @@ class CivilActController extends Controller
         }
 
         $type = $request->route('type');
+        $this->prepareBirthDateInputs($request, $type);
         $rules = $this->getValidationRules($type);
         
         $isOldRegistry = $request->boolean('is_old_registry');
@@ -418,13 +534,31 @@ class CivilActController extends Controller
         }
 
         // RULE: sequential numbering across ALL volumes of the same year
-        // Count all acts for this year+type+center across every volume
+        // Count all acts for this year+type+center across every volume, ignoring custom non-sequential references
         $allRegistryIds = \App\Models\Registry::where('civil_registration_center_id', $centerId)
             ->where('type', $type)
             ->where('year', $year)
             ->pluck('id');
-        $yearActCount = $model->whereIn('registry_id', $allRegistryIds)->count();
-        $increment = $yearActCount + 1;
+
+        $referenceNumbers = $model->whereIn('registry_id', $allRegistryIds)
+            ->pluck('reference_number')
+            ->toArray();
+        $maxIncrement = 0;
+        $escapedPrefix = preg_quote($registry->reference_prefix, '/');
+        foreach ($referenceNumbers as $ref) {
+            if (preg_match('/^' . $escapedPrefix . '-(\d+)$/', $ref, $matches)) {
+                $val = intval($matches[1]);
+                if ($val > $maxIncrement) {
+                    $maxIncrement = $val;
+                }
+            } elseif (preg_match('/^[A-Z]-\d{4}-C\d+(?:-\d+)?-(\d+)$/', $ref, $matches)) {
+                $val = intval($matches[1]);
+                if ($val > $maxIncrement) {
+                    $maxIncrement = $val;
+                }
+            }
+        }
+        $increment = $maxIncrement + 1;
 
         if ($increment > 9999 && !($isOldRegistry && !empty($validated['reference_number']))) {
             return back()->withErrors(['registry_id' => 'La limite annuelle d\'actes a été atteinte.']);
@@ -538,6 +672,7 @@ class CivilActController extends Controller
         }
 
         $type = $request->route('type');
+        $this->prepareBirthDateInputs($request, $type);
         $model = $this->getModel($type);
         $act = $model->with('registry')->findOrFail($id);
 
@@ -550,6 +685,21 @@ class CivilActController extends Controller
 
         // TECHNICAL RULE: Filter out dot-notation keys
         $data = array_filter($validated, fn($key) => !str_contains($key, '.'), ARRAY_FILTER_USE_KEY);
+
+        $isOldRegistry = $request->boolean('is_old_registry');
+        if ($isOldRegistry && !empty($validated['reference_number'])) {
+            $targetRegId = $data['registry_id'] ?? $act->registry_id;
+            $alreadyExists = $model->where('registry_id', $targetRegId)
+                ->where('reference_number', $validated['reference_number'])
+                ->where('id', '!=', $act->id)
+                ->exists();
+
+            if ($alreadyExists) {
+                return back()->withErrors([
+                    'reference_number' => "L'acte « {$validated['reference_number']} » existe déjà dans ce registre. Veuillez choisir un autre numéro."
+                ]);
+            }
+        }
 
         $data = $this->formatTextData($data);
 
@@ -702,9 +852,10 @@ class CivilActController extends Controller
     protected function getValidationRules(string $type, $id = null): array
     {
         $isOldRegistry = request()->boolean('is_old_registry');
-        $docRule = ($id || $isOldRegistry) ? 'nullable' : 'required';
+        $isApprox = in_array(request()->input('birth_date_type'), ['vers', 'annee', 'age']);
+        $docRule = ($id || $isOldRegistry || $isApprox) ? 'nullable' : 'required';
         $judgmentRule = ($id || $isOldRegistry) ? 'nullable' : 'nullable|required_if:is_judgment,true';
-        $oldRegistryMetaRule = ($id || $isOldRegistry) ? 'nullable' : 'required';
+        $oldRegistryMetaRule = ($id || $isOldRegistry || $isApprox) ? 'nullable' : 'required';
 
         $common = [
             'officer_comments' => 'nullable|string',
@@ -723,10 +874,13 @@ class CivilActController extends Controller
             return array_merge($common, [
                 'first_name'                              => 'required|string',
                 'last_name'                               => 'required|string',
+                'birth_date_type'                         => 'nullable|in:exact,vers,annee,age',
+                'birth_year'                              => 'nullable|integer|min:1850|max:' . (date('Y') + 1),
+                'presumed_age'                            => 'nullable|integer|min:0|max:150',
                 'date_of_birth'                           => 'required|date',
-                'time_of_birth'                           => ($isOldRegistry || $id) ? 'nullable|date_format:H:i' : 'required|date_format:H:i',
+                'time_of_birth'                           => ($isOldRegistry || $id || $isApprox) ? 'nullable|date_format:H:i' : 'required|date_format:H:i',
                 'place_of_birth'                          => 'required|string',
-                'health_facility'                         => ($isOldRegistry || $id) ? 'nullable|string' : 'required|string',
+                'health_facility'                         => ($isOldRegistry || $id || $isApprox) ? 'nullable|string' : 'required|string',
                 'act_registration_date'                   => 'required|date',
                 'gender'                                  => 'required|in:M,F',
                 'is_judgment'                             => 'nullable|boolean',
@@ -738,6 +892,9 @@ class CivilActController extends Controller
                 'parents_metadata'                        => 'required|array',
                 'parents_metadata.is_foundling'           => 'nullable|boolean',
                 'parents_metadata.is_father_unrecognized' => 'nullable|boolean',
+                'parents_metadata.father_birth_type'      => 'nullable|in:exact,vers,annee,age',
+                'parents_metadata.father_birth_year'      => 'nullable|integer',
+                'parents_metadata.father_age'             => 'nullable|integer',
                 'parents_metadata.father_profession'      => $fatherRule . '|string',
                 'parents_metadata.father_date_of_birth'   => [
                     $fatherRule,
@@ -756,6 +913,9 @@ class CivilActController extends Controller
                 ],
                 'parents_metadata.father_place_of_birth'  => $fatherRule . '|string',
                 'parents_metadata.father_domicile'        => $fatherRule . '|string',
+                'parents_metadata.mother_birth_type'      => 'nullable|in:exact,vers,annee,age',
+                'parents_metadata.mother_birth_year'      => 'nullable|integer',
+                'parents_metadata.mother_age'             => 'nullable|integer',
                 'parents_metadata.mother_profession'      => $parentRule . '|string',
                 'parents_metadata.mother_date_of_birth'   => [
                     $parentRule,
@@ -820,12 +980,18 @@ class CivilActController extends Controller
                 'judgment_date'                                => $judgmentRule . '|date',
                 // Spouses Metadata JSON
                 'spouses_metadata'                             => 'required|array',
+                'spouses_metadata.husband_birth_type'          => 'nullable|in:exact,vers,annee,age',
+                'spouses_metadata.husband_birth_year'          => 'nullable|integer',
+                'spouses_metadata.husband_age'                 => 'nullable|integer',
                 'spouses_metadata.husband_date_of_birth'       => $oldRegistryMetaRule . '|date',
                 'spouses_metadata.husband_place_of_birth'      => $oldRegistryMetaRule . '|string',
                 'spouses_metadata.husband_profession'          => $oldRegistryMetaRule . '|string',
                 'spouses_metadata.husband_domicile'            => $oldRegistryMetaRule . '|string',
                 'spouses_metadata.husband_residence'           => $oldRegistryMetaRule . '|string',
                 'spouses_metadata.husband_married_to'          => 'nullable|string',
+                'spouses_metadata.wife_birth_type'             => 'nullable|in:exact,vers,annee,age',
+                'spouses_metadata.wife_birth_year'             => 'nullable|integer',
+                'spouses_metadata.wife_age'                    => 'nullable|integer',
                 'spouses_metadata.wife_date_of_birth'          => $oldRegistryMetaRule . '|date',
                 'spouses_metadata.wife_place_of_birth'         => $oldRegistryMetaRule . '|string',
                 'spouses_metadata.wife_profession'             => $oldRegistryMetaRule . '|string',
@@ -882,6 +1048,9 @@ class CivilActController extends Controller
                 'deceased_first_name'                       => 'required|string',
                 'deceased_last_name'                        => 'required|string',
                 'gender'                                    => 'required|in:M,F',
+                'birth_date_type'                           => 'nullable|in:exact,vers,annee,age',
+                'birth_year'                                => 'nullable|integer|min:1850|max:' . (date('Y') + 1),
+                'presumed_age'                              => 'nullable|integer|min:0|max:150',
                 'date_of_birth'                             => 'required|date',
                 'date_of_death'                             => 'required|date',
                 'time_of_death'                             => 'required|date_format:H:i',
@@ -904,11 +1073,17 @@ class CivilActController extends Controller
                 // Parents of deceased
                 'death_metadata.father_first_name'          => $oldRegistryMetaRule . '|string',
                 'death_metadata.father_last_name'           => $oldRegistryMetaRule . '|string',
+                'death_metadata.father_birth_type'          => 'nullable|in:exact,vers,annee,age',
+                'death_metadata.father_birth_year'          => 'nullable|integer',
+                'death_metadata.father_age'                 => 'nullable|integer',
                 'death_metadata.father_date_of_birth'       => $oldRegistryMetaRule . '|date',
                 'death_metadata.father_profession'          => $oldRegistryMetaRule . '|string',
                 'death_metadata.father_domicile'            => $oldRegistryMetaRule . '|string',
                 'death_metadata.mother_first_name'          => $oldRegistryMetaRule . '|string',
                 'death_metadata.mother_last_name'           => $oldRegistryMetaRule . '|string',
+                'death_metadata.mother_birth_type'          => 'nullable|in:exact,vers,annee,age',
+                'death_metadata.mother_birth_year'          => 'nullable|integer',
+                'death_metadata.mother_age'                 => 'nullable|integer',
                 'death_metadata.mother_date_of_birth'       => $oldRegistryMetaRule . '|date',
                 'death_metadata.mother_profession'          => $oldRegistryMetaRule . '|string',
                 'death_metadata.mother_domicile'            => $oldRegistryMetaRule . '|string',
@@ -998,7 +1173,11 @@ class CivilActController extends Controller
 
     private function formatTextData(array $data): array
     {
-        $excludeKeys = ['reference_number', 'officer_comments', 'certificate_path', 'judgment_number', 'gender', 'marriage_option', 'matrimonial_regime', 'marital_status', 'judgment_court', 'cause_of_death'];
+        $excludeKeys = [
+            'reference_number', 'officer_comments', 'certificate_path', 'judgment_number', 'gender',
+            'marriage_option', 'matrimonial_regime', 'marital_status', 'judgment_court', 'cause_of_death',
+            'birth_date_type', 'father_birth_type', 'mother_birth_type', 'husband_birth_type', 'wife_birth_type',
+        ];
 
         foreach ($data as $key => $value) {
             if (is_string($value)) {
@@ -1007,7 +1186,7 @@ class CivilActController extends Controller
                 if ($isName) {
                     $data[$key] = mb_strtoupper($value, 'UTF-8');
                 } else {
-                    if (!in_array($key, $excludeKeys) && !preg_match('/_date|_time|_id|doc_|^is_/', $key)) {
+                    if (!in_array($key, $excludeKeys) && !preg_match('/_date|_time|_id|doc_|^is_|_type$/', $key)) {
                         $data[$key] = mb_convert_case(mb_strtolower($value, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
                     }
                 }

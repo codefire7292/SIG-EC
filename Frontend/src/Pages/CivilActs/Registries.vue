@@ -26,7 +26,8 @@ import {
     CheckCircleIcon,
     Squares2X2Icon,
     ListBulletIcon,
-    BuildingLibraryIcon
+    BuildingLibraryIcon,
+    PlusIcon
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -709,14 +710,26 @@ const formatDate = (d) => {
                                         <div v-if="reg.closing_date"><span class="font-bold text-gray-600">Clos :</span> {{ formatDate(reg.closing_date) }}</div>
                                     </div>
 
-                                    <Link
-                                        :href="`/acts/${type}/list?registry_id=${reg.id}&sort_by=number&sort_order=asc`"
-                                        class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-white transition-all shadow-md active:scale-95 group-hover:shadow-lg"
-                                        :style="`background: linear-gradient(135deg, ${typeConfig.gradientFrom}, ${typeConfig.gradientTo});`"
-                                    >
-                                        <span>Vérifier</span>
-                                        <ChevronRightIcon class="h-3.5 w-3.5 stroke-[3] transition-transform group-hover:translate-x-0.5" />
-                                    </Link>
+                                    <div class="flex items-center gap-2">
+                                        <Link
+                                            v-if="reg.status === 'open'"
+                                            :href="`/acts/${type}/create?old_registry=1&registry_id=${reg.id}`"
+                                            class="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-600 hover:bg-amber-700 text-white transition-all shadow-md active:scale-95"
+                                            title="Saisir un acte dans ce volume"
+                                        >
+                                            <PlusIcon class="h-3.5 w-3.5 stroke-[3]" />
+                                            <span>Saisir</span>
+                                        </Link>
+
+                                        <Link
+                                            :href="`/acts/${type}/list?registry_id=${reg.id}&sort_by=number&sort_order=asc`"
+                                            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-white transition-all shadow-md active:scale-95 group-hover:shadow-lg"
+                                            :style="`background: linear-gradient(135deg, ${typeConfig.gradientFrom}, ${typeConfig.gradientTo});`"
+                                        >
+                                            <span>Vérifier</span>
+                                            <ChevronRightIcon class="h-3.5 w-3.5 stroke-[3] transition-transform group-hover:translate-x-0.5" />
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -824,14 +837,26 @@ const formatDate = (d) => {
                                 <div><span class="font-bold text-gray-600">Ouvert :</span> {{ formatDate(reg.opening_date) }}</div>
                             </div>
 
-                            <Link
-                                :href="`/acts/${type}/list?registry_id=${reg.id}&sort_by=number&sort_order=asc`"
-                                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-white transition-all shadow-md active:scale-95 group-hover:shadow-lg"
-                                :style="`background: linear-gradient(135deg, ${typeConfig.gradientFrom}, ${typeConfig.gradientTo});`"
-                            >
-                                <span>Vérifier actes</span>
-                                <ChevronRightIcon class="h-3.5 w-3.5 stroke-[3]" />
-                            </Link>
+                            <div class="flex items-center gap-2">
+                                <Link
+                                    v-if="reg.status === 'open'"
+                                    :href="`/acts/${type}/create?old_registry=1&registry_id=${reg.id}`"
+                                    class="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-600 hover:bg-amber-700 text-white transition-all shadow-md active:scale-95"
+                                    title="Saisir un acte dans ce volume"
+                                >
+                                    <PlusIcon class="h-3.5 w-3.5 stroke-[3]" />
+                                    <span>Saisir</span>
+                                </Link>
+
+                                <Link
+                                    :href="`/acts/${type}/list?registry_id=${reg.id}&sort_by=number&sort_order=asc`"
+                                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-white transition-all shadow-md active:scale-95 group-hover:shadow-lg"
+                                    :style="`background: linear-gradient(135deg, ${typeConfig.gradientFrom}, ${typeConfig.gradientTo});`"
+                                >
+                                    <span>Vérifier actes</span>
+                                    <ChevronRightIcon class="h-3.5 w-3.5 stroke-[3]" />
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>

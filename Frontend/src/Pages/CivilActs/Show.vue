@@ -23,7 +23,8 @@ import {
     ShieldCheckIcon,
     SparklesIcon,
     BuildingOfficeIcon,
-    DocumentTextIcon
+    DocumentTextIcon,
+    BookOpenIcon
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -114,6 +115,33 @@ const canCreateAct = computed(() => {
            hasRole('Officier d\'état-civil') ||
            hasRole('Superviseur / Chef de centre') ||
            hasRole('Superviseur');
+});
+
+const currentYear = new Date().getFullYear();
+
+const isOldRegistryAct = computed(() => {
+    if (!props.act?.registry) return false;
+    // Registre d'une année antérieure
+    if (Number(props.act.registry.year) < currentYear) return true;
+    // Ou date de naissance / déclaration avec date approximative
+    if (props.act.birth_date_type && props.act.birth_date_type !== 'exact') return true;
+    // Ou année d'événement antérieure
+    const actYear = props.act.date_of_birth ? new Date(props.act.date_of_birth).getFullYear() : null;
+    if (actYear && actYear < currentYear) return true;
+    // Ou absence de données obligatoires contemporaines
+    if (!props.act.time_of_birth || !props.act.health_facility) return true;
+    return false;
+});
+
+const isCurrentRegistryOpen = computed(() => {
+    return props.act?.registry && props.act.registry.status === 'open';
+});
+
+const nextActInRegistryUrl = computed(() => {
+    if (props.act?.registry?.id && isCurrentRegistryOpen.value) {
+        return `/acts/${props.type}/create?old_registry=1&registry_id=${props.act.registry.id}`;
+    }
+    return `/acts/${props.type}/create?old_registry=1`;
 });
 
 const showStatusModal = ref(false);
@@ -234,11 +262,45 @@ const goBack = () => {
                             Modifier
                         </Link>
 
-                        <Link v-if="canCreateAct" :href="`/acts/${type}/create`"
-                              class="inline-flex items-center px-5 py-3 bg-[#1E690F] hover:bg-[#16500B] text-white rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg shadow-green-900/15 transition-all active:scale-95">
-                            <PlusIcon class="h-4 w-4 mr-2 stroke-[3]" />
-                            Créer un autre acte
-                        </Link>
+                        <template v-if="canCreateAct">
+                            <!-- Si l'acte provient d'un ancien registre -->
+                            <template v-if="isOldRegistryAct">
+                                <Link v-if="isCurrentRegistryOpen" :href="nextActInRegistryUrl"
+                                      class="inline-flex items-center px-4 py-2.5 sm:px-5 sm:py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg shadow-amber-900/15 transition-all active:scale-95"
+                                      :title="`Saisir l'acte suivant dans ce registre ${act.registry?.reference_prefix || ''}`">
+                                    <BookOpenIcon class="h-4 w-4 mr-2 stroke-[2.5]" />
+                                    <span>Saisir dans ce registre (Vol. {{ act.registry?.number }} - {{ act.registry?.year }})</span>
+                                </Link>
+
+                                <Link :href="`/acts/${type}/create?old_registry=1`"
+                                      class="inline-flex items-center px-4 py-2.5 sm:px-4 sm:py-3 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-2xl text-xs font-black uppercase tracking-wider transition-all active:scale-95"
+                                      title="Choisir un autre volume d'ancien registre">
+                                    <PlusCircleIcon class="h-4 w-4 mr-1.5" />
+                                    <span>Autre Ancien Registre</span>
+                                </Link>
+
+                                <Link :href="`/acts/${type}/create`"
+                                      class="inline-flex items-center px-4 py-2.5 sm:px-4 sm:py-3 bg-[#1E690F] hover:bg-[#16500B] text-white rounded-2xl text-xs font-black uppercase tracking-wider shadow-sm transition-all active:scale-95">
+                                    <PlusIcon class="h-4 w-4 mr-1.5 stroke-[3]" />
+                                    <span>Déclaration Ordinaire</span>
+                                </Link>
+                            </template>
+
+                            <!-- Si l'acte est ordinaire -->
+                            <template v-else>
+                                <Link :href="`/acts/${type}/create`"
+                                      class="inline-flex items-center px-5 py-3 bg-[#1E690F] hover:bg-[#16500B] text-white rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg shadow-green-900/15 transition-all active:scale-95">
+                                    <PlusIcon class="h-4 w-4 mr-2 stroke-[3]" />
+                                    Créer un autre acte
+                                </Link>
+
+                                <Link :href="`/acts/${type}/create?old_registry=1`"
+                                      class="inline-flex items-center px-4 py-3 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-2xl text-xs font-black uppercase tracking-wider transition-all active:scale-95">
+                                    <BookOpenIcon class="h-4 w-4 mr-1.5" />
+                                    <span>Saisie Ancien Registre</span>
+                                </Link>
+                            </template>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -287,9 +349,23 @@ const goBack = () => {
                                             <CalendarIcon class="h-3.5 w-3.5 text-[#1E690F]" />
                                             Naissance
                                         </h4>
-                                        <div class="text-base font-black text-gray-900">
-                                            {{ formatDate(act.date_of_birth) }}
-                                            <span v-if="act.time_of_birth" class="text-gray-500 font-bold text-xs ml-2">à {{ formatTime(act.time_of_birth) }}</span>
+                                        <div class="text-base font-black text-gray-900 flex items-center flex-wrap gap-2">
+                                            <template v-if="act.birth_date_type === 'vers'">
+                                                <span class="px-2 py-0.5 rounded-md text-[10px] uppercase font-black tracking-wider bg-amber-100 text-amber-800 border border-amber-300">Né(e) vers</span>
+                                                <span>{{ act.birth_year || (act.date_of_birth ? new Date(act.date_of_birth).getFullYear() : '—') }}</span>
+                                            </template>
+                                            <template v-else-if="act.birth_date_type === 'annee'">
+                                                <span class="px-2 py-0.5 rounded-md text-[10px] uppercase font-black tracking-wider bg-amber-100 text-amber-800 border border-amber-300">Au cours de</span>
+                                                <span>{{ act.birth_year || (act.date_of_birth ? new Date(act.date_of_birth).getFullYear() : '—') }}</span>
+                                            </template>
+                                            <template v-else-if="act.birth_date_type === 'age'">
+                                                <span class="px-2 py-0.5 rounded-md text-[10px] uppercase font-black tracking-wider bg-amber-100 text-amber-800 border border-amber-300">Âge présumé</span>
+                                                <span>{{ act.presumed_age }} ans (vers {{ act.birth_year }})</span>
+                                            </template>
+                                            <template v-else>
+                                                {{ formatDate(act.date_of_birth) }}
+                                            </template>
+                                            <span v-if="act.time_of_birth && (!act.birth_date_type || act.birth_date_type === 'exact')" class="text-gray-500 font-bold text-xs ml-2">à {{ formatTime(act.time_of_birth) }}</span>
                                         </div>
                                         <div class="text-xs font-bold text-gray-500 italic mt-1 flex items-center gap-1">
                                             <MapPinIcon class="h-3.5 w-3.5 text-gray-400" />
@@ -332,7 +408,12 @@ const goBack = () => {
                                     <div class="p-5 bg-blue-50/20 rounded-2xl border border-blue-100/40 space-y-2">
                                         <h4 class="text-[10px] font-black text-blue-900 uppercase tracking-widest">Père</h4>
                                         <div class="text-base font-black text-gray-900">{{ act.father_name || 'Non renseigné' }}</div>
-                                        <div v-if="act.parents_metadata?.father_date_of_birth" class="text-xs text-gray-600 font-medium">Né le {{ formatDate(act.parents_metadata.father_date_of_birth) }}<span v-if="act.parents_metadata.father_place_of_birth"> — {{ act.parents_metadata.father_place_of_birth }}</span></div>
+                                        <div v-if="act.parents_metadata?.father_date_of_birth || act.parents_metadata?.father_birth_year || act.parents_metadata?.father_age" class="text-xs text-gray-600 font-medium">
+                                            <template v-if="act.parents_metadata?.father_birth_type === 'vers'">Né vers {{ act.parents_metadata.father_birth_year || (act.parents_metadata.father_date_of_birth ? new Date(act.parents_metadata.father_date_of_birth).getFullYear() : '') }}</template>
+                                            <template v-else-if="act.parents_metadata?.father_birth_type === 'age'">Âgé de {{ act.parents_metadata.father_age }} ans</template>
+                                            <template v-else>Né le {{ formatDate(act.parents_metadata.father_date_of_birth) }}</template>
+                                            <span v-if="act.parents_metadata?.father_place_of_birth"> — {{ act.parents_metadata.father_place_of_birth }}</span>
+                                        </div>
                                         <div v-if="act.parents_metadata?.father_domicile" class="text-xs text-gray-600 font-medium">Domicile : {{ act.parents_metadata.father_domicile }}</div>
                                         <div v-if="act.parents_metadata?.father_profession" class="text-xs text-gray-600 font-medium">Profession : {{ act.parents_metadata.father_profession }}</div>
                                     </div>
@@ -340,7 +421,12 @@ const goBack = () => {
                                     <div class="p-5 bg-pink-50/20 rounded-2xl border border-pink-100/40 space-y-2">
                                         <h4 class="text-[10px] font-black text-pink-900 uppercase tracking-widest">Mère</h4>
                                         <div class="text-base font-black text-gray-900">{{ act.mother_name || 'Non renseignée' }}</div>
-                                        <div v-if="act.parents_metadata?.mother_date_of_birth" class="text-xs text-gray-600 font-medium">Née le {{ formatDate(act.parents_metadata.mother_date_of_birth) }}<span v-if="act.parents_metadata.mother_place_of_birth"> — {{ act.parents_metadata.mother_place_of_birth }}</span></div>
+                                        <div v-if="act.parents_metadata?.mother_date_of_birth || act.parents_metadata?.mother_birth_year || act.parents_metadata?.mother_age" class="text-xs text-gray-600 font-medium">
+                                            <template v-if="act.parents_metadata?.mother_birth_type === 'vers'">Née vers {{ act.parents_metadata.mother_birth_year || (act.parents_metadata.mother_date_of_birth ? new Date(act.parents_metadata.mother_date_of_birth).getFullYear() : '') }}</template>
+                                            <template v-else-if="act.parents_metadata?.mother_birth_type === 'age'">Âgée de {{ act.parents_metadata.mother_age }} ans</template>
+                                            <template v-else>Née le {{ formatDate(act.parents_metadata.mother_date_of_birth) }}</template>
+                                            <span v-if="act.parents_metadata?.mother_place_of_birth"> — {{ act.parents_metadata.mother_place_of_birth }}</span>
+                                        </div>
                                         <div v-if="act.parents_metadata?.mother_domicile" class="text-xs text-gray-600 font-medium">Domicile : {{ act.parents_metadata.mother_domicile }}</div>
                                         <div v-if="act.parents_metadata?.mother_profession" class="text-xs text-gray-600 font-medium">Profession : {{ act.parents_metadata.mother_profession }}</div>
                                     </div>
@@ -495,8 +581,11 @@ const goBack = () => {
                                             </div>
                                             <div class="grid grid-cols-2 gap-4">
                                                 <div>
-                                                    <span class="text-gray-400 font-bold block uppercase text-[9px]">Né(e) le</span>
-                                                    <span class="text-gray-800 font-bold">{{ formatDate(act.date_of_birth) }}</span>
+                                                    <span class="text-gray-400 font-bold block uppercase text-[9px]">Naissance</span>
+                                                    <span v-if="act.birth_date_type === 'vers'" class="text-gray-800 font-bold">Né(e) vers {{ act.birth_year || (act.date_of_birth ? new Date(act.date_of_birth).getFullYear() : '') }}</span>
+                                                    <span v-else-if="act.birth_date_type === 'annee'" class="text-gray-800 font-bold">Au cours de {{ act.birth_year || (act.date_of_birth ? new Date(act.date_of_birth).getFullYear() : '') }}</span>
+                                                    <span v-else-if="act.birth_date_type === 'age'" class="text-gray-800 font-bold">Présumé(e) âgé(e) de {{ act.presumed_age }} ans</span>
+                                                    <span v-else class="text-gray-800 font-bold">Né(e) le {{ formatDate(act.date_of_birth) }}</span>
                                                 </div>
                                                 <div>
                                                     <span class="text-gray-400 font-bold block uppercase text-[9px]">Sexe</span>
@@ -583,13 +672,37 @@ const goBack = () => {
                             </button>
                         </template>
 
-                        <!-- Créer un autre acte -->
-                        <div v-if="canCreateAct" class="pt-3 border-t border-gray-100">
-                            <Link :href="`/acts/${type}/create`" 
-                                  class="w-full py-3.5 px-4 bg-gray-50 hover:bg-[#1E690F] text-gray-700 hover:text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 group cursor-pointer shadow-xs active:scale-95">
-                                <PlusIcon class="w-4 h-4 stroke-[2.5] text-[#1E690F] group-hover:text-white transition-colors" />
-                                <span>Créer un autre acte</span>
-                            </Link>
+                        <!-- Actions de création / saisie suivante -->
+                        <div v-if="canCreateAct" class="pt-3 border-t border-gray-100 space-y-2">
+                            <template v-if="isOldRegistryAct">
+                                <Link v-if="isCurrentRegistryOpen" :href="nextActInRegistryUrl" 
+                                      class="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 group cursor-pointer shadow-md shadow-amber-900/10 active:scale-95 text-center">
+                                    <BookOpenIcon class="w-4 h-4 stroke-[2.5]" />
+                                    <span>Saisir l'acte suivant (Vol. {{ act.registry?.number }} - {{ act.registry?.year }})</span>
+                                </Link>
+                                <Link :href="`/acts/${type}/create?old_registry=1`" 
+                                      class="w-full py-2.5 px-4 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-2xl transition-all font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer border border-amber-200 active:scale-95 text-center">
+                                    <PlusCircleIcon class="w-3.5 h-3.5" />
+                                    <span>Saisir un autre ancien acte</span>
+                                </Link>
+                                <Link :href="`/acts/${type}/create`" 
+                                      class="w-full py-2.5 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-2xl transition-all font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer border border-gray-200 active:scale-95 text-center">
+                                    <PlusIcon class="w-3.5 h-3.5 stroke-[2.5]" />
+                                    <span>Nouvelle déclaration ordinaire</span>
+                                </Link>
+                            </template>
+                            <template v-else>
+                                <Link :href="`/acts/${type}/create`" 
+                                      class="w-full py-3.5 px-4 bg-gray-50 hover:bg-[#1E690F] text-gray-700 hover:text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 group cursor-pointer shadow-xs active:scale-95">
+                                    <PlusIcon class="w-4 h-4 stroke-[2.5] text-[#1E690F] group-hover:text-white transition-colors" />
+                                    <span>Créer un autre acte</span>
+                                </Link>
+                                <Link :href="`/acts/${type}/create?old_registry=1`" 
+                                      class="w-full py-2.5 px-4 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-2xl transition-all font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer border border-amber-200 active:scale-95">
+                                    <BookOpenIcon class="w-3.5 h-3.5" />
+                                    <span>Saisir un ancien acte</span>
+                                </Link>
+                            </template>
                         </div>
                     </div>
 
@@ -643,13 +756,37 @@ const goBack = () => {
                         </div>
                     </div>
 
-                    <!-- Pour les actes signés : Action Créer un autre acte -->
-                    <div v-if="act.status === 'signe' && canCreateAct" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-5">
-                        <Link :href="`/acts/${type}/create`" 
-                              class="w-full py-3.5 px-4 bg-[#1E690F] hover:bg-[#16500B] text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-green-900/10 active:scale-95 cursor-pointer">
-                            <PlusIcon class="w-4 h-4 stroke-[3]" />
-                            <span>Créer un autre acte</span>
-                        </Link>
+                    <!-- Pour les actes signés : Actions de création / saisie suivante -->
+                    <div v-if="act.status === 'signe' && canCreateAct" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-5 space-y-2">
+                        <template v-if="isOldRegistryAct">
+                            <Link v-if="isCurrentRegistryOpen" :href="nextActInRegistryUrl" 
+                                  class="w-full py-3 px-4 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-amber-900/10 active:scale-95 cursor-pointer text-center">
+                                <BookOpenIcon class="w-4 h-4 stroke-[2.5]" />
+                                <span>Saisir l'acte suivant (Vol. {{ act.registry?.number }} - {{ act.registry?.year }})</span>
+                            </Link>
+                            <Link :href="`/acts/${type}/create?old_registry=1`" 
+                                  class="w-full py-2.5 px-4 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-2xl transition-all font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer border border-amber-200 active:scale-95 text-center">
+                                <PlusCircleIcon class="w-3.5 h-3.5" />
+                                <span>Saisir un autre ancien acte</span>
+                            </Link>
+                            <Link :href="`/acts/${type}/create`" 
+                                  class="w-full py-2.5 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-2xl transition-all font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer border border-gray-200 active:scale-95 text-center">
+                                <PlusIcon class="w-3.5 h-3.5 stroke-[2.5]" />
+                                <span>Nouvelle déclaration ordinaire</span>
+                            </Link>
+                        </template>
+                        <template v-else>
+                            <Link :href="`/acts/${type}/create`" 
+                                  class="w-full py-3.5 px-4 bg-[#1E690F] hover:bg-[#16500B] text-white rounded-2xl transition-all font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-green-900/10 active:scale-95 cursor-pointer">
+                                <PlusIcon class="w-4 h-4 stroke-[3]" />
+                                <span>Créer un autre acte</span>
+                            </Link>
+                            <Link :href="`/acts/${type}/create?old_registry=1`" 
+                                  class="w-full py-2.5 px-4 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-2xl transition-all font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer border border-amber-200 active:scale-95">
+                                <BookOpenIcon class="w-3.5 h-3.5" />
+                                <span>Saisir un ancien acte</span>
+                            </Link>
+                        </template>
                     </div>
                 </div>
             </div>

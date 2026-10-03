@@ -411,14 +411,23 @@ const getActsCount = (reg) => {
                     </div>
 
                     <div>
-                        <!-- Lien vers la consultation des actes de ce registre -->
-                        <div v-if="['naissance', 'mariage', 'deces'].includes(registry.type)" class="mb-3">
+                        <!-- Lien vers la consultation et saisie des actes de ce registre -->
+                        <div v-if="['naissance', 'mariage', 'deces'].includes(registry.type)" class="mb-3 flex items-center gap-2">
                             <Link
                                 :href="`/acts/${registry.type}/list?registry_id=${registry.id}&sort_by=number&sort_order=asc`"
-                                class="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-100"
+                                class="flex-1 py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-100"
                             >
                                 <FolderOpenIcon class="h-4 w-4" />
                                 <span>Vérifier les actes</span>
+                            </Link>
+                            <Link
+                                v-if="registry.status === 'open'"
+                                :href="`/acts/${registry.type}/create?old_registry=1&registry_id=${registry.id}`"
+                                class="py-2 px-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-md shadow-amber-100"
+                                title="Saisir un acte dans ce registre"
+                            >
+                                <PlusIcon class="h-4 w-4 stroke-[3]" />
+                                <span>Saisir</span>
                             </Link>
                         </div>
 

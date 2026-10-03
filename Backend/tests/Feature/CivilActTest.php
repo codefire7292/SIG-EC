@@ -565,5 +565,233 @@ class CivilActTest extends TestCase
         $this->assertCount(1, $acts);
         $this->assertEquals('UniqueSearchFirst', $acts[0]['first_name']);
     }
+
+    public function test_can_create_birth_act_with_approximate_birth_date_vers(): void
+    {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole(\App\Enums\UserRole::ADMIN->value);
+        $this->actingAs($user);
+
+        $response = $this->post(route('acts.naissance.store'), [
+            'reference_number' => '2024/NAI/VERS1',
+            'registry_id' => $this->registry->id,
+            'first_name' => 'Ablaye',
+            'last_name' => 'Diallo',
+            'birth_date_type' => 'vers',
+            'birth_year' => 1954,
+            'place_of_birth' => 'Enampore',
+            'act_registration_date' => '2024-01-02',
+            'gender' => 'M',
+            'father_name' => 'Mamadou Diallo',
+            'mother_name' => 'Aissatou Diallo',
+            'parents_metadata' => [
+                'father_birth_type' => 'vers',
+                'father_birth_year' => 1920,
+                'father_profession' => 'Agriculteur',
+                'father_place_of_birth' => 'Enampore',
+                'father_domicile' => 'Enampore',
+                'mother_birth_type' => 'age',
+                'mother_age' => 40,
+                'mother_profession' => 'Ménagère',
+                'mother_place_of_birth' => 'Enampore',
+                'mother_domicile' => 'Enampore',
+            ],
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect();
+
+        $act = BirthAct::where('first_name', 'Ablaye')->first();
+        $this->assertNotNull($act);
+        $this->assertEquals('vers', $act->birth_date_type);
+        $this->assertEquals(1954, $act->birth_year);
+        $this->assertEquals('1954-01-01', $act->date_of_birth->format('Y-m-d'));
+
+        // Check parents metadata
+        $this->assertEquals('vers', $act->parents_metadata['father_birth_type']);
+        $this->assertEquals(1920, $act->parents_metadata['father_birth_year']);
+        $this->assertEquals('1920-01-01', $act->parents_metadata['father_date_of_birth']);
+        $this->assertEquals('age', $act->parents_metadata['mother_birth_type']);
+        $this->assertEquals(40, $act->parents_metadata['mother_age']);
+
+        // Check PDF rendering with DocumentGenerationService
+        $service = app(\App\Services\DocumentGenerationService::class);
+        $pdfContent = $service->generateActExtractPdf($act, 'naissance');
+        $this->assertNotEmpty($pdfContent);
+
+        // Check Blade rendering directly contains the expected phrase
+        $html = view('pdf.act', [
+            'act' => $act,
+            'type' => 'naissance',
+            'title' => 'Extrait',
+            'center' => null,
+            'qrCode' => '',
+            'logo' => '',
+            'timestamp' => now()->format('d/m/Y H:i:s'),
+            'volet' => null,
+        ])->render();
+
+        $this->assertStringContainsString("vers l'an", $html);
+        $this->assertStringContainsString("1954", $html);
+        $this->assertStringNotContainsString("premier du mois de", $html);
+    }
+
+    public function test_can_create_birth_act_with_presumed_age(): void
+    {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole(\App\Enums\UserRole::ADMIN->value);
+        $this->actingAs($user);
+
+        $response = $this->post(route('acts.naissance.store'), [
+            'reference_number' => '2024/NAI/AGE1',
+            'registry_id' => $this->registry->id,
+            'first_name' => 'Fatou',
+            'last_name' => 'Sow',
+            'birth_date_type' => 'age',
+            'presumed_age' => 50,
+            'place_of_birth' => 'Ziguinchor',
+            'act_registration_date' => '2024-06-15',
+            'gender' => 'F',
+            'father_name' => 'Amadou Sow',
+            'mother_name' => 'Mariama Sow',
+            'parents_metadata' => [
+                'father_profession' => 'Commerçant',
+                'father_date_of_birth' => '1950-01-01',
+                'father_place_of_birth' => 'Ziguinchor',
+                'father_domicile' => 'Ziguinchor',
+                'mother_profession' => 'Commerçante',
+                'mother_date_of_birth' => '1955-01-01',
+                'mother_place_of_birth' => 'Ziguinchor',
+                'mother_domicile' => 'Ziguinchor',
+            ],
+        ]);
+
+        $response->assertRedirect();
+
+        $act = BirthAct::where('first_name', 'Fatou')->first();
+        $this->assertNotNull($act);
+        $this->assertEquals('age', $act->birth_date_type);
+        $this->assertEquals(50, $act->presumed_age);
+        $this->assertEquals(1974, $act->birth_year);
+        $this->assertEquals('1974-01-01', $act->date_of_birth->format('Y-m-d'));
+    }
+
+    public function test_old_registry_excludes_taken_reference_numbers_from_available_list(): void
+    {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole(\App\Enums\UserRole::OFFICIER->value);
+        $this->actingAs($user);
+
+        // Registry 2016 Vol 1 (N-2016-C1)
+        $registry = Registry::create([
+            'civil_registration_center_id' => 1,
+            'name' => 'Registre 2016',
+            'type' => 'naissance',
+            'year' => 2016,
+            'number' => 1,
+            'reference_prefix' => 'N-2016-C1',
+            'status' => 'open'
+        ]);
+
+        // Insert Act #1 with reference N-2016-C1-0001
+        BirthAct::forceCreate([
+            'registry_id' => $registry->id,
+            'reference_number' => 'N-2016-C1-0001',
+            'first_name' => 'Premier',
+            'last_name' => 'Acte',
+            'date_of_birth' => '2016-03-01',
+            'place_of_birth' => 'Enampore',
+            'gender' => 'M',
+            'status' => 'brouillon'
+        ]);
+
+        // Insert Act #5 with reference N-2016-C1-0005
+        BirthAct::forceCreate([
+            'registry_id' => $registry->id,
+            'reference_number' => 'N-2016-C1-0005',
+            'first_name' => 'Cinquieme',
+            'last_name' => 'Acte',
+            'date_of_birth' => '2016-04-01',
+            'place_of_birth' => 'Enampore',
+            'gender' => 'F',
+            'status' => 'brouillon'
+        ]);
+
+        // 1. Visit create page and verify Inertia props
+        $createResponse = $this->get(route('acts.naissance.create', ['old_registry' => 1]));
+        $createResponse->assertStatus(200);
+
+        $registriesProp = $createResponse->inertiaProps('registries');
+        $this->assertNotEmpty($registriesProp);
+        
+        $regItem = collect($registriesProp)->firstWhere('id', $registry->id);
+        $this->assertNotNull($regItem);
+        $this->assertContains('N-2016-C1-0001', $regItem['existing_reference_numbers']);
+        $this->assertContains('N-2016-C1-0005', $regItem['existing_reference_numbers']);
+        $this->assertContains(1, $regItem['used_act_numbers']);
+        $this->assertContains(5, $regItem['used_act_numbers']);
+        $this->assertNotContains(2, $regItem['used_act_numbers']);
+
+        // 2. Attempting to create an act with N-2016-C1-0001 in the same registry must fail validation
+        $dupResponse = $this->post(route('acts.naissance.store'), [
+            'is_old_registry' => true,
+            'registry_id' => $registry->id,
+            'reference_number' => 'N-2016-C1-0001',
+            'first_name' => 'Doublon',
+            'last_name' => 'Test',
+            'date_of_birth' => '2016-01-01',
+            'place_of_birth' => 'Enampore',
+            'act_registration_date' => '2016-01-02',
+            'gender' => 'M',
+            'father_name' => 'Pere Test',
+            'mother_name' => 'Mere Test',
+            'parents_metadata' => [
+                'father_profession' => 'Agriculteur',
+                'father_date_of_birth' => '1980-01-01',
+                'father_place_of_birth' => 'Enampore',
+                'father_domicile' => 'Enampore',
+                'mother_profession' => 'Ménagère',
+                'mother_date_of_birth' => '1985-01-01',
+                'mother_place_of_birth' => 'Enampore',
+                'mother_domicile' => 'Enampore',
+            ],
+        ]);
+
+        $dupResponse->assertSessionHasErrors(['reference_number']);
+
+        // 3. Creating an act with an available reference number (N-2016-C1-0002) must succeed
+        $successResponse = $this->post(route('acts.naissance.store'), [
+            'is_old_registry' => true,
+            'registry_id' => $registry->id,
+            'reference_number' => 'N-2016-C1-0002',
+            'first_name' => 'Deuxieme',
+            'last_name' => 'Valide',
+            'date_of_birth' => '2016-01-01',
+            'place_of_birth' => 'Enampore',
+            'act_registration_date' => '2016-01-02',
+            'gender' => 'M',
+            'father_name' => 'Pere Test',
+            'mother_name' => 'Mere Test',
+            'parents_metadata' => [
+                'father_profession' => 'Agriculteur',
+                'father_date_of_birth' => '1980-01-01',
+                'father_place_of_birth' => 'Enampore',
+                'father_domicile' => 'Enampore',
+                'mother_profession' => 'Ménagère',
+                'mother_date_of_birth' => '1985-01-01',
+                'mother_place_of_birth' => 'Enampore',
+                'mother_domicile' => 'Enampore',
+            ],
+        ]);
+
+        $successResponse->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('birth_acts', [
+            'reference_number' => 'N-2016-C1-0002',
+            'first_name' => 'Deuxieme'
+        ]);
+    }
 }
 

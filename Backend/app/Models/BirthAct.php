@@ -22,6 +22,9 @@ class BirthAct extends Model
         'first_name',
         'last_name',
         'date_of_birth',
+        'birth_date_type',
+        'birth_year',
+        'presumed_age',
         'time_of_birth',
         'place_of_birth',
         'health_facility',
@@ -48,6 +51,8 @@ class BirthAct extends Model
 
     protected $casts = [
         'date_of_birth' => 'date',
+        'birth_year' => 'integer',
+        'presumed_age' => 'integer',
         'is_judgment' => 'boolean',
         'judgment_date' => 'date',
         'act_registration_date' => 'date',

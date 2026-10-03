@@ -23,6 +23,9 @@ class DeathAct extends Model
         'deceased_last_name',
         'gender',
         'date_of_birth',
+        'birth_date_type',
+        'birth_year',
+        'presumed_age',
         'date_of_death',
         'time_of_death',
         'place_of_death',
@@ -47,6 +50,8 @@ class DeathAct extends Model
     protected $casts = [
         'date_of_death' => 'date',
         'date_of_birth' => 'date',
+        'birth_year' => 'integer',
+        'presumed_age' => 'integer',
         'act_registration_date' => 'date',
         'judgment_date' => 'date',
         'is_judgment' => 'boolean',

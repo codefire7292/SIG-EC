@@ -43,11 +43,13 @@
     $refNum = isset($refMatches[1]) ? intval($refMatches[1]) : '';
 
     if ($type === 'naissance') {
-        $refYear = $act->date_of_birth ? $act->date_of_birth->format('Y') : ($act->registry?->year ?? now()->year);
-        $dob      = $act->date_of_birth;
-        $yearFr   = $dob ? ucfirst(toFrWords((int)$dob->format('Y'))) : '';
-        $dayFr    = $dob ? ($dob->day === 1 ? 'premier' : toFrWords($dob->day)) : '';
-        $monthWord = $dob ? $months[$dob->month - 1] : '';
+        $dob           = $act->date_of_birth;
+        $birthDateType = $act->birth_date_type ?? 'exact';
+        $birthYearVal  = $act->birth_year ?? ($dob ? (int)$dob->format('Y') : ($act->registry?->year ?? now()->year));
+        $refYear       = $birthYearVal;
+        $yearFr        = $birthYearVal ? ucfirst(toFrWords((int)$birthYearVal)) : '';
+        $dayFr         = $dob ? ($dob->day === 1 ? 'premier' : toFrWords($dob->day)) : '';
+        $monthWord     = $dob ? $months[$dob->month - 1] : '';
         // Normalize time to avoid format mismatch
         $rawTime = $act->time_of_birth;
         if ($rawTime) {
@@ -227,11 +229,25 @@
 
         @if($type === 'naissance')
 
+        @if($birthDateType === 'vers')
+        <p class="narrative">
+            Est né(e) <strong>vers l'an {{ strtoupper($yearFr) }}</strong> ({{ $birthYearVal }})
+        </p>
+        @elseif($birthDateType === 'annee')
+        <p class="narrative">
+            Est né(e) <strong>au cours de l'année {{ strtoupper($yearFr) }}</strong> ({{ $birthYearVal }})
+        </p>
+        @elseif($birthDateType === 'age')
+        <p class="narrative">
+            Présumé(e) âgé(e) de <strong>{{ $act->presumed_age ?? '...' }} ans</strong> en l'an <strong>{{ strtoupper($yearFr) }}</strong> (né(e) vers {{ $birthYearVal }})
+        </p>
+        @else
         {{-- Ligne narrative : L'an ... le ... du mois de ... --}}
         <p class="narrative">
             L'an <strong>{{ strtoupper($yearFr) }}</strong>, le <strong>{{ $dayFr }}</strong> du mois de <strong>{{ strtoupper($monthWord) }}</strong>
             @if($dob)({{ $dob->format('d/m/Y') }})@endif
         </p>
+        @endif
 
         <table class="field-row" style="{{ $fieldMargin }}">
             <tr>
@@ -352,7 +368,15 @@
         </table>
         <p class="narrative">de sexe : {{ $act->gender === 'M' ? 'Masculin' : ($act->gender === 'F' ? 'Féminin' : 'N/A') }}</p>
         @if($act->date_of_birth)
-        <p class="narrative">né(e) le : {{ $act->date_of_birth->format('d/m/Y') }}</p>
+            @if(($act->birth_date_type ?? 'exact') === 'vers')
+                <p class="narrative">né(e) vers : <strong>{{ $act->birth_year ?? $act->date_of_birth->format('Y') }}</strong></p>
+            @elseif(($act->birth_date_type ?? 'exact') === 'annee')
+                <p class="narrative">né(e) au cours de l'année : <strong>{{ $act->birth_year ?? $act->date_of_birth->format('Y') }}</strong></p>
+            @elseif(($act->birth_date_type ?? 'exact') === 'age')
+                <p class="narrative">présumé(e) âgé(e) de : <strong>{{ $act->presumed_age ?? '...' }} ans</strong> (né(e) vers {{ $act->birth_year ?? $act->date_of_birth->format('Y') }})</p>
+            @else
+                <p class="narrative">né(e) le : {{ $act->date_of_birth->format('d/m/Y') }}</p>
+            @endif
         @endif
 
         @endif
