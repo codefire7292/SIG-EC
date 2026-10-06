@@ -133,9 +133,14 @@ const spousesMeta = computed(() => props.act?.spouses_metadata ?? null)
                                 </div>
                                 <div class="p-5 bg-gray-50 rounded-2xl border border-gray-100">
                                     <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Date de naissance</p>
-                                    <p class="font-bold text-gray-800">{{ formatDate(act.date_of_birth) }}</p>
+                                    <p class="font-bold text-gray-800">
+                                        <template v-if="act.birth_date_type === 'vers'">Né(e) vers {{ act.birth_year || (act.date_of_birth ? new Date(act.date_of_birth).getFullYear() : '') }}</template>
+                                        <template v-else-if="act.birth_date_type === 'annee'">Au cours de {{ act.birth_year || (act.date_of_birth ? new Date(act.date_of_birth).getFullYear() : '') }}</template>
+                                        <template v-else-if="act.birth_date_type === 'age'">Présumé(e) âgé(e) de {{ act.presumed_age }} ans</template>
+                                        <template v-else>{{ formatDate(act.date_of_birth) }}</template>
+                                    </p>
                                 </div>
-                                <div v-if="act.time_of_birth" class="p-5 bg-gray-50 rounded-2xl border border-gray-100">
+                                <div v-if="act.time_of_birth && (!act.birth_date_type || act.birth_date_type === 'exact')" class="p-5 bg-gray-50 rounded-2xl border border-gray-100">
                                     <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Heure de naissance</p>
                                     <p class="font-bold text-gray-800">{{ formatTime(act.time_of_birth) }}</p>
                                 </div>
@@ -238,9 +243,14 @@ const spousesMeta = computed(() => props.act?.spouses_metadata ?? null)
                                     <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Sexe</p>
                                     <p class="font-bold text-gray-800">{{ formatGender(act.gender) }}</p>
                                 </div>
-                                <div v-if="act.date_of_birth" class="p-5 bg-gray-50 rounded-2xl border border-gray-100">
+                                <div v-if="act.date_of_birth || act.birth_year || act.presumed_age" class="p-5 bg-gray-50 rounded-2xl border border-gray-100">
                                     <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Date de naissance</p>
-                                    <p class="font-bold text-gray-800">{{ formatDate(act.date_of_birth) }}</p>
+                                    <p class="font-bold text-gray-800">
+                                        <template v-if="act.birth_date_type === 'vers'">Né(e) vers {{ act.birth_year || (act.date_of_birth ? new Date(act.date_of_birth).getFullYear() : '') }}</template>
+                                        <template v-else-if="act.birth_date_type === 'annee'">Au cours de {{ act.birth_year || (act.date_of_birth ? new Date(act.date_of_birth).getFullYear() : '') }}</template>
+                                        <template v-else-if="act.birth_date_type === 'age'">Présumé(e) âgé(e) de {{ act.presumed_age }} ans</template>
+                                        <template v-else>{{ formatDate(act.date_of_birth) }}</template>
+                                    </p>
                                 </div>
                                 <div class="p-5 bg-slate-100 rounded-2xl border border-slate-200">
                                     <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Date de décès</p>
