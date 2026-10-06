@@ -793,5 +793,52 @@ class CivilActTest extends TestCase
             'first_name' => 'Deuxieme'
         ]);
     }
+
+    public function test_validation_messages_for_non_file_max_rules(): void
+    {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole(\App\Enums\UserRole::ADMIN->value);
+        $this->actingAs($user);
+
+        // Test birth_year exceeding max (future year)
+        $response = $this->post(route('acts.naissance.store'), [
+            'birth_date_type' => 'vers',
+            'birth_year' => (int) date('Y') + 10, // Exceeds max
+            'is_old_registry' => true,
+            'reference_number' => 'TEST-001',
+            'first_name' => 'Test',
+            'last_name' => 'Child',
+            'place_of_birth' => 'Dakar',
+            'act_registration_date' => '2024-01-01',
+            'gender' => 'M',
+            'parents_metadata' => [],
+        ]);
+
+        $response->assertSessionHasErrors(['birth_year']);
+        $errors = session('errors')->get('birth_year');
+        $this->assertStringNotContainsString('500 Ko', $errors[0]);
+        $this->assertStringContainsString('année de naissance', mb_strtolower($errors[0]));
+
+        // Test presumed_age exceeding 150
+        $responseAge = $this->post(route('acts.naissance.store'), [
+            'birth_date_type' => 'age',
+            'presumed_age' => 200,
+            'is_old_registry' => true,
+            'reference_number' => 'TEST-002',
+            'first_name' => 'Test',
+            'last_name' => 'Child',
+            'place_of_birth' => 'Dakar',
+            'act_registration_date' => '2024-01-01',
+            'gender' => 'M',
+            'parents_metadata' => [],
+        ]);
+
+        $responseAge->assertSessionHasErrors(['presumed_age']);
+        $ageErrors = session('errors')->get('presumed_age');
+        $this->assertStringNotContainsString('500 Ko', $ageErrors[0]);
+        $this->assertStringContainsString('âge présumé', mb_strtolower($ageErrors[0]));
+    }
 }
+
 

@@ -451,11 +451,7 @@ class CivilActController extends Controller
             $rules['reference_number'] = 'required|string|max:255';
         }
 
-        $validated = $request->validate($rules, [
-            'file' => 'Le fichier doit être valide.',
-            'mimes' => 'Le document doit être au format PDF.',
-            'max' => 'La taille du fichier ne doit pas dépasser 500 Ko.',
-        ]);
+        $validated = $request->validate($rules, $this->getValidationMessages());
 
         $centerId = 1;
         if (!\App\Models\CivilRegistrationCenter::where('id', $centerId)->exists()) {
@@ -677,11 +673,7 @@ class CivilActController extends Controller
         $act = $model->with('registry')->findOrFail($id);
 
         $rules = $this->getValidationRules($type, $id);
-        $validated = $request->validate($rules, [
-            'file' => 'Le fichier doit être valide.',
-            'mimes' => 'Le document doit être au format PDF.',
-            'max' => 'La taille du fichier ne doit pas dépasser 500 Ko.',
-        ]);
+        $validated = $request->validate($rules, $this->getValidationMessages());
 
         // TECHNICAL RULE: Filter out dot-notation keys
         $data = array_filter($validated, fn($key) => !str_contains($key, '.'), ARRAY_FILTER_USE_KEY);
@@ -847,6 +839,22 @@ class CivilActController extends Controller
 
         return redirect()->route("acts.{$type}.show", $act->id)
             ->with('success', 'Acte mis à jour avec succès.');
+    }
+
+    protected function getValidationMessages(): array
+    {
+        return [
+            'file' => 'Le fichier doit être valide.',
+            'mimes' => 'Le document doit être au format PDF.',
+            'max.file' => 'La taille du fichier ne doit pas dépasser :max Ko.',
+            'max.string' => 'Le texte ne doit pas dépasser :max caractères.',
+            'max.numeric' => 'La valeur ne doit pas être supérieure à :max.',
+            'birth_year.max' => "L'année de naissance ne peut pas être supérieure à :max.",
+            'birth_year.min' => "L'année de naissance doit être supérieure ou égale à :min.",
+            'presumed_age.max' => "L'âge présumé ne peut pas dépasser :max ans.",
+            'presumed_age.min' => "L'âge présumé doit être supérieur ou égal à :min.",
+            'reference_number.max' => 'Le numéro de référence ne doit pas dépasser :max caractères.',
+        ];
     }
 
     protected function getValidationRules(string $type, $id = null): array
