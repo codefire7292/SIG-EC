@@ -1259,153 +1259,173 @@ const submit = () => {
                     </div>
                     <div v-if="!form.parents_metadata.is_foundling" class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <!-- Père -->
-                        <div class="p-6 bg-blue-50/40 rounded-2xl border border-blue-100 space-y-4">
-                            <div class="flex items-center justify-between">
-                                <h4 class="text-[10px] font-black text-blue-900 uppercase tracking-widest flex items-center gap-2">
-                                    <div class="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
+                        <div class="p-6 bg-blue-50/50 rounded-3xl border border-blue-200/70 shadow-2xs space-y-4">
+                            <div class="flex items-center justify-between pb-3 border-b border-blue-100">
+                                <h4 class="text-xs font-black text-blue-900 uppercase tracking-widest flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-blue-600 rounded-full"></span>
                                     Père
                                 </h4>
-                                <label class="flex items-center gap-2 cursor-pointer select-none">
-                                    <input v-model="form.parents_metadata.is_father_unrecognized" type="checkbox" id="is_father_unrecognized" class="h-3.5 w-3.5 text-amber-600 focus:ring-amber-500 border-gray-300 rounded" />
-                                    <span class="text-[9px] font-black text-amber-700 uppercase tracking-widest">Père non reconnu</span>
+                                <label class="inline-flex items-center gap-2 cursor-pointer select-none px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200/80 hover:bg-amber-100/70 transition-colors">
+                                    <input v-model="form.parents_metadata.is_father_unrecognized" type="checkbox" id="is_father_unrecognized" class="h-3.5 w-3.5 text-amber-600 focus:ring-amber-500 border-amber-300 rounded cursor-pointer" />
+                                    <span class="text-[9px] font-black text-amber-800 uppercase tracking-wider">Père non reconnu</span>
                                 </label>
                             </div>
-                            <div v-if="form.parents_metadata.is_father_unrecognized" class="flex items-start gap-2 p-3 bg-amber-50 rounded-xl border border-amber-200">
-                                <svg class="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                <p class="text-[10px] text-amber-700 font-medium leading-relaxed">Le père ne reconnaît pas l'enfant. Conformément à l'art. 30, aucune mention ne sera faite à son sujet sur le registre.</p>
+                            <div v-if="form.parents_metadata.is_father_unrecognized" class="flex items-start gap-2.5 p-3.5 bg-amber-50 rounded-2xl border border-amber-200">
+                                <svg class="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <p class="text-[11px] text-amber-800 font-medium leading-relaxed">Le père ne reconnaît pas l'enfant. Conformément à l'art. 30 du Code de la Famille, aucune mention ne sera faite à son sujet sur le registre.</p>
                             </div>
                             <template v-if="!form.parents_metadata.is_father_unrecognized">
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms &amp; Nom du Père <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
-                                <input v-model="form.father_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
+                                <input v-model="form.father_name" type="text" placeholder="Prénoms et Nom du père" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-gray-800 shadow-2xs" :required="!form.is_old_registry && !is_edit" />
                             </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
-                                <input v-model="form.parents_metadata.father_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1.5 pl-1">
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                                            Date de naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span>
+
+                            <!-- Bloc Dédié Date de Naissance du Père -->
+                            <div class="p-4 bg-white rounded-2xl border border-blue-200/90 shadow-2xs space-y-3">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-gray-100">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-blue-900 uppercase tracking-widest">
+                                            Date de Naissance du Père <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span>
                                         </label>
-                                        <div class="inline-flex p-0.5 bg-gray-100 rounded-lg border border-gray-200 text-[10px] font-bold gap-0.5 self-start sm:self-auto shadow-2xs">
-                                            <button type="button" 
-                                                @click="setFatherBirthType('exact')"
-                                                :class="form.parents_metadata.father_birth_type === 'exact' ? 'bg-white text-[#1E690F] shadow-xs font-black' : 'text-gray-500 hover:text-gray-700'"
-                                                class="px-2 py-0.5 rounded transition-all cursor-pointer">Exacte</button>
-                                            <button type="button" 
-                                                @click="setFatherBirthType('vers')"
-                                                :class="form.parents_metadata.father_birth_type === 'vers' ? 'bg-[#1E690F] text-white shadow-xs font-black' : 'text-gray-500 hover:text-gray-700'"
-                                                class="px-2 py-0.5 rounded transition-all cursor-pointer">Né vers</button>
-                                            <button type="button" 
-                                                @click="setFatherBirthType('age')"
-                                                :class="form.parents_metadata.father_birth_type === 'age' ? 'bg-[#1E690F] text-white shadow-xs font-black' : 'text-gray-500 hover:text-gray-700'"
-                                                class="px-2 py-0.5 rounded transition-all cursor-pointer">Âge</button>
-                                        </div>
+                                        <span class="text-[10px] text-gray-400 font-medium">Précision exacte ou estimation</span>
                                     </div>
-                                    <div v-if="form.parents_metadata.father_birth_type === 'exact'">
-                                        <input v-model="form.parents_metadata.father_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
+                                    <div class="inline-flex p-0.5 bg-gray-100 rounded-xl border border-gray-200 text-[10px] font-bold gap-0.5 self-start sm:self-auto">
+                                        <button type="button" 
+                                            @click="setFatherBirthType('exact')"
+                                            :class="form.parents_metadata.father_birth_type === 'exact' ? 'bg-[#1E690F] text-white shadow-xs font-black' : 'text-gray-600 hover:text-gray-900'"
+                                            class="px-2.5 py-1 rounded-lg transition-all cursor-pointer">Date exacte</button>
+                                        <button type="button" 
+                                            @click="setFatherBirthType('vers')"
+                                            :class="form.parents_metadata.father_birth_type === 'vers' ? 'bg-[#1E690F] text-white shadow-xs font-black' : 'text-gray-600 hover:text-gray-900'"
+                                            class="px-2.5 py-1 rounded-lg transition-all cursor-pointer">Né vers</button>
+                                        <button type="button" 
+                                            @click="setFatherBirthType('age')"
+                                            :class="form.parents_metadata.father_birth_type === 'age' ? 'bg-[#1E690F] text-white shadow-xs font-black' : 'text-gray-600 hover:text-gray-900'"
+                                            class="px-2.5 py-1 rounded-lg transition-all cursor-pointer">Âge présumé</button>
                                     </div>
-                                    <div v-else-if="form.parents_metadata.father_birth_type === 'vers'" class="space-y-1.5">
-                                        <div class="relative">
-                                            <input v-model.number="form.parents_metadata.father_birth_year" @input="onFatherYearInput" type="number" min="1850" :max="new Date().getFullYear()" placeholder="Année (ex : 1948)" class="w-full px-4 py-3 rounded-xl border border-amber-300 bg-amber-50/30 focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
-                                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded">Année</span>
-                                        </div>
-                                        <div class="text-[10px] font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 flex items-center gap-1.5">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                            Mention : <strong>Né vers {{ form.parents_metadata.father_birth_year || '...' }}</strong>
-                                        </div>
+                                </div>
+                                <div v-if="form.parents_metadata.father_birth_type === 'exact'">
+                                    <input v-model="form.parents_metadata.father_date_of_birth" type="date" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-gray-800" :required="!form.is_old_registry && !is_edit" />
+                                </div>
+                                <div v-else-if="form.parents_metadata.father_birth_type === 'vers'" class="space-y-2">
+                                    <div class="relative">
+                                        <input v-model.number="form.parents_metadata.father_birth_year" @input="onFatherYearInput" type="number" min="1850" :max="new Date().getFullYear()" placeholder="Année de naissance (ex : 1948)" class="w-full px-4 py-2.5 rounded-xl border border-amber-300 bg-amber-50/30 focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
+                                        <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded">Année</span>
                                     </div>
-                                    <div v-else-if="form.parents_metadata.father_birth_type === 'age'" class="space-y-1.5">
-                                        <div class="relative">
-                                            <input v-model.number="form.parents_metadata.father_age" @input="onFatherAgeInput" type="number" min="10" max="130" placeholder="Âge en années (ex : 42)" class="w-full px-4 py-3 rounded-xl border border-amber-300 bg-amber-50/30 focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
-                                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded">ans</span>
-                                        </div>
-                                        <div class="text-[10px] font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 flex items-center gap-1.5">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                            Présumé âgé de {{ form.parents_metadata.father_age || '..' }} ans (vers {{ form.parents_metadata.father_birth_year || '...' }})
-                                        </div>
+                                    <div class="text-[10px] font-bold text-amber-800 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 flex items-center gap-1.5">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        Mention : <strong>« Né vers {{ form.parents_metadata.father_birth_year || '...' }} »</strong>
                                     </div>
+                                </div>
+                                <div v-else-if="form.parents_metadata.father_birth_type === 'age'" class="space-y-2">
+                                    <div class="relative">
+                                        <input v-model.number="form.parents_metadata.father_age" @input="onFatherAgeInput" type="number" min="10" max="130" placeholder="Âge en années (ex : 42)" class="w-full px-4 py-2.5 rounded-xl border border-amber-300 bg-amber-50/30 focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
+                                        <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded">ans</span>
+                                    </div>
+                                    <div class="text-[10px] font-bold text-amber-800 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 flex items-center gap-1.5">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        Mention : <strong>« Présumé âgé de {{ form.parents_metadata.father_age || '..' }} ans (vers {{ form.parents_metadata.father_birth_year || '...' }}) »</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Profession & Lieu de naissance -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                    <input v-model="form.parents_metadata.father_profession" type="text" placeholder="Ex: Enseignant, Pêcheur..." class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
-                                    <input v-model="form.parents_metadata.father_place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
+                                    <input v-model="form.parents_metadata.father_place_of_birth" type="text" placeholder="Ex: Ziguinchor, Enampore..." class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                             </div>
+
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
-                                <input v-model="form.parents_metadata.father_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
+                                <input v-model="form.parents_metadata.father_domicile" type="text" placeholder="Ex: Enampore, Maison Sane" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                             </div>
                             </template>
                         </div>
+
                         <!-- Mère -->
-                        <div class="p-6 bg-pink-50/40 rounded-2xl border border-pink-100 space-y-4">
-                            <h4 class="text-[10px] font-black text-pink-900 uppercase tracking-widest flex items-center gap-2">
-                                <div class="w-1.5 h-1.5 bg-pink-500 rounded-full"></div>
-                                Mère
-                            </h4>
+                        <div class="p-6 bg-pink-50/50 rounded-3xl border border-pink-200/70 shadow-2xs space-y-4">
+                            <div class="flex items-center justify-between pb-3 border-b border-pink-100">
+                                <h4 class="text-xs font-black text-pink-900 uppercase tracking-widest flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-pink-500 rounded-full"></span>
+                                    Mère
+                                </h4>
+                            </div>
+
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Prénoms &amp; Nom de la Mère <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
-                                <input v-model="form.mother_name" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
+                                <input v-model="form.mother_name" type="text" placeholder="Prénoms et Nom de la mère" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-gray-800 shadow-2xs" :required="!form.is_old_registry && !is_edit" />
                             </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
-                                <input v-model="form.parents_metadata.mother_profession" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1.5 pl-1">
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                                            Date de naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span>
+
+                            <!-- Bloc Dédié Date de Naissance de la Mère -->
+                            <div class="p-4 bg-white rounded-2xl border border-pink-200/90 shadow-2xs space-y-3">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-gray-100">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-pink-900 uppercase tracking-widest">
+                                            Date de Naissance de la Mère <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span>
                                         </label>
-                                        <div class="inline-flex p-0.5 bg-gray-100 rounded-lg border border-gray-200 text-[10px] font-bold gap-0.5 self-start sm:self-auto shadow-2xs">
-                                            <button type="button" 
-                                                @click="setMotherBirthType('exact')"
-                                                :class="form.parents_metadata.mother_birth_type === 'exact' ? 'bg-white text-[#1E690F] shadow-xs font-black' : 'text-gray-500 hover:text-gray-700'"
-                                                class="px-2 py-0.5 rounded transition-all cursor-pointer">Exacte</button>
-                                            <button type="button" 
-                                                @click="setMotherBirthType('vers')"
-                                                :class="form.parents_metadata.mother_birth_type === 'vers' ? 'bg-[#1E690F] text-white shadow-xs font-black' : 'text-gray-500 hover:text-gray-700'"
-                                                class="px-2 py-0.5 rounded transition-all cursor-pointer">Née vers</button>
-                                            <button type="button" 
-                                                @click="setMotherBirthType('age')"
-                                                :class="form.parents_metadata.mother_birth_type === 'age' ? 'bg-[#1E690F] text-white shadow-xs font-black' : 'text-gray-500 hover:text-gray-700'"
-                                                class="px-2 py-0.5 rounded transition-all cursor-pointer">Âge</button>
-                                        </div>
+                                        <span class="text-[10px] text-gray-400 font-medium">Précision exacte ou estimation</span>
                                     </div>
-                                    <div v-if="form.parents_metadata.mother_birth_type === 'exact'">
-                                        <input v-model="form.parents_metadata.mother_date_of_birth" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
+                                    <div class="inline-flex p-0.5 bg-gray-100 rounded-xl border border-gray-200 text-[10px] font-bold gap-0.5 self-start sm:self-auto">
+                                        <button type="button" 
+                                            @click="setMotherBirthType('exact')"
+                                            :class="form.parents_metadata.mother_birth_type === 'exact' ? 'bg-[#1E690F] text-white shadow-xs font-black' : 'text-gray-600 hover:text-gray-900'"
+                                            class="px-2.5 py-1 rounded-lg transition-all cursor-pointer">Date exacte</button>
+                                        <button type="button" 
+                                            @click="setMotherBirthType('vers')"
+                                            :class="form.parents_metadata.mother_birth_type === 'vers' ? 'bg-[#1E690F] text-white shadow-xs font-black' : 'text-gray-600 hover:text-gray-900'"
+                                            class="px-2.5 py-1 rounded-lg transition-all cursor-pointer">Née vers</button>
+                                        <button type="button" 
+                                            @click="setMotherBirthType('age')"
+                                            :class="form.parents_metadata.mother_birth_type === 'age' ? 'bg-[#1E690F] text-white shadow-xs font-black' : 'text-gray-600 hover:text-gray-900'"
+                                            class="px-2.5 py-1 rounded-lg transition-all cursor-pointer">Âge présumé</button>
                                     </div>
-                                    <div v-else-if="form.parents_metadata.mother_birth_type === 'vers'" class="space-y-1.5">
-                                        <div class="relative">
-                                            <input v-model.number="form.parents_metadata.mother_birth_year" @input="onMotherYearInput" type="number" min="1850" :max="new Date().getFullYear()" placeholder="Année (ex : 1952)" class="w-full px-4 py-3 rounded-xl border border-amber-300 bg-amber-50/30 focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
-                                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded">Année</span>
-                                        </div>
-                                        <div class="text-[10px] font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 flex items-center gap-1.5">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                            Mention : <strong>Née vers {{ form.parents_metadata.mother_birth_year || '...' }}</strong>
-                                        </div>
+                                </div>
+                                <div v-if="form.parents_metadata.mother_birth_type === 'exact'">
+                                    <input v-model="form.parents_metadata.mother_date_of_birth" type="date" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold text-gray-800" :required="!form.is_old_registry && !is_edit" />
+                                </div>
+                                <div v-else-if="form.parents_metadata.mother_birth_type === 'vers'" class="space-y-2">
+                                    <div class="relative">
+                                        <input v-model.number="form.parents_metadata.mother_birth_year" @input="onMotherYearInput" type="number" min="1850" :max="new Date().getFullYear()" placeholder="Année de naissance (ex : 1952)" class="w-full px-4 py-2.5 rounded-xl border border-amber-300 bg-amber-50/30 focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
+                                        <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded">Année</span>
                                     </div>
-                                    <div v-else-if="form.parents_metadata.mother_birth_type === 'age'" class="space-y-1.5">
-                                        <div class="relative">
-                                            <input v-model.number="form.parents_metadata.mother_age" @input="onMotherAgeInput" type="number" min="10" max="130" placeholder="Âge en années (ex : 38)" class="w-full px-4 py-3 rounded-xl border border-amber-300 bg-amber-50/30 focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
-                                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded">ans</span>
-                                        </div>
-                                        <div class="text-[10px] font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 flex items-center gap-1.5">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                            Présumée âgée de {{ form.parents_metadata.mother_age || '..' }} ans (vers {{ form.parents_metadata.mother_birth_year || '...' }})
-                                        </div>
+                                    <div class="text-[10px] font-bold text-amber-800 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 flex items-center gap-1.5">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        Mention : <strong>« Née vers {{ form.parents_metadata.mother_birth_year || '...' }} »</strong>
                                     </div>
+                                </div>
+                                <div v-else-if="form.parents_metadata.mother_birth_type === 'age'" class="space-y-2">
+                                    <div class="relative">
+                                        <input v-model.number="form.parents_metadata.mother_age" @input="onMotherAgeInput" type="number" min="10" max="130" placeholder="Âge en années (ex : 38)" class="w-full px-4 py-2.5 rounded-xl border border-amber-300 bg-amber-50/30 focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
+                                        <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded">ans</span>
+                                    </div>
+                                    <div class="text-[10px] font-bold text-amber-800 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 flex items-center gap-1.5">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        Mention : <strong>« Présumée âgée de {{ form.parents_metadata.mother_age || '..' }} ans (vers {{ form.parents_metadata.mother_birth_year || '...' }}) »</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Profession & Lieu de naissance -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Profession <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
+                                    <input v-model="form.parents_metadata.mother_profession" type="text" placeholder="Ex: Ménagère, Commerçante..." class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Lieu de naissance <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
-                                    <input v-model="form.parents_metadata.mother_place_of_birth" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
+                                    <input v-model="form.parents_metadata.mother_place_of_birth" type="text" placeholder="Ex: Ziguinchor, Enampore..." class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                                 </div>
                             </div>
+
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Domicile <span v-if="!form.is_old_registry && !is_edit" class="text-red-500">*</span></label>
-                                <input v-model="form.parents_metadata.mother_domicile" type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
+                                <input v-model="form.parents_metadata.mother_domicile" type="text" placeholder="Ex: Enampore, Maison Sane" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" :required="!form.is_old_registry && !is_edit" />
                             </div>
                         </div>
                     </div>
