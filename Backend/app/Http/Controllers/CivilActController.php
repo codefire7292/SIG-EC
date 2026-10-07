@@ -270,6 +270,8 @@ class CivilActController extends Controller
         $model = $this->getModel($type);
         $act = $model->with(['registry', 'validator'])->findOrFail($id);
 
+        $act->recordAuditLog('consultation');
+
         return Inertia::render('CivilActs/Show', [
             'act' => $act,
             'type' => $type,
@@ -1166,6 +1168,18 @@ class CivilActController extends Controller
 
         // Use direct DB update or unrestricted query to bypass Fillable protection securely
         $model::where('id', $act->id)->update($updateData);
+
+        $actionName = match ($newStatus) {
+            'valide' => 'validation',
+            'signe' => 'signature',
+            'rejete' => 'rejet',
+            'a_corriger' => 'demande_correction',
+            default => 'changement_statut',
+        };
+        $act->recordAuditLog($actionName, [
+            'previous_status' => $act->status,
+            'new_status' => $newStatus,
+        ]);
 
         // Notifier l'agent émetteur si renvoyé à la correction
         if ($newStatus === 'a_corriger' && $act->creator) {

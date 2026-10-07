@@ -140,6 +140,8 @@ class UserController extends Controller
 
         $user->update(['is_active' => !$user->is_active]);
 
+        $user->recordAuditLog($user->is_active ? 'reactivation_compte' : 'suspension_compte');
+
         $msg = $user->is_active
             ? "Le compte de {$user->name} a été réactivé."
             : "Le compte de {$user->name} a été suspendu.";

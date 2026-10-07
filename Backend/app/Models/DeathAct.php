@@ -10,10 +10,11 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use App\Models\AuditLog;
+use App\Traits\HasAuditLogs;
 
 class DeathAct extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasAuditLogs;
 
     protected $fillable = [
         'registry_id',
@@ -100,21 +101,10 @@ class DeathAct extends Model
             ->get();
     }
 
-    public function recordAuditLog(string $action): void
+    public function getAuditTargetSummary(): string
     {
-        AuditLog::create([
-            'user_id' => auth()->id(),
-            'action' => $action,
-            'auditable_type' => self::class,
-            'auditable_id' => $this->id,
-            'metadata' => [
-                'status' => $this->status,
-                'reference' => $this->reference_number,
-                'version' => $this->version_number,
-            ],
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-        ]);
+        $name = trim(($this->deceased_first_name ?? '') . ' ' . ($this->deceased_last_name ?? ''));
+        return "Acte de Décès N° {$this->reference_number}" . ($name ? " ({$name})" : '');
     }
 
     public function attachments(): MorphMany

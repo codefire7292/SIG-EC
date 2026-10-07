@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Traits\HasAuditLogs;
+
 class Registry extends Model
 {
-    use HasFactory;
+    use HasFactory, HasAuditLogs;
 
     protected $fillable = [
         'civil_registration_center_id',
@@ -54,5 +56,10 @@ class Registry extends Model
     public function certificates(): HasMany
     {
         return $this->hasMany(CivilCertificate::class);
+    }
+
+    public function getAuditTargetSummary(): string
+    {
+        return "Registre " . ucfirst($this->type) . " {$this->year} (Vol. {$this->number})";
     }
 }

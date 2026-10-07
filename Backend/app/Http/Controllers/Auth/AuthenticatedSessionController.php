@@ -66,6 +66,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user->recordAuditLog('connexion');
+
         return redirect()->intended(route('dashboard'));
     }
 
@@ -74,6 +76,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request)
     {
+        if ($user = Auth::user()) {
+            $user->recordAuditLog('deconnexion');
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
@@ -132,6 +138,8 @@ class AuthenticatedSessionController extends Controller
         }
 
         $user->save();
+
+        $user->recordAuditLog('modification_mot_de_passe');
 
         // Refresh user in guard
         Auth::setUser($user);

@@ -239,6 +239,8 @@ class RegistryController extends Controller
             'closing_date' => now(),
         ]);
 
+        $registry->recordAuditLog('fermeture_registre');
+
         return back()->with('success', 'Registre clôturé avec succès.');
     }
 
@@ -256,6 +258,8 @@ class RegistryController extends Controller
             'status' => 'open',
             'closing_date' => null,
         ]);
+
+        $registry->recordAuditLog('reouverture_registre');
 
         return back()->with('success', 'Registre réouvert avec succès.');
     }

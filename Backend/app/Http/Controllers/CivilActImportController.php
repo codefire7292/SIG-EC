@@ -104,6 +104,14 @@ class CivilActImportController extends Controller
         try {
             Excel::import($importClass, $request->file('file'));
 
+            $reg = Registry::find($registryId);
+            if ($reg) {
+                $reg->recordAuditLog('import', [
+                    'act_type' => $type,
+                    'file_name' => $request->file('file')->getClientOriginalName(),
+                ]);
+            }
+
             $failures = $importClass->failures();
             if ($failures->count() > 0) {
                 return back()->with('warning', "Importation complétée avec {$failures->count()} erreurs de validation.");

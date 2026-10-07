@@ -51,7 +51,7 @@ const navigation = computed(() => {
             title: 'Sécurité & Contrôle',
             items: [
                 { name: 'Vérification QR', href: '/verify-certificate/search', icon: ShieldCheckIcon, show: true },
-                { name: "Journaux d'Audit", href: '#', icon: ClipboardDocumentListIcon, show: isAdmin },
+                { name: "Module de Contrôle (Audit)", href: '/admin/audit-logs', icon: ClipboardDocumentListIcon, show: userPermissions.includes('view-logs') || userPermissions.includes('manage-users') || isAdmin },
             ]
         },
         {

@@ -154,5 +154,11 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('settings.index');
             Route::post('settings', [\App\Http\Controllers\SettingController::class, 'update'])->name('settings.update');
         });
+
+        Route::middleware('permission:view-logs')->group(function() {
+            Route::get('audit-logs', [\App\Http\Controllers\AuditLogController::class, 'index'])->name('audit-logs.index');
+            Route::get('audit-logs/export', [\App\Http\Controllers\AuditLogController::class, 'export'])->name('audit-logs.export');
+            Route::get('audit-logs/{id}', [\App\Http\Controllers\AuditLogController::class, 'show'])->name('audit-logs.show');
+        });
     });
 });

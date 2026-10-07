@@ -148,6 +148,14 @@ class CertificateVerificationController extends Controller
 
         $pdfContent = $documentService->generateActExtractPdf($act, $type, $volet);
 
+        if (auth()->check()) {
+            $act->recordAuditLog('telechargement_extrait', [
+                'volet' => $volet,
+                'type' => $type,
+                'reference' => $act->reference_number,
+            ]);
+        }
+
         $filename = $volet ? 'extrait_volet' . $volet . '_' . $type . '_' . $act->reference_number . '.pdf' : 'extrait_' . $type . '_' . $act->reference_number . '.pdf';
 
         return response($pdfContent, 200, [

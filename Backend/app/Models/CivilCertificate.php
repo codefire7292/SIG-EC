@@ -98,4 +98,11 @@ class CivilCertificate extends Model
     {
         return $this->hasMany(self::class, 'parent_id')->orderBy('version_number', 'asc');
     }
+
+    public function getAuditTargetSummary(): string
+    {
+        $applicant = trim(($this->applicant_first_name ?? '') . ' ' . ($this->applicant_last_name ?? ''));
+        $ref = $this->reference_number ?: "ID {$this->id}";
+        return "Certificat N° {$ref}" . ($applicant ? " ({$applicant})" : '');
+    }
 }

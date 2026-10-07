@@ -17,15 +17,27 @@ trait HasAuditLogs
         });
 
         static::updated(function ($model) {
-            $model->recordAuditLog('modification', [
-                'changes' => $model->getChanges(),
-                'original' => array_intersect_key($model->getOriginal(), $model->getChanges()),
-            ]);
+            $changes = $model->getChanges();
+            unset($changes['updated_at'], $changes['remember_token']);
+
+            if (!empty($changes)) {
+                $original = array_intersect_key($model->getOriginal(), $changes);
+                $model->recordAuditLog('modification', [
+                    'changes' => $changes,
+                    'original' => $original,
+                ]);
+            }
         });
 
         static::deleted(function ($model) {
             $model->recordAuditLog('suppression');
         });
+
+        if (method_exists(static::class, 'restored')) {
+            static::restored(function ($model) {
+                $model->recordAuditLog('restauration');
+            });
+        }
     }
 
     /**
@@ -33,13 +45,32 @@ trait HasAuditLogs
      */
     public function recordAuditLog(string $action, ?array $extraMetadata = [])
     {
-        $metadata = array_merge([
-            'ip' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-        ], $extraMetadata);
+        $user = Auth::user();
+        $ip = request()?->ip() ?? '127.0.0.1';
+        $userAgent = request()?->userAgent() ?? 'System';
 
-        AuditLog::create([
-            'user_id' => Auth::id(),
+        $baseMetadata = [
+            'ip' => $ip,
+            'user_agent' => $userAgent,
+            'user_name' => $user?->name,
+            'user_email' => $user?->email,
+            'user_role' => $user?->getRoleNames()->first(),
+        ];
+
+        if (method_exists($this, 'getAuditTargetSummary')) {
+            $baseMetadata['target_summary'] = $this->getAuditTargetSummary();
+        } elseif (isset($this->reference_number)) {
+            $baseMetadata['target_summary'] = class_basename($this) . ' #' . $this->reference_number;
+        } elseif (isset($this->certificate_number)) {
+            $baseMetadata['target_summary'] = class_basename($this) . ' #' . $this->certificate_number;
+        } elseif (isset($this->name)) {
+            $baseMetadata['target_summary'] = class_basename($this) . ' ' . $this->name;
+        }
+
+        $metadata = array_merge($baseMetadata, $extraMetadata ?? []);
+
+        return AuditLog::create([
+            'user_id' => $user?->id ?? Auth::id(),
             'auditable_id' => $this->id,
             'auditable_type' => get_class($this),
             'action' => $action,

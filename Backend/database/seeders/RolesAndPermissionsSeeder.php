@@ -73,6 +73,7 @@ class RolesAndPermissionsSeeder extends Seeder
             UserRole::SUPERVISEUR->value => [
                 'view-registries',
                 'manage-registries',
+                'view-logs',
                 'validate-intermediate',
                 'manage-corrections',
                 'print-extracts',

@@ -16,11 +16,12 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Notifications\ResetPasswordNotification;
+use App\Traits\HasAuditLogs;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes, HasAuditLogs;
 
     /**
      * Send the password reset notification.
@@ -91,4 +92,9 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public function getAuditTargetSummary(): string
+    {
+        return "Agent / Utilisateur {$this->name} ({$this->email})";
+    }
 }
