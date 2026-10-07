@@ -11,10 +11,31 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class AuditLogController extends Controller
 {
     /**
+     * Ensure only Administrators and the Mayor can access the audit module.
+     */
+    private function authorizeAuditAccess(): void
+    {
+        $user = auth()->user();
+        if (!$user) {
+            abort(403, 'Utilisateur non authentifié.');
+        }
+
+        $userRole = $user->getRoleNames()->first() ?? '';
+        $isAdmin = str_contains(mb_strtolower($userRole), 'admin') || $user->hasRole(\App\Enums\UserRole::ADMIN->value);
+        $isMaire = str_contains(mb_strtolower($userRole), 'maire') || $user->hasRole(\App\Enums\UserRole::MAIRE->value);
+
+        if (!$isAdmin && !$isMaire) {
+            abort(403, 'Accès réservé exclusivement aux Administrateurs et au Maire.');
+        }
+    }
+
+    /**
      * Display the Audit & Control Module index page.
      */
     public function index(Request $request)
     {
+        $this->authorizeAuditAccess();
+
         $query = AuditLog::with(['user' => function ($q) {
             $q->withTrashed();
         }, 'auditable' => function ($q) {
@@ -159,6 +180,8 @@ class AuditLogController extends Controller
      */
     public function show(int $id)
     {
+        $this->authorizeAuditAccess();
+
         $log = AuditLog::with(['user' => function ($q) {
             $q->withTrashed();
         }, 'auditable' => function ($q) {
@@ -175,6 +198,8 @@ class AuditLogController extends Controller
      */
     public function export(Request $request): StreamedResponse
     {
+        $this->authorizeAuditAccess();
+
         $query = AuditLog::with(['user' => function ($q) {
             $q->withTrashed();
         }])->latest('id');

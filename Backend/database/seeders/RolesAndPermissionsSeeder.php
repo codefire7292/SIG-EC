@@ -62,6 +62,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'sign-legally',
                 'view-registries',
                 'print-extracts',
+                'view-logs',
             ],
             UserRole::OFFICIER->value => [
                 'create-drafts',
@@ -73,7 +74,6 @@ class RolesAndPermissionsSeeder extends Seeder
             UserRole::SUPERVISEUR->value => [
                 'view-registries',
                 'manage-registries',
-                'view-logs',
                 'validate-intermediate',
                 'manage-corrections',
                 'print-extracts',

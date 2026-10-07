@@ -21,7 +21,7 @@ class AuditLogTest extends TestCase
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
     }
 
-    public function test_admin_and_supervisor_can_access_audit_logs()
+    public function test_admin_and_mayor_can_access_audit_logs()
     {
         $admin = User::factory()->create();
         $admin->assignRole(UserRole::ADMIN->value);
@@ -35,11 +35,11 @@ class AuditLogTest extends TestCase
             ->has('agents')
         );
 
-        $supervisor = User::factory()->create();
-        $supervisor->assignRole(UserRole::SUPERVISEUR->value);
+        $maire = User::factory()->create();
+        $maire->assignRole(UserRole::MAIRE->value);
 
-        $responseSup = $this->actingAs($supervisor)->get(route('admin.audit-logs.index'));
-        $responseSup->assertStatus(200);
+        $responseMaire = $this->actingAs($maire)->get(route('admin.audit-logs.index'));
+        $responseMaire->assertStatus(200);
     }
 
     public function test_unauthorized_user_cannot_access_audit_logs()
@@ -49,6 +49,12 @@ class AuditLogTest extends TestCase
 
         $response = $this->actingAs($agent)->get(route('admin.audit-logs.index'));
         $response->assertStatus(403);
+
+        $supervisor = User::factory()->create();
+        $supervisor->assignRole(UserRole::SUPERVISEUR->value);
+
+        $responseSup = $this->actingAs($supervisor)->get(route('admin.audit-logs.index'));
+        $responseSup->assertStatus(403);
     }
 
     public function test_act_creation_and_status_update_records_audit_logs()

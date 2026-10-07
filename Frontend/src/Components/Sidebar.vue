@@ -22,8 +22,11 @@ const props = defineProps({
 const page = usePage()
 
 const navigation = computed(() => {
-    const userPermissions = page.props.auth.user.permissions || []
-    const isAdmin = page.props.auth.user.role === 'Administrateur'
+    const userRole = page.props.auth.user?.role || ''
+    const userPermissions = page.props.auth.user?.permissions || []
+    const isAdmin = userRole === 'Administrateur technique' || userRole === 'Administrateur' || userRole.toLowerCase().includes('admin')
+    const isMaire = userRole === 'Maire ou Délégué' || userRole.toLowerCase().includes('maire')
+    const canViewAudit = isAdmin || isMaire
 
     return [
         {
@@ -51,7 +54,7 @@ const navigation = computed(() => {
             title: 'Sécurité & Contrôle',
             items: [
                 { name: 'Vérification QR', href: '/verify-certificate/search', icon: ShieldCheckIcon, show: true },
-                { name: "Module de Contrôle (Audit)", href: '/admin/audit-logs', icon: ClipboardDocumentListIcon, show: userPermissions.includes('view-logs') || userPermissions.includes('manage-users') || isAdmin },
+                { name: "Module de Contrôle (Audit)", href: '/admin/audit-logs', icon: ClipboardDocumentListIcon, show: canViewAudit },
             ]
         },
         {
