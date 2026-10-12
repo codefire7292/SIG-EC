@@ -416,23 +416,4 @@ class RegistryTest extends TestCase
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['reference_number']);
     }
-
-    public function test_excel_import_and_download_permissions()
-    {
-        $agent = User::factory()->create();
-        $agent->assignRole(UserRole::OFFICIER->value); // restricted role
-        $agent->givePermissionTo('create-drafts');
-
-        $supervisor = User::factory()->create();
-        $supervisor->assignRole(UserRole::SUPERVISEUR->value); // allowed role
-        $supervisor->givePermissionTo('create-drafts');
-
-        // Agent should be forbidden
-        $response = $this->actingAs($agent)->get(route('acts.naissance.template'));
-        $response->assertStatus(403);
-
-        // Supervisor should be allowed
-        $response = $this->actingAs($supervisor)->get(route('acts.naissance.template'));
-        $response->assertStatus(200);
-    }
 }

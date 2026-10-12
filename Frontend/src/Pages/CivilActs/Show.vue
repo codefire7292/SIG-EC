@@ -265,23 +265,9 @@ const goBack = () => {
                         <template v-if="canCreateAct">
                             <!-- Si l'acte provient d'un ancien registre -->
                             <template v-if="isOldRegistryAct">
-                                <Link v-if="isCurrentRegistryOpen" :href="nextActInRegistryUrl"
-                                      class="inline-flex items-center px-4 py-2.5 sm:px-5 sm:py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg shadow-amber-900/15 transition-all active:scale-95"
-                                      :title="`Saisir l'acte suivant dans ce registre ${act.registry?.reference_prefix || ''}`">
-                                    <BookOpenIcon class="h-4 w-4 mr-2 stroke-[2.5]" />
-                                    <span>Saisir dans ce registre (Vol. {{ act.registry?.number }} - {{ act.registry?.year }})</span>
-                                </Link>
-
-                                <Link :href="`/acts/${type}/create?old_registry=1`"
-                                      class="inline-flex items-center px-4 py-2.5 sm:px-4 sm:py-3 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-2xl text-xs font-black uppercase tracking-wider transition-all active:scale-95"
-                                      title="Choisir un autre volume d'ancien registre">
-                                    <PlusCircleIcon class="h-4 w-4 mr-1.5" />
-                                    <span>Autre Ancien Registre</span>
-                                </Link>
-
                                 <Link :href="`/acts/${type}/create`"
-                                      class="inline-flex items-center px-4 py-2.5 sm:px-4 sm:py-3 bg-[#1E690F] hover:bg-[#16500B] text-white rounded-2xl text-xs font-black uppercase tracking-wider shadow-sm transition-all active:scale-95">
-                                    <PlusIcon class="h-4 w-4 mr-1.5 stroke-[3]" />
+                                      class="inline-flex items-center px-5 py-3 bg-[#1E690F] hover:bg-[#16500B] text-white rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg shadow-green-900/15 transition-all active:scale-95">
+                                    <PlusIcon class="h-4 w-4 mr-2 stroke-[3]" />
                                     <span>Déclaration Ordinaire</span>
                                 </Link>
                             </template>

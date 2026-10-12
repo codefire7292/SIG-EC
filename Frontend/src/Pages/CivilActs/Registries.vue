@@ -334,54 +334,52 @@ const formatDate = (d) => {
                 </div>
             </div>
 
-            <!-- ── Barre de Navigation "Année par Année" (Onglets Rapides) ── -->
+            <!-- ── Barre de Navigation "Année par Année" (Liste Déroulante) ── -->
             <div v-if="availableYears.length > 0" class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-                <div class="flex items-center justify-between gap-3 mb-3">
-                    <div class="flex items-center gap-2">
-                        <CalendarIcon class="h-4 w-4 text-blue-600" />
-                        <span class="text-xs font-black uppercase tracking-wider text-gray-800">Vérification Année par Année</span>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="p-2 bg-blue-50 text-blue-600 rounded-xl">
+                            <CalendarIcon class="h-4 w-4 stroke-[2.5]" />
+                        </div>
+                        <div>
+                            <span class="text-xs font-black uppercase tracking-wider text-gray-800 block">Vérification Année par Année</span>
+                            <span class="text-[11px] font-medium text-gray-500 block mt-0.5">
+                                {{ selectedYear === 'all' 
+                                    ? `Toutes les années (${registries.length} volume(s) au total)` 
+                                    : `Année ${selectedYear} sélectionnée (${volumeCountsByYear[selectedYear] || 0} volume(s))` }}
+                            </span>
+                        </div>
                     </div>
-                    <span class="text-[11px] font-bold text-gray-400">
-                        {{ selectedYear === 'all' ? 'Toutes les années sélectionnées' : `Année ${selectedYear} active` }}
-                    </span>
-                </div>
 
-                <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
-                    <button
-                        type="button"
-                        @click="selectedYear = 'all'"
-                        class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap flex items-center gap-2"
-                        :class="selectedYear === 'all'
-                            ? 'bg-blue-600 text-white shadow-md shadow-blue-200'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-                    >
-                        <span>Toutes les années</span>
-                        <span
-                            class="px-2 py-0.5 rounded-full text-[10px] font-black"
-                            :class="selectedYear === 'all' ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'"
-                        >
-                            {{ registries.length }}
-                        </span>
-                    </button>
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <div class="relative flex-1 sm:w-72 md:w-80">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-blue-600">
+                                <CalendarIcon class="h-4 w-4" />
+                            </div>
+                            <select
+                                v-model="selectedYear"
+                                class="w-full pl-10 pr-9 py-2.5 bg-gray-50 hover:bg-gray-100/80 border border-gray-200 rounded-xl text-xs font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all cursor-pointer appearance-none shadow-sm"
+                            >
+                                <option value="all">Toutes les années ({{ registries.length }} volumes)</option>
+                                <option v-for="yr in availableYears" :key="yr" :value="yr">
+                                    Année {{ yr }} ({{ volumeCountsByYear[yr] || 0 }} volume{{ (volumeCountsByYear[yr] || 0) > 1 ? 's' : '' }})
+                                </option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-gray-400">
+                                <ChevronDownIcon class="h-4 w-4 stroke-[2]" />
+                            </div>
+                        </div>
 
-                    <button
-                        v-for="yr in availableYears"
-                        :key="yr"
-                        type="button"
-                        @click="selectedYear = yr"
-                        class="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap flex items-center gap-2"
-                        :class="Number(selectedYear) === Number(yr)
-                            ? 'bg-blue-600 text-white shadow-md shadow-blue-200'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-                    >
-                        <span>Année {{ yr }}</span>
-                        <span
-                            class="px-2 py-0.5 rounded-full text-[10px] font-black"
-                            :class="Number(selectedYear) === Number(yr) ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'"
+                        <button
+                            v-if="selectedYear !== 'all'"
+                            type="button"
+                            @click="selectedYear = 'all'"
+                            title="Réinitialiser à toutes les années"
+                            class="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 rounded-xl transition-all shadow-sm flex items-center justify-center shrink-0"
                         >
-                            {{ volumeCountsByYear[yr] || 0 }} vol.
-                        </span>
-                    </button>
+                            <XMarkIcon class="h-4 w-4 stroke-[2]" />
+                        </button>
+                    </div>
                 </div>
             </div>
 

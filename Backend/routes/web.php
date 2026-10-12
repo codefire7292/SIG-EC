@@ -125,8 +125,6 @@ Route::middleware(['auth'])->group(function (): void {
                 Route::get("/list", [\App\Http\Controllers\CivilActController::class, 'index'])->name('index')->defaults('type', $type);
                 Route::get("/create", [\App\Http\Controllers\CivilActController::class, 'create'])->name('create')->defaults('type', $type);
                 Route::post("/", [\App\Http\Controllers\CivilActController::class, 'store'])->name('store')->defaults('type', $type);
-                Route::get("/template", [\App\Http\Controllers\CivilActImportController::class, 'downloadTemplate'])->name('template')->defaults('type', $type);
-                Route::post("/import", [\App\Http\Controllers\CivilActImportController::class, 'import'])->name('import')->defaults('type', $type);
                 Route::get("/{id}", [\App\Http\Controllers\CivilActController::class, 'show'])->name('show')->defaults('type', $type);
                 Route::get("/{id}/edit", [\App\Http\Controllers\CivilActController::class, 'edit'])->name('edit')->defaults('type', $type);
                 Route::patch("/{id}", [\App\Http\Controllers\CivilActController::class, 'update'])->name('update')->defaults('type', $type);
