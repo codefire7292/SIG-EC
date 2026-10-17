@@ -375,7 +375,15 @@ class CivilActController extends Controller
                 $refDate = $type === 'deces'
                     ? ($request->input('date_of_death') ?: $request->input('act_registration_date'))
                     : $request->input('act_registration_date');
-                $refYear = $refDate ? (int) date('Y', strtotime($refDate)) : (int) date('Y');
+                $refYear = (int) date('Y');
+                if ($refDate) {
+                    $refYear = (int) date('Y', strtotime($refDate));
+                } elseif ($request->filled('registry_id')) {
+                    $reg = \App\Models\Registry::find($request->input('registry_id'));
+                    if ($reg && $reg->year) {
+                        $refYear = (int) $reg->year;
+                    }
+                }
                 $year = max(1850, $refYear - $age);
                 $request->merge([
                     'presumed_age' => $age,
@@ -891,7 +899,7 @@ class CivilActController extends Controller
                 'time_of_birth'                           => ($isOldRegistry || $id || $isApprox) ? 'nullable|date_format:H:i' : 'required|date_format:H:i',
                 'place_of_birth'                          => 'required|string',
                 'health_facility'                         => ($isOldRegistry || $id || $isApprox) ? 'nullable|string' : 'required|string',
-                'act_registration_date'                   => 'required|date',
+                'act_registration_date'                   => 'nullable|date',
                 'gender'                                  => 'required|in:M,F',
                 'is_judgment'                             => 'nullable|boolean',
                 'judgment_number'                         => $judgmentRule . '|string',
@@ -1066,7 +1074,7 @@ class CivilActController extends Controller
                 'time_of_death'                             => 'required|date_format:H:i',
                 'place_of_death'                            => 'required|string',
                 'health_facility'                           => 'required|string',
-                'act_registration_date'                     => 'required|date',
+                'act_registration_date'                     => 'nullable|date',
                 'cause_of_death'                            => 'nullable|string',
                 'is_judgment'                               => 'nullable|boolean',
                 'judgment_number'                           => $judgmentRule . '|string',

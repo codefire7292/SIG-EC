@@ -839,6 +839,68 @@ class CivilActTest extends TestCase
         $this->assertStringNotContainsString('500 Ko', $ageErrors[0]);
         $this->assertStringContainsString('âge présumé', mb_strtolower($ageErrors[0]));
     }
+
+    public function test_can_create_birth_act_without_act_registration_date(): void
+    {
+        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole(\App\Enums\UserRole::ADMIN->value);
+        $this->actingAs($user);
+
+        $response = $this->post(route('acts.naissance.store'), [
+            'reference_number' => '2024/NAI/NOREGDATE',
+            'registry_id' => $this->registry->id,
+            'first_name' => 'OptionalDate',
+            'last_name' => 'Child',
+            'date_of_birth' => '2024-01-01',
+            'time_of_birth' => '10:00',
+            'place_of_birth' => 'Dakar',
+            'health_facility' => 'Centre de Santé',
+            'gender' => 'M',
+            'father_name' => 'Father',
+            'mother_name' => 'Mother',
+            'parents_metadata' => [
+                'father_profession' => 'Ingénieur',
+                'father_date_of_birth' => '1990-01-01',
+                'father_place_of_birth' => 'Dakar',
+                'father_domicile' => 'Dakar Plateau',
+                'mother_profession' => 'Médecin',
+                'mother_date_of_birth' => '1992-02-02',
+                'mother_place_of_birth' => 'Dakar',
+                'mother_domicile' => 'Dakar Plateau',
+            ],
+            'doc_cni_pere' => \Illuminate\Http\UploadedFile::fake()->create('cni_pere.pdf', 100, 'application/pdf'),
+            'doc_cni_mere' => \Illuminate\Http\UploadedFile::fake()->create('cni_mere.pdf', 100, 'application/pdf'),
+            'doc_acte_naissance' => \Illuminate\Http\UploadedFile::fake()->create('acte_naissance.pdf', 100, 'application/pdf'),
+            'doc_cni_declarant' => \Illuminate\Http\UploadedFile::fake()->create('cni_declarant.pdf', 100, 'application/pdf'),
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('birth_acts', [
+            'first_name' => 'Optionaldate',
+            'act_registration_date' => null,
+        ]);
+
+        $act = BirthAct::where('first_name', 'Optionaldate')->first();
+        $this->assertNotNull($act);
+        $this->assertNull($act->act_registration_date);
+
+        // Verify volet PDF view renders without error when act_registration_date is null
+        $view = view('pdf.volet', [
+            'act' => $act,
+            'type' => 'naissance',
+            'title' => 'Naissance',
+            'volet' => 1,
+            'center' => null,
+            'qrCode' => '',
+            'logo' => '',
+            'timestamp' => '',
+        ])->render();
+
+        $this->assertNotEmpty($view);
+    }
 }
 
 

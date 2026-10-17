@@ -1015,8 +1015,8 @@ const submit = () => {
                                         <input v-model="form.time_of_death" type="time" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
                                     </div>
                                     <div>
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date d'inscription de l'acte <span class="text-red-500">*</span></label>
-                                        <input v-model="form.act_registration_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Date d'inscription de l'acte <span class="text-gray-400 font-bold ml-1 text-[9px]">(Optionnel)</span></label>
+                                        <input v-model="form.act_registration_date" type="date" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -2225,8 +2225,8 @@ const submit = () => {
                         Date d'Inscription de l'Acte
                     </h3>
                     <div>
-                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Fait à Enampore, le <span class="text-red-500">*</span></label>
-                        <input v-model="form.act_registration_date" type="date" class="w-full md:w-72 px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" required />
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 pl-1">Fait à Enampore, le <span class="text-gray-400 font-bold ml-1 text-[9px]">(Optionnel)</span></label>
+                        <input v-model="form.act_registration_date" type="date" class="w-full md:w-72 px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E690F] focus:border-[#1E690F] font-bold" />
                     </div>
                 </div>
 

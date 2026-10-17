@@ -233,10 +233,10 @@
     $birthMonthDigits = (!$isApprox && $act->date_of_birth) ? toDigitArray($act->date_of_birth->format('m'), 2) : ['-','-'];
     $birthYearDigits = toDigitArray($birthYearStr, 4);
 
-    $declDate = $act->act_registration_date ?? now();
-    $declDayDigits = toDigitArray($declDate->format('d'), 2);
-    $declMonthDigits = toDigitArray($declDate->format('m'), 2);
-    $declYearDigits = toDigitArray($declDate->format('Y'), 4);
+    $declDate = $act->act_registration_date;
+    $declDayDigits = $declDate ? toDigitArray($declDate->format('d'), 2) : ['-','-'];
+    $declMonthDigits = $declDate ? toDigitArray($declDate->format('m'), 2) : ['-','-'];
+    $declYearDigits = $declDate ? toDigitArray($declDate->format('Y'), 4) : ['-','-','-','-'];
 @endphp
 
 <div class="container">
@@ -469,7 +469,7 @@
         <div style="margin-bottom: 6px;">
             <strong>EN FOI DE QUOI, NOUS AVONS REDIGE LE PRESENT ACTE</strong><br>
             Fait à <span class="dotted-line" style="min-width: 130px;">{!! dotField(strtoupper($centerObj->commune ?? $centerObj->name ?? 'ENAMPORE'), 16) !!}</span>, le 
-            <span class="dotted-line" style="min-width: 120px;">{!! dotField($declDate->format('d / m / Y'), 15) !!}</span>
+            <span class="dotted-line" style="min-width: 120px;">{!! dotField($declDate ? $declDate->format('d / m / Y') : '', 15) !!}</span>
         </div>
         <table>
             <tr>
